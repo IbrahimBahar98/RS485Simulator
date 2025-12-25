@@ -435,11 +435,10 @@ class CompleteFlowMeterGUI:
             self._set_server_ui_state(False, f"✗ Failed to start server: cannot open port '{port}': {type(e).__name__}: {e}")
             return
 
-        # Covers a wide range so register addressing differences don't cause illegal-address reads.
-        # Keeps everything else the same (same addresses in setValues()).
-        IR_BASE = 0
+        # Use 1-based addressing to match Modbus protocol (registers start at 1, not 0)
+        IR_BASE = 1
         IR_LEN = 2000   # plenty for 772..813 and more
-        HR_BASE = 0
+        HR_BASE = 1
         HR_LEN = 2000
 
         self.ir_block_110 = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
