@@ -10,6 +10,7 @@ import asyncio
 import struct
 import json
 import serial
+import logging
 
 from pymodbus.server import StartAsyncSerialServer
 from pymodbus.datastore import context, sparse
@@ -411,6 +412,8 @@ class CompleteFlowMeterGUI:
         test.close()
 
     def start_server(self):
+        logging.basicConfig(level=logging.INFO)
+        logging.getLogger("pymodbus").setLevel(logging.DEBUG)
         if self.server_running:
             self.log("Server already running!")
             return
@@ -432,24 +435,18 @@ class CompleteFlowMeterGUI:
             self._set_server_ui_state(False, f"✗ Failed to start server: cannot open port '{port}': {type(e).__name__}: {e}")
             return
 
-        # Create data blocks for both devices
-        # Input Registers (FC 04)
-        self.ir_block_110 = sparse.ModbusSparseDataBlock({
-            772: [0] * 50,  # Covers 772-821 (includes all input registers)
-        })
+        # Covers a wide range so register addressing differences don't cause illegal-address reads.
+        # Keeps everything else the same (same addresses in setValues()).
+        IR_BASE = 0
+        IR_LEN = 2000   # plenty for 772..813 and more
+        HR_BASE = 0
+        HR_LEN = 2000
 
-        self.ir_block_111 = sparse.ModbusSparseDataBlock({
-            772: [0] * 50,
-        })
+        self.ir_block_110 = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
+        self.ir_block_111 = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
 
-        # Holding Registers (FC 03)
-        self.hr_block_110 = sparse.ModbusSparseDataBlock({
-            261: [0] * 30,  # Covers 261-290 (includes all holding registers)
-        })
-
-        self.hr_block_111 = sparse.ModbusSparseDataBlock({
-            261: [0] * 30,
-        })
+        self.hr_block_110 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
+        self.hr_block_111 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
 
         # Create device contexts with BOTH input and holding registers
         store_110 = context.ModbusDeviceContext(ir=self.ir_block_110, hr=self.hr_block_110)
