@@ -448,6 +448,16 @@ class CompleteFlowMeterGUI:
         self.hr_block_110 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
         self.hr_block_111 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
 
+        # Populate the dictionaries so update_registers() can find them
+        self.ir_blocks = {
+            110: self.ir_block_110,
+            111: self.ir_block_111
+        }
+        self.hr_blocks = {
+            110: self.hr_block_110,
+            111: self.hr_block_111
+        }
+
         # Create device contexts with BOTH input and holding registers
         store_110 = context.ModbusDeviceContext(ir=self.ir_block_110, hr=self.hr_block_110)
         store_111 = context.ModbusDeviceContext(ir=self.ir_block_111, hr=self.hr_block_111)
