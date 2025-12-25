@@ -627,8 +627,10 @@ class CompleteFlowMeterGUI:
                     if self.register_map.get("alm_low_val", {}).get("enabled", True):
                         hr_block.setValues(self.register_map["alm_low_val"]["address"], pack_float32(self.var_alm_low_val.get()))
 
-            except Exception:
-                pass  # Silently ignore update errors
+            except Exception as e:
+                self.log(f"✗ Error updating registers: {type(e).__name__}: {e}")
+                import traceback
+                self.log(traceback.format_exc())
 
         # Schedule next update (user-configurable period)
         try:
