@@ -381,7 +381,7 @@ class CompleteFlowMeterGUI:
             self.log_area.insert(tk.END, message + '\n')
             self.log_area.see(tk.END)
         self.root.after(0, append)
-    
+
     def _set_server_ui_state(self, running: bool, message: str | None = None):
         """Update UI state for server start/stop in a thread-safe way."""
         def apply():
@@ -420,11 +420,16 @@ class CompleteFlowMeterGUI:
 
         port = self.var_port.get()
         baud = int(self.var_baud.get())
+        try:
+            slave_ids = self._parse_slave_ids()
+        except Exception as e:
+            messagebox.showerror("Invalid Slave IDs", f"{e}")
+            return
 
         self.log("=" * 60)
         self.log("Starting Complete Modbus RTU Server...")
         self.log(f"Port: {port}, Baud: {baud}")
-        self.log(f"Slave IDs: 110, 111")
+        self.log(f"Slave IDs: {', '.join(str(x) for x in slave_ids)}")
         self.log("=" * 60)
 
         # Preflight check: fail fast and keep UI intuitive
@@ -442,24 +447,19 @@ class CompleteFlowMeterGUI:
         HR_BASE = 0
         HR_LEN = 2000
 
-        self.ir_block_110 = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
-        self.ir_block_111 = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
+        # Build one ModbusDeviceContext per slave id (separate register spaces).
+        self.ir_blocks = {}
+        self.hr_blocks = {}
+        slaves = {}
+        for sid in slave_ids:
+            ir_block = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
+            hr_block = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
+            self.ir_blocks[sid] = ir_block
+            self.hr_blocks[sid] = hr_block
+            slaves[sid] = context.ModbusDeviceContext(ir=ir_block, hr=hr_block)
 
-        self.hr_block_110 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
-        self.hr_block_111 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
-
-        # Create device contexts with BOTH input and holding registers
-        store_110 = context.ModbusDeviceContext(ir=self.ir_block_110, hr=self.hr_block_110)
-        store_111 = context.ModbusDeviceContext(ir=self.ir_block_111, hr=self.hr_block_111)
-
-        # Create server context with BOTH devices
-        self.server_context = context.ModbusServerContext(
-            devices={
-                110: store_110,
-                111: store_111
-            },
-            single=False
-        )
+        # Multi-slave mode (unit id matters)
+        self.server_context = context.ModbusServerContext(slaves=slaves, single=False)
 
         # Start server thread
         self.server_running = True
@@ -507,7 +507,9 @@ class CompleteFlowMeterGUI:
 
             async def serve():
                 self.log("✓ Async server starting...")
-                await StartAsyncSerialServer(
+                # StartAsyncSerialServer typically runs until stopped; run it as a task
+                # so the coroutine can continue and update the UI/log.
+                loop.create_task(StartAsyncSerialServer(
                     context=self.server_context,
                     port=port,
                     baudrate=baud,
@@ -515,8 +517,8 @@ class CompleteFlowMeterGUI:
                     parity='N',
                     stopbits=1,
                     timeout=1
-                )
-                self.log("✓ Server is now listening for requests!")
+                ))
+                self._set_server_ui_state(True, "✓ Server is now listening for requests!")
                 self.log(f"✓ Responding to slave IDs: {self.var_slave_ids.get()}")
                 self.log("✓ Input Registers (FC 04) and Holding Registers (FC 03) ready")
 
