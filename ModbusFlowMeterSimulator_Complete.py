@@ -123,6 +123,10 @@ class TextHandler(logging.Handler):
     def emit(self, record):
         msg = self.format(record)
         
+        # FILTER: Prevent performance degradation from Device 100 spam
+        if "requested device id does not exist: 100" in msg:
+            return  # Silently drop to prevent GUI/performance issues
+        
         # Simple color coding based on content
         tag = "INFO"
         if "Received" in msg or "recv" in msg.lower():
@@ -559,11 +563,14 @@ class FlowMeterSimulatorApp:
             # To support multiple slaves, we need a different approach
             
             # Create slave context dict mapping slave ID to our shim
-            # AUTOMATICALLY ADD SLAVE 111 for dual-device support
+            # AUTOMATICALLY ADD SLAVE 111 & 100 for multi-device support
             slaves = {slave_id: slave_context}
             if slave_id != 111:
                 slaves[111] = slave_context
                 self.log("✓ Auto-added Slave ID 111 for dual-device simulation")
+            if slave_id != 100:
+                slaves[100] = slave_context
+                self.log("✓ Auto-added Slave ID 100 to eliminate error overhead")
 
             try:
                 # Proper initialization with 'devices' arg (PyModbus v3.x)
@@ -704,25 +711,28 @@ class FlowMeterSimulatorApp:
             self.root.after(0, log_error)
 
     def stop_server(self):
-        self.log("⚠ Stopping server... (Restart App to fully reset port)")
-        
-        # PATCH: Use ServerStop to actually kill the thread
-        if ServerStop:
-            try:
-                ServerStop()
-                self.log("✓ ServerStop() called.")
-            except Exception as e:
-                self.log(f"Error calling ServerStop: {e}")
-        
         try:
-            # Stop internal thread reference
-            if self.server_thread and self.server_thread.is_alive():
-                 self.log("Thread stop signal sent. (Background thread may persist until app exit)")
-        except Exception:
-            pass
+            self.log("⚠ Stopping server... (Restart App to fully reset port)")
             
-        self.start_btn.config(state="normal")
-        self.stop_btn.config(state="disabled")
+            # NOTE: ServerStop() doesn't work with synchronous StartSerialServer
+            # The server thread will continue until the app exits
+            self.log("⚠ Server thread will stop when app closes (synchronous server limitation)")
+                
+            self.start_btn.config(state="normal")
+            self.stop_btn.config(state="disabled")
+            self.log("✓ Stop button handler completed successfully")
+        except Exception as e:
+            # Catch and log any crash
+            import traceback
+            error_msg = f"CRASH in stop_server: {e}\n{traceback.format_exc()}"
+            self.log(error_msg)
+            print(error_msg)  # Also print to console
+            # Try to re-enable buttons even if there was an error
+            try:
+                self.start_btn.config(state="normal")
+                self.stop_btn.config(state="disabled")
+            except:
+                pass
 
 
 if __name__ == "__main__":
