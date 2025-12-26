@@ -1,767 +1,734 @@
-"""
-Complete Flow Meter Modbus RTU Simulator
-Supports both Slave ID 110 and 111 with all registers
-"""
 import tkinter as tk
-from tkinter import ttk, scrolledtext
-from tkinter import filedialog, messagebox
+from tkinter import ttk, messagebox
 import threading
-import asyncio
-import struct
-import json
-import serial
 import logging
+import asyncio
+import serial.tools.list_ports
+import struct
+import sys
+import time
 
-from pymodbus.server import StartAsyncSerialServer
-from pymodbus.datastore import context, sparse
+# --- Pymodbus v3.x Robust Imports ---
+print(f"Debug: Pymodbus import check...")
+
+# Check Serial Dependency
+try:
+    import serial
+    print(f"Debug: serial imported from {serial.__file__}")
+except ImportError as e:
+    print(f"Debug: FAILED to import serial: {e}")
+
+StartSerialServer = None
+StartAsyncSerialServer = None
+ModbusSerialServer = None
+ServerStop = None  # PATCH: Added for v3.11.4
+
+try:
+    import pymodbus.server
+    print(f"Debug: pymodbus.server dir: {dir(pymodbus.server)}")
+except ImportError as e:
+    print(f"Debug: Failed to import pymodbus.server module: {e}")
+
+try:
+    from pymodbus.server import StartSerialServer
+    print("Debug: Imported StartSerialServer")
+except ImportError as e:
+    print(f"Debug: Failed to import StartSerialServer: {e}")
+
+try:
+    from pymodbus.server import StartAsyncSerialServer
+    print("Debug: Imported StartAsyncSerialServer")
+except ImportError as e:
+    print(f"Debug: Failed to import StartAsyncSerialServer: {e}")
+
+try:
+    from pymodbus.server import ModbusSerialServer
+    print("Debug: Imported ModbusSerialServer")
+except ImportError as e:
+    print(f"Debug: Failed to import ModbusSerialServer: {e}")
+
+# PATCH: Import ServerStop for v3.11.4 compatibility
+try:
+    from pymodbus.server import ServerStop
+    print("Debug: Imported ServerStop")
+except ImportError as e:
+    print(f"Debug: Failed to import ServerStop: {e}")
+
+try:
+    from pymodbus.device import ModbusDeviceIdentification
+except ImportError:
+    ModbusDeviceIdentification = None
+
+# Datastore Imports - Try multiple strategies for v3.x
+ModbusServerContext = None
+ModbusSlaveContext = None
+ModbusSequentialDataBlock = None
+
+# Strategy 1: Try v3.6+ imports
+try:
+    from pymodbus.datastore import ModbusServerContext
+    from pymodbus.datastore import ModbusSequentialDataBlock
+    print("Debug: Imported ModbusServerContext and ModbusSequentialDataBlock")
+    
+    # Try to import ModbusSlaveContext (doesn't exist in v3.6+)
+    try:
+        from pymodbus.datastore import ModbusSlaveContext
+        print("Debug: Imported ModbusSlaveContext")
+    except ImportError:
+        # In v3.6+, we build slave context manually as dict
+        print("Debug: ModbusSlaveContext not available (v3.6+ - will use dict approach)")
+        
+except ImportError as e:
+    print(f"Debug: Strategy 1 failed: {e}")
+
+# Strategy 2: Individual imports with fallbacks for older v3.x
+if ModbusServerContext is None:
+    try:
+        from pymodbus.datastore.context import ModbusServerContext
+        print("Debug: Imported ModbusServerContext from .context")
+    except ImportError as e:
+        print(f"Debug: Failed to import ModbusServerContext: {e}")
+
+if ModbusSequentialDataBlock is None:
+    try:
+        from pymodbus.datastore.store import ModbusSequentialDataBlock
+        print("Debug: Imported ModbusSequentialDataBlock from .store")
+    except ImportError:
+        try:
+            from pymodbus.datastore.sequential import ModbusSequentialDataBlock
+            print("Debug: Imported ModbusSequentialDataBlock from .sequential")
+        except ImportError as e:
+            print(f"Debug: Failed to import ModbusSequentialDataBlock: {e}")
+
+# Final check and report
+print(f"Debug: ModbusServerContext = {ModbusServerContext}")
+print(f"Debug: ModbusSlaveContext = {ModbusSlaveContext}")
+print(f"Debug: ModbusSequentialDataBlock = {ModbusSequentialDataBlock}")
+
+# Configure logging
+logging.basicConfig()
+log = logging.getLogger()
+log.setLevel(logging.INFO)
 
 
-class CompleteFlowMeterGUI:
+class TextHandler(logging.Handler):
+    def __init__(self, text_widget):
+        super().__init__()
+        self.text_widget = text_widget
+        self.text_widget.tag_config("RX", foreground="blue")
+        self.text_widget.tag_config("TX", foreground="green")
+        self.text_widget.tag_config("ERR", foreground="red")
+        self.text_widget.tag_config("INFO", foreground="black")
+
+    def emit(self, record):
+        msg = self.format(record)
+        
+        # Simple color coding based on content
+        tag = "INFO"
+        if "Received" in msg or "recv" in msg.lower():
+            tag = "RX"
+        elif "Sending" in msg or "send" in msg.lower():
+            tag = "TX"
+        elif "Error" in msg or "Exception" in msg:
+            tag = "ERR"
+            
+        def append():
+            self.text_widget.configure(state='normal')
+            self.text_widget.insert('end', msg + '\n', tag)
+            self.text_widget.see('end')
+            self.text_widget.configure(state='disabled')
+            
+        # Ensure thread safety for GUI updates
+        self.text_widget.after(0, append)
+
+
+# --- Custom ModbusSlaveContext to fix v3.x compatibility ---
+class ModbusSlaveContext:
+    """
+    Shim class to replace the missing ModbusSlaveContext in Pymodbus v3.x.
+    It wraps the 4 data blocks (di, co, hr, ir) and provides the required interface.
+    """
+    def __init__(self, di=None, co=None, hr=None, ir=None, zero_mode=False):
+        self.store = {}
+        if di: self.store['d'] = di
+        if co: self.store['c'] = co
+        if hr: self.store['h'] = hr
+        if ir: self.store['i'] = ir
+        self.zero_mode = zero_mode
+
+    def __str__(self):
+        return "ModbusSlaveContext"
+
+    def reset(self):
+        for block in self.store.values():
+            block.reset()
+
+    def validate(self, fx, address, count=1):
+        if fx in [1, 5, 15]: block = self.store.get('c')
+        elif fx in [2]:      block = self.store.get('d')
+        elif fx in [3, 6, 16]: block = self.store.get('h')
+        elif fx in [4]:      block = self.store.get('i')
+        else: return False
+        
+        if not block: return False
+        return block.validate(address, count)
+
+    def getValues(self, fx, address, count=1):
+        # logging.debug(f"getValues fx={fx}, addr={address}, count={count}")
+        if fx in [1, 5, 15]: block = self.store.get('c')
+        elif fx in [2]:      block = self.store.get('d')
+        elif fx in [3, 6, 16]: block = self.store.get('h')
+        elif fx in [4]:      block = self.store.get('i')
+        else: return []
+        
+        vals = block.getValues(address, count)
+        # logging.debug(f" -> Returning: {vals}")
+        return vals
+
+    def setValues(self, fx, address, values):
+        if fx in [1, 5, 15]: block = self.store.get('c')
+        elif fx in [2]:      block = self.store.get('d')
+        elif fx in [3, 6, 16]: block = self.store.get('h')
+        elif fx in [4]:      block = self.store.get('i')
+        else: return
+        
+        block.setValues(address, values)
+        
+    async def async_getValues(self, fx, address, count=1):
+        return self.getValues(fx, address, count)
+        
+    async def async_setValues(self, fx, address, values):
+        return self.setValues(fx, address, values)
+
+
+class FlowMeterSimulatorApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Complete Flow Meter Simulator")
-        self.root.geometry("800x700")
+        self.root.title("Flow Meter Simulator (Modbus RTU Slave) - FIXED v3.11.4")
+        self.root.geometry("900x850")
 
-        self.server_running = False
         self.server_thread = None
+        self.stop_server_event = threading.Event()
+        self.context = None
+        self.store = None
 
-        # Connection Variables
-        self.var_port = tk.StringVar(value="COM18")
-        self.var_baud = tk.StringVar(value="9600")
+        self.setup_ui()
+        
+        # Setup Logging to GUI
+        self.logger = logging.getLogger("pymodbus")
+        self.logger.setLevel(logging.INFO)
+        self.logger.handlers = []
+        
+        self.log_handler = TextHandler(self.log_text)
+        self.log_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s', '%H:%M:%S'))
+        self.logger.addHandler(self.log_handler)
+        
+        self.my_logger = logging.getLogger("SimApp")
+        self.my_logger.setLevel(logging.INFO)
+        self.my_logger.addHandler(self.log_handler)
+        
+        # Check imports availability
+        if not StartAsyncSerialServer and not StartSerialServer:
+            self.my_log("ERROR: Could not import Pymodbus Server function. Check version.")
 
-        # --- New: Server + UI configuration (user-editable) ---
-        self.var_slave_ids = tk.StringVar(value="110,111")     # Allow add/remove devices
-        self.var_update_period_ms = tk.IntVar(value=500)       # Update period (ms)
-        self.var_byte_order = tk.StringVar(value="CDAB")       # Word/byte order mode
+    def my_log(self, msg):
+        self.my_logger.info(msg)
 
-        # Slider scaling/limits + precision (user-editable)
-        self.var_flow_max = tk.DoubleVar(value=500.0)
-        self.var_flow_precision = tk.IntVar(value=1)           # decimals
-        self.var_cond_max = tk.DoubleVar(value=1000.0)
-        self.var_cond_precision = tk.IntVar(value=1)           # decimals
+    def setup_ui(self):
+        # Configuration Frame
+        config_frame = ttk.LabelFrame(self.root, text="Configuration", padding="10")
+        config_frame.pack(fill="x", padx=10, pady=5)
 
-        # Register map (editable as JSON text)
-        # Note: keep current behavior as default (matches existing hardcoded map).
-        self.register_map = {
-            "forward_total": {"fc": "ir", "address": 772, "type": "uint32", "enabled": True},
-            "unit_info": {"fc": "ir", "address": 774, "type": "uint16", "enabled": True},
-            "alarm_flags": {"fc": "ir", "address": 777, "type": "uint16", "enabled": True},
-            "flow_rate": {"fc": "ir", "address": 778, "type": "float32", "enabled": True},
-            "overflow_count": {"fc": "ir", "address": 786, "type": "uint16", "enabled": True},
-            "conductivity": {"fc": "ir", "address": 812, "type": "float32", "enabled": True},
+        # COM Port
+        ttk.Label(config_frame, text="COM Port:").grid(row=0, column=0, padx=5, pady=5)
+        self.com_port_var = tk.StringVar()
+        self.com_port_combo = ttk.Combobox(config_frame, textvariable=self.com_port_var)
+        self.com_port_combo.grid(row=0, column=1, padx=5, pady=5)
+        self.refresh_ports()
+        ttk.Button(config_frame, text="Refresh", command=self.refresh_ports).grid(row=0, column=2, padx=5, pady=5)
 
-            "flow_range": {"fc": "hr", "address": 261, "type": "float32", "enabled": True},
-            "alm_high_val": {"fc": "hr", "address": 281, "type": "float32", "enabled": True},
-            "alm_low_val": {"fc": "hr", "address": 284, "type": "float32", "enabled": True},
-        }
+        # Baudrate
+        ttk.Label(config_frame, text="Baudrate:").grid(row=1, column=0, padx=5, pady=5)
+        self.baudrate_var = tk.IntVar(value=9600)
+        ttk.Combobox(config_frame, textvariable=self.baudrate_var, values=[4800, 9600, 19200, 38400, 57600, 115200]).grid(row=1, column=1, padx=5, pady=5)
 
-        # Input Registers (FC 04) - Process Variables
-        self.var_flow_rate = tk.DoubleVar(value=125.5)          # Reg 778-779 (float32)
-        self.var_alarm_flags = tk.IntVar(value=0)               # Reg 777 (uint16)
-        self.var_forward_total = tk.IntVar(value=1000000)       # Reg 772-773 (uint32)
-        self.var_forward_overflow = tk.IntVar(value=0)          # Reg 786 (uint16)
-        self.var_unit_info = tk.IntVar(value=3)                 # Reg 774 (uint16) - 3=m3/h
-        self.var_conductivity = tk.DoubleVar(value=450.2)       # Reg 812-813 (float32)
+        # Slave ID
+        ttk.Label(config_frame, text="Slave ID:").grid(row=2, column=0, padx=5, pady=5)
+        self.slave_id_var = tk.IntVar(value=1)
+        ttk.Entry(config_frame, textvariable=self.slave_id_var).grid(row=2, column=1, padx=5, pady=5)
 
-        # Holding Registers (FC 03) - Configuration Parameters
-        self.var_flow_range = tk.DoubleVar(value=500.0)         # Reg 261-262 (float32)
-        self.var_alm_high_val = tk.DoubleVar(value=400.0)       # Reg 281-282 (float32)
-        self.var_alm_low_val = tk.DoubleVar(value=10.0)         # Reg 284-285 (float32)
+        # Start/Stop Buttons
+        self.start_btn = ttk.Button(config_frame, text="Start Server", command=self.start_server)
+        self.start_btn.grid(row=3, column=0, padx=5, pady=10)
+        self.stop_btn = ttk.Button(config_frame, text="Stop Server", command=self.stop_server, state="disabled")
+        self.stop_btn.grid(row=3, column=1, padx=5, pady=10)
+        
+        # Traffic Toggle
+        self.show_traffic_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(config_frame, text="Show Bus Traffic (Hex)", variable=self.show_traffic_var, command=self.toggle_traffic).grid(row=3, column=2, padx=5)
 
-        # Alarm checkboxes
-        self.var_alarm_empty = tk.BooleanVar(value=False)       # Bit 0
-        self.var_alarm_excitation = tk.BooleanVar(value=False)  # Bit 1
-        self.var_alarm_high = tk.BooleanVar(value=False)        # Bit 2
-        self.var_alarm_low = tk.BooleanVar(value=False)         # Bit 3
-
-        # Runtime-created device blocks are stored here (keyed by slave id)
-        self.ir_blocks = {}
-        self.hr_blocks = {}
-
-        self._init_ui()
-
-    def _init_ui(self):
-        # Connection Frame
-        conn_frame = ttk.LabelFrame(self.root, text="Connection", padding=10)
-        conn_frame.pack(fill="x", padx=10, pady=5)
-
-        ttk.Label(conn_frame, text="Port:").grid(row=0, column=0, padx=5)
-        ttk.Entry(conn_frame, textvariable=self.var_port, width=10).grid(row=0, column=1, padx=5)
-
-        ttk.Label(conn_frame, text="Baud:").grid(row=0, column=2, padx=5)
-        ttk.Entry(conn_frame, textvariable=self.var_baud, width=10).grid(row=0, column=3, padx=5)
-
-        ttk.Label(conn_frame, text="Slave IDs:", font=("Arial", 9, "bold")).grid(row=0, column=4, padx=10, sticky="e")
-        ttk.Entry(conn_frame, textvariable=self.var_slave_ids, width=12).grid(row=0, column=5, padx=5, sticky="w")
-
-        self.btn_start = ttk.Button(conn_frame, text="Start Server", command=self.start_server)
-        self.btn_start.grid(row=0, column=6, padx=10)
-
-        # Create notebook for tabs
-        notebook = ttk.Notebook(self.root)
-        notebook.pack(fill="both", expand=True, padx=10, pady=5)
-
-        # Tab 1: Process Variables (Input Registers)
-        process_frame = ttk.Frame(notebook, padding=10)
-        notebook.add(process_frame, text="Process Variables (Input Regs)")
-
-        row = 0
+        # Simulation Controls Frame
+        sim_frame = ttk.LabelFrame(self.root, text="Simulation Controls (High Level)", padding="10")
+        sim_frame.pack(fill="x", padx=10, pady=5)
+        
         # Flow Rate
-        ttk.Label(process_frame, text="Flow Rate (Reg 778-779):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        self.scale_flow = ttk.Scale(
-            process_frame,
-            from_=0,
-            to=float(self.var_flow_max.get()),
-            variable=self.var_flow_rate,
-            command=self._on_flow_slider
-        )
-        self.scale_flow.grid(row=row, column=1, sticky="ew", padx=5)
-        ttk.Entry(process_frame, textvariable=self.var_flow_rate, width=10).grid(row=row, column=2, padx=5)
-        ttk.Label(process_frame, text="m³/h").grid(row=row, column=3, sticky="w")
+        ttk.Label(sim_frame, text="Flow Rate (Float):").grid(row=0, column=0, padx=5, pady=5)
+        self.flow_rate_var = tk.DoubleVar(value=0.0)
+        self.flow_rate_entry = ttk.Entry(sim_frame, textvariable=self.flow_rate_var)
+        self.flow_rate_entry.grid(row=0, column=1, padx=5, pady=5)
+        ttk.Button(sim_frame, text="Set Flow Rate", command=self.set_flow_rate).grid(row=0, column=2, padx=5, pady=5)
 
-        row += 1
         # Conductivity
-        ttk.Label(process_frame, text="Conductivity (Reg 812-813):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        self.scale_cond = ttk.Scale(
-            process_frame,
-            from_=0,
-            to=float(self.var_cond_max.get()),
-            variable=self.var_conductivity,
-            command=self._on_cond_slider
-        )
-        self.scale_cond.grid(row=row, column=1, sticky="ew", padx=5)
-        ttk.Entry(process_frame, textvariable=self.var_conductivity, width=10).grid(row=row, column=2, padx=5)
-        ttk.Label(process_frame, text="µS/cm").grid(row=row, column=3, sticky="w")
+        ttk.Label(sim_frame, text="Conductivity (Float):").grid(row=1, column=0, padx=5, pady=5)
+        self.conductivity_var = tk.DoubleVar(value=0.0)
+        self.conductivity_entry = ttk.Entry(sim_frame, textvariable=self.conductivity_var)
+        self.conductivity_entry.grid(row=1, column=1, padx=5, pady=5)
+        ttk.Button(sim_frame, text="Set Conductivity", command=self.set_conductivity).grid(row=1, column=2, padx=5, pady=5)
 
-        row += 1
-        ttk.Separator(process_frame, orient="horizontal").grid(row=row, column=0, columnspan=4, sticky="ew", pady=10)
+        # Forward Total (Uint32)
+        ttk.Label(sim_frame, text="Forward Total (Uint32):").grid(row=2, column=0, padx=5, pady=5)
+        self.fwd_total_var = tk.IntVar(value=0)
+        self.fwd_total_entry = ttk.Entry(sim_frame, textvariable=self.fwd_total_var)
+        self.fwd_total_entry.grid(row=2, column=1, padx=5, pady=5)
+        ttk.Button(sim_frame, text="Set Total", command=self.set_fwd_total).grid(row=2, column=2, padx=5, pady=5)
 
-        row += 1
-        # Forward Total
-        ttk.Label(process_frame, text="Forward Total (Reg 772-773):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        ttk.Entry(process_frame, textvariable=self.var_forward_total, width=15).grid(row=row, column=1, sticky="w", padx=5)
-        ttk.Button(process_frame, text="+1000", command=lambda: self.var_forward_total.set(self.var_forward_total.get() + 1000)).grid(row=row, column=2)
+        # Alarm Flags (Bitfield) - ROW 3
+        ttk.Label(sim_frame, text="Alarm Flags (Hex):").grid(row=3, column=0, padx=5, pady=5)
+        self.alarm_flags_var = tk.StringVar(value="0x0000")
+        self.alarm_flags_entry = ttk.Entry(sim_frame, textvariable=self.alarm_flags_var)
+        self.alarm_flags_entry.grid(row=3, column=1, padx=5, pady=5)
+        ttk.Button(sim_frame, text="Set Alarms", command=self.set_alarm_flags).grid(row=3, column=2, padx=5, pady=5)
 
-        row += 1
-        # Overflow Count
-        ttk.Label(process_frame, text="Overflow Count (Reg 786):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        ttk.Entry(process_frame, textvariable=self.var_forward_overflow, width=10).grid(row=row, column=1, sticky="w", padx=5)
-        ttk.Button(process_frame, text="Reset", command=lambda: self.var_forward_overflow.set(0)).grid(row=row, column=2)
+        # Quick Alarm Buttons - ROW 4
+        alarm_btn_frame = ttk.Frame(sim_frame)
+        alarm_btn_frame.grid(row=4, column=0, columnspan=3, pady=5)
+        ttk.Button(alarm_btn_frame, text="Empty Pipe ON", command=lambda: self.toggle_alarm_bit(0, True)).pack(side="left", padx=2)
+        ttk.Button(alarm_btn_frame, text="Empty Pipe OFF", command=lambda: self.toggle_alarm_bit(0, False)).pack(side="left", padx=2)
+        ttk.Button(alarm_btn_frame, text="High Flow ON", command=lambda: self.toggle_alarm_bit(2, True)).pack(side="left", padx=2)
+        ttk.Button(alarm_btn_frame, text="High Flow OFF", command=lambda: self.toggle_alarm_bit(2, False)).pack(side="left", padx=2)
 
-        row += 1
-        # Unit Info
-        ttk.Label(process_frame, text="Unit Code (Reg 774):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        ttk.Spinbox(process_frame, from_=0, to=10, textvariable=self.var_unit_info, width=10).grid(row=row, column=1, sticky="w", padx=5)
-        ttk.Label(process_frame, text="(0=L, 3=m³, etc.)").grid(row=row, column=2, sticky="w", columnspan=2)
+        # Data Frame
+        data_frame = ttk.LabelFrame(self.root, text="Raw Registers (Both HR & IR)", padding="10")
+        data_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
-        row += 1
-        ttk.Separator(process_frame, orient="horizontal").grid(row=row, column=0, columnspan=4, sticky="ew", pady=10)
+        # Register Map - Complete with all CR009 required registers
+        self.register_map = [
+            # Input Registers (FC 04) - Flow Meter Reads These
+            {"addr": 772, "name": "Forward Total (Word 0 - MSW)", "val": 0, "type": "IR"},
+            {"addr": 773, "name": "Forward Total (Word 1 - LSW)", "val": 0, "type": "IR"},
+            {"addr": 774, "name": "Unit Info", "val": 0x0403, "type": "IR"},  # Default: Total=L, Flow=L/s
+            {"addr": 777, "name": "Alarm Flags", "val": 0, "type": "IR"},
+            {"addr": 778, "name": "Flow Rate (Word 0 - MSW)", "val": 0, "type": "IR"},
+            {"addr": 779, "name": "Flow Rate (Word 1 - LSW)", "val": 0, "type": "IR"},
+            {"addr": 786, "name": "Forward Overflow Count", "val": 0, "type": "IR"},
+            {"addr": 812, "name": "Conductivity (Word 0 - MSW)", "val": 0, "type": "IR"},
+            {"addr": 813, "name": "Conductivity (Word 1 - LSW)", "val": 0, "type": "IR"},
+            
+            # Holding Registers (FC 03) - Configuration Parameters
+            {"addr": 261, "name": "Flow Range (Word 0 - MSW)", "val": 0x43D4, "type": "HR"},  # 424.0
+            {"addr": 262, "name": "Flow Range (Word 1 - LSW)", "val": 0x0000, "type": "HR"},
+            {"addr": 281, "name": "Alm High Val (Word 0 - MSW)", "val": 0x42C8, "type": "HR"},  # 100.0
+            {"addr": 282, "name": "Alm High Val (Word 1 - LSW)", "val": 0x0000, "type": "HR"},
+            {"addr": 284, "name": "Alm Low Val (Word 0 - MSW)", "val": 0x4120, "type": "HR"},   # 10.0
+            {"addr": 285, "name": "Alm Low Val (Word 1 - LSW)", "val": 0x0000, "type": "HR"},
+        ]
+        
+        # Table
+        self.tree = ttk.Treeview(data_frame, columns=("Address", "Type", "Name", "Value"), show="headings", height=15)
+        self.tree.heading("Address", text="Address")
+        self.tree.heading("Type", text="Type")
+        self.tree.heading("Name", text="Name")
+        self.tree.heading("Value", text="Value (Hex)")
+        self.tree.column("Address", width=70)
+        self.tree.column("Type", width=50)
+        self.tree.column("Name", width=250)
+        self.tree.column("Value", width=100)
+        self.tree.pack(fill="both", expand=True, side="left")
 
-        row += 1
-        # Alarms
-        ttk.Label(process_frame, text="Alarm Flags (Reg 777):", font=("Arial", 9, "bold")).grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        row += 1
-        alarm_frame = ttk.Frame(process_frame)
-        alarm_frame.grid(row=row, column=0, columnspan=4, sticky="w", padx=20)
-        ttk.Checkbutton(alarm_frame, text="Empty Pipe (Bit 0)", variable=self.var_alarm_empty, command=self.update_alarm_flags).pack(anchor="w")
-        ttk.Checkbutton(alarm_frame, text="Excitation Error (Bit 1)", variable=self.var_alarm_excitation, command=self.update_alarm_flags).pack(anchor="w")
-        ttk.Checkbutton(alarm_frame, text="High Flow (Bit 2)", variable=self.var_alarm_high, command=self.update_alarm_flags).pack(anchor="w")
-        ttk.Checkbutton(alarm_frame, text="Low Flow (Bit 3)", variable=self.var_alarm_low, command=self.update_alarm_flags).pack(anchor="w")
+        # Scrollbar
+        scrollbar = ttk.Scrollbar(data_frame, orient="vertical", command=self.tree.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.tree.configure(yscrollcommand=scrollbar.set)
 
-        process_frame.columnconfigure(1, weight=1)
+        # Initialize Data Rows
+        for reg in self.register_map:
+            self.tree.insert("", "end", iid=reg["addr"], 
+                           values=(reg["addr"], reg["type"], reg["name"], f"0x{reg['val']:04X}"))
 
-        # Tab 2: Configuration Parameters (Holding Registers)
-        config_frame = ttk.Frame(notebook, padding=10)
-        notebook.add(config_frame, text="Configuration (Holding Regs)")
+        # Edit Value
+        edit_frame = ttk.Frame(data_frame)
+        edit_frame.pack(fill="x", pady=5)
+        ttk.Label(edit_frame, text="Selected Register Value (Hex):").pack(side="left", padx=5)
+        self.edit_val_var = tk.StringVar(value="0x0000")
+        self.edit_entry = ttk.Entry(edit_frame, textvariable=self.edit_val_var)
+        self.edit_entry.pack(side="left", padx=5)
+        self.edit_entry.bind('<Return>', lambda e: self.update_register())
+        ttk.Button(edit_frame, text="Update", command=self.update_register).pack(side="left", padx=5)
+        
+        self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
+        
+        # Log Frame
+        log_frame = ttk.LabelFrame(self.root, text="Bus Traffic", padding="10")
+        log_frame.pack(fill="x", padx=10, pady=5)
+        self.log_text = tk.Text(log_frame, height=8, state="disabled", bg="black", fg="white")
+        self.log_text.pack(fill="x")
 
-        row = 0
-        # Flow Range
-        ttk.Label(config_frame, text="Flow Range (Reg 261-262):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        ttk.Entry(config_frame, textvariable=self.var_flow_range, width=15).grid(row=row, column=1, sticky="w", padx=5)
-        ttk.Label(config_frame, text="m³/h (Max flow)").grid(row=row, column=2, sticky="w")
+    def toggle_traffic(self):
+        if self.show_traffic_var.get():
+            self.logger.setLevel(logging.DEBUG)
+            self.my_log("Traffic Logging ENABLED")
+        else:
+            self.logger.setLevel(logging.INFO)
+            self.my_log("Traffic Logging DISABLED")
 
-        row += 1
-        # Alarm High Value
-        ttk.Label(config_frame, text="Alarm High Value (Reg 281-282):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        ttk.Entry(config_frame, textvariable=self.var_alm_high_val, width=15).grid(row=row, column=1, sticky="w", padx=5)
-        ttk.Label(config_frame, text="m³/h").grid(row=row, column=2, sticky="w")
+    def float_to_registers(self, value):
+        """Pack float as Big Endian, return (MSW, LSW)"""
+        b = struct.pack('>f', value)
+        regs = struct.unpack('>HH', b)
+        return regs[0], regs[1]  # MSW, LSW
 
-        row += 1
-        # Alarm Low Value
-        ttk.Label(config_frame, text="Alarm Low Value (Reg 284-285):").grid(row=row, column=0, sticky="w", padx=5, pady=5)
-        ttk.Entry(config_frame, textvariable=self.var_alm_low_val, width=15).grid(row=row, column=1, sticky="w", padx=5)
-        ttk.Label(config_frame, text="m³/h").grid(row=row, column=2, sticky="w")
+    def uint32_to_registers(self, value):
+        """Pack Uint32 as Big Endian, return (MSW, LSW)"""
+        b = struct.pack('>I', value)
+        regs = struct.unpack('>HH', b)
+        return regs[0], regs[1]  # MSW, LSW
 
-        row += 1
-        ttk.Label(config_frame, text="\nNote: These are configuration parameters that the EdgeBox reads on startup.",
-                  font=("Arial", 8, "italic")).grid(row=row, column=0, columnspan=3, sticky="w", padx=5, pady=10)
-
-        # Tab 3: Advanced (server settings + profile + register map)
-        adv_frame = ttk.Frame(notebook, padding=10)
-        notebook.add(adv_frame, text="Advanced")
-
-        # Server settings
-        settings_frame = ttk.LabelFrame(adv_frame, text="Server Settings", padding=10)
-        settings_frame.pack(fill="x", padx=5, pady=5)
-
-        r = 0
-        ttk.Label(settings_frame, text="Update period (ms):").grid(row=r, column=0, sticky="w", padx=5, pady=2)
-        ttk.Entry(settings_frame, textvariable=self.var_update_period_ms, width=10).grid(row=r, column=1, sticky="w", padx=5, pady=2)
-
-        ttk.Label(settings_frame, text="Byte/Word order:").grid(row=r, column=2, sticky="w", padx=5, pady=2)
-        ttk.Combobox(
-            settings_frame,
-            textvariable=self.var_byte_order,
-            values=["CDAB", "ABCD", "BADC", "DCBA"],
-            width=8,
-            state="readonly"
-        ).grid(row=r, column=3, sticky="w", padx=5, pady=2)
-
-        r += 1
-        ttk.Label(settings_frame, text="Flow max:").grid(row=r, column=0, sticky="w", padx=5, pady=2)
-        ttk.Entry(settings_frame, textvariable=self.var_flow_max, width=10).grid(row=r, column=1, sticky="w", padx=5, pady=2)
-
-        ttk.Label(settings_frame, text="Flow decimals:").grid(row=r, column=2, sticky="w", padx=5, pady=2)
-        ttk.Spinbox(settings_frame, from_=0, to=4, textvariable=self.var_flow_precision, width=8).grid(row=r, column=3, sticky="w", padx=5, pady=2)
-
-        r += 1
-        ttk.Label(settings_frame, text="Conductivity max:").grid(row=r, column=0, sticky="w", padx=5, pady=2)
-        ttk.Entry(settings_frame, textvariable=self.var_cond_max, width=10).grid(row=r, column=1, sticky="w", padx=5, pady=2)
-
-        ttk.Label(settings_frame, text="Cond decimals:").grid(row=r, column=2, sticky="w", padx=5, pady=2)
-        ttk.Spinbox(settings_frame, from_=0, to=4, textvariable=self.var_cond_precision, width=8).grid(row=r, column=3, sticky="w", padx=5, pady=2)
-
-        r += 1
-        ttk.Button(settings_frame, text="Apply Settings", command=self.apply_settings).grid(row=r, column=0, padx=5, pady=6, sticky="w")
-        ttk.Button(settings_frame, text="Save Profile", command=self.save_profile).grid(row=r, column=1, padx=5, pady=6, sticky="w")
-        ttk.Button(settings_frame, text="Load Profile", command=self.load_profile).grid(row=r, column=2, padx=5, pady=6, sticky="w")
-
-        # Register map editor (JSON)
-        map_frame = ttk.LabelFrame(adv_frame, text="Register Map (JSON)", padding=10)
-        map_frame.pack(fill="both", expand=True, padx=5, pady=5)
-
-        self.txt_register_map = scrolledtext.ScrolledText(map_frame, height=12, state="normal", font=("Consolas", 9))
-        self.txt_register_map.pack(fill="both", expand=True)
-        self._refresh_register_map_editor()
-
-        btns = ttk.Frame(map_frame)
-        btns.pack(fill="x", pady=6)
-        ttk.Button(btns, text="Apply Register Map", command=self.apply_register_map_from_editor).pack(side="left")
-        ttk.Button(btns, text="Reset to Defaults", command=self.reset_register_map_defaults).pack(side="left", padx=6)
-
-        # Tab 4: Log
-        log_frame = ttk.Frame(notebook, padding=10)
-        notebook.add(log_frame, text="Log")
-
-        self.log_area = scrolledtext.ScrolledText(log_frame, height=20, state='normal', font=("Consolas", 9))
-        self.log_area.pack(fill="both", expand=True)
-
-        # Start update loop
-        self.update_registers()
-
-    def _on_flow_slider(self, v):
-        """Slider callback respecting the configured decimal precision."""
+    def set_flow_rate(self):
         try:
-            decimals = int(self.var_flow_precision.get())
-        except Exception:
-            decimals = 1
-        self.var_flow_rate.set(round(float(v), decimals))
-
-    def _on_cond_slider(self, v):
-        """Slider callback respecting the configured decimal precision."""
-        try:
-            decimals = int(self.var_cond_precision.get())
-        except Exception:
-            decimals = 1
-        self.var_conductivity.set(round(float(v), decimals))
-
-    def _refresh_register_map_editor(self):
-        """Keep the register map editor in sync with the in-memory map."""
-        self.txt_register_map.delete("1.0", tk.END)
-        self.txt_register_map.insert(tk.END, json.dumps(self.register_map, indent=2, sort_keys=True))
-
-    def reset_register_map_defaults(self):
-        """Restore the default register map (same as original hardcoded behavior)."""
-        self.register_map = {
-            "forward_total": {"fc": "ir", "address": 772, "type": "uint32", "enabled": True},
-            "unit_info": {"fc": "ir", "address": 774, "type": "uint16", "enabled": True},
-            "alarm_flags": {"fc": "ir", "address": 777, "type": "uint16", "enabled": True},
-            "flow_rate": {"fc": "ir", "address": 778, "type": "float32", "enabled": True},
-            "overflow_count": {"fc": "ir", "address": 786, "type": "uint16", "enabled": True},
-            "conductivity": {"fc": "ir", "address": 812, "type": "float32", "enabled": True},
-            "flow_range": {"fc": "hr", "address": 261, "type": "float32", "enabled": True},
-            "alm_high_val": {"fc": "hr", "address": 281, "type": "float32", "enabled": True},
-            "alm_low_val": {"fc": "hr", "address": 284, "type": "float32", "enabled": True},
-        }
-        self._refresh_register_map_editor()
-        self.log("✓ Register map reset to defaults")
-
-    def apply_register_map_from_editor(self):
-        """Parse JSON from editor and replace the active register map."""
-        raw = self.txt_register_map.get("1.0", tk.END).strip()
-        try:
-            parsed = json.loads(raw)
-            if not isinstance(parsed, dict):
-                raise ValueError("Register map JSON must be an object/dict")
-            # Basic sanity checks so bad edits don't crash the update loop.
-            for key, cfg in parsed.items():
-                if not isinstance(cfg, dict):
-                    raise ValueError(f"'{key}' must be an object")
-                if cfg.get("fc") not in ("ir", "hr"):
-                    raise ValueError(f"'{key}.fc' must be 'ir' or 'hr'")
-                if not isinstance(cfg.get("address"), int):
-                    raise ValueError(f"'{key}.address' must be an integer")
-                if cfg.get("type") not in ("uint16", "uint32", "float32"):
-                    raise ValueError(f"'{key}.type' must be uint16/uint32/float32")
-                if not isinstance(cfg.get("enabled", True), bool):
-                    raise ValueError(f"'{key}.enabled' must be boolean")
-            self.register_map = parsed
-            self.log("✓ Register map applied")
+            val = self.flow_rate_var.get()
+            msw, lsw = self.float_to_registers(val)
+            self.update_register_direct(778, msw) 
+            self.update_register_direct(779, lsw)
+            self.log(f"✓ Set Flow Rate to {val} (778=0x{msw:04X}, 779=0x{lsw:04X})")
         except Exception as e:
-            messagebox.showerror("Invalid Register Map", f"Failed to apply register map:\n{e}")
+            messagebox.showerror("Error", f"Invalid Float: {e}")
 
-    def apply_settings(self):
-        """Apply settings that affect UI behavior (sliders) and the update loop timing."""
-        # Update slider ranges immediately (server doesn't need restart for this).
+    def set_conductivity(self):
         try:
-            flow_max = float(self.var_flow_max.get())
-            cond_max = float(self.var_cond_max.get())
-            if flow_max <= 0 or cond_max <= 0:
-                raise ValueError("Max values must be > 0")
-
-            self.scale_flow.configure(to=flow_max)
-            self.scale_cond.configure(to=cond_max)
-
-            self.log(f"✓ Applied slider limits: flow_max={flow_max}, cond_max={cond_max}")
+            val = self.conductivity_var.get()
+            msw, lsw = self.float_to_registers(val)
+            self.update_register_direct(812, msw)
+            self.update_register_direct(813, lsw)
+            self.log(f"✓ Set Conductivity to {val} (812=0x{msw:04X}, 813=0x{lsw:04X})")
         except Exception as e:
-            messagebox.showerror("Invalid Settings", f"Failed to apply settings:\n{e}")
-            return
+            messagebox.showerror("Error", f"Invalid Float: {e}")
 
-        # Update period is used on the next scheduled loop automatically.
+    def set_fwd_total(self):
         try:
-            period = int(self.var_update_period_ms.get())
-            if period < 50:
-                # Keep it sane so the GUI thread doesn't get hammered.
-                period = 50
-                self.var_update_period_ms.set(period)
-            self.log(f"✓ Applied update period: {period} ms")
+            val = self.fwd_total_var.get()
+            msw, lsw = self.uint32_to_registers(val)
+            self.update_register_direct(772, msw)
+            self.update_register_direct(773, lsw)
+            self.log(f"✓ Set Forward Total to {val} (772=0x{msw:04X}, 773=0x{lsw:04X})")
         except Exception as e:
-            messagebox.showerror("Invalid Settings", f"Invalid update period:\n{e}")
+            messagebox.showerror("Error", f"Invalid Int: {e}")
 
-    def _parse_slave_ids(self):
-        """Parse slave IDs from UI into a sorted list of unique ints."""
-        raw = self.var_slave_ids.get().strip()
-        if not raw:
-            raise ValueError("Slave IDs cannot be empty")
 
-        parts = [p.strip() for p in raw.split(",") if p.strip()]
-        ids = []
-        for p in parts:
-            v = int(p)
-            if v < 1 or v > 247:
-                raise ValueError(f"Invalid slave id '{v}' (valid range 1..247)")
-            ids.append(v)
+    def set_alarm_flags(self):
+        try:
+            val_str = self.alarm_flags_var.get()
+            val = int(val_str, 16) if val_str.startswith('0x') else int(val_str)
+            if val < 0 or val > 0xFFFF:
+                raise ValueError("Out of range")
+            self.update_register_direct(777, val)
+            self.log(f"✓ Set Alarm Flags to 0x{val:04X}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Invalid Hex: {e}")
 
-        # Remove duplicates but keep stable ordering using dict trick.
-        ids = list(dict.fromkeys(ids))
-        return ids
-
-    def update_alarm_flags(self):
-        """Update alarm flags based on checkboxes"""
-        flags = 0
-        if self.var_alarm_empty.get(): flags |= 0x01
-        if self.var_alarm_excitation.get(): flags |= 0x02
-        if self.var_alarm_high.get(): flags |= 0x04
-        if self.var_alarm_low.get(): flags |= 0x08
-        self.var_alarm_flags.set(flags)
-
-    def log(self, message):
-        """Thread-safe logging"""
-        def append():
-            self.log_area.insert(tk.END, message + '\n')
-            self.log_area.see(tk.END)
-        self.root.after(0, append)
-    
-    def _set_server_ui_state(self, running: bool, message: str | None = None):
-        """Update UI state for server start/stop in a thread-safe way."""
-        def apply():
-            if running:
-                self.btn_start.config(state='disabled', text="Running...")
+    def toggle_alarm_bit(self, bit, state):
+        """Toggle specific alarm bit"""
+        try:
+            if self.tree.exists(777):
+                current_val = int(self.tree.item(777)['values'][3], 16)
             else:
-                self.btn_start.config(state='normal', text="Start Server")
+                current_val = 0
+            
+            if state:
+                new_val = current_val | (1 << bit)
+            else:
+                new_val = current_val & ~(1 << bit)
+            
+            self.update_register_direct(777, new_val)
+            self.alarm_flags_var.set(f"0x{new_val:04X}")
+            
+            bit_names = {0: "Empty Pipe", 1: "Excitation", 2: "High Flow", 3: "Low Flow"}
+            self.log(f"✓ Alarm Bit {bit} ({bit_names.get(bit, 'Unknown')}) {'ON' if state else 'OFF'}")
+        except Exception as e:
+            self.log(f"✗ Error toggling alarm bit: {e}")
 
-            if message:
-                self.log(message)
+    def update_register_direct(self, addr, val):
+        """Update both GUI and Modbus stores (HR + IR)"""
+        # Update Tree
+        if self.tree.exists(addr):
+            item = self.tree.item(addr)
+            reg_type = item['values'][1]
+            name = item['values'][2]
+            self.tree.item(addr, values=(addr, reg_type, name, f"0x{val:04X}"))
+        
+        # Update BOTH Modbus Stores (This is the FIX!)
+        if self.store:
+            self.store.setValues(3, addr, [val])  # Holding Registers (FC 03)
+            self.store.setValues(4, addr, [val])  # Input Registers (FC 04) ← CRITICAL FIX
 
-        self.root.after(0, apply)
+    def refresh_ports(self):
+        ports = serial.tools.list_ports.comports()
+        self.com_port_combo['values'] = [p.device for p in ports]
+        if ports:
+            self.com_port_combo.current(0)
 
-    def _preflight_check_serial(self, port: str, baud: int):
-        """
-        Quick sanity check before starting the pymodbus server thread.
-        This avoids getting stuck in 'Running...' when the port is missing/inaccessible.
-        """
-        # Uses the same serial settings as StartAsyncSerialServer
-        test = serial.Serial(
-            port=port,
-            baudrate=baud,
-            bytesize=8,
-            parity='N',
-            stopbits=1,
-            timeout=1
-        )
-        test.close()
+    def on_tree_select(self, event):
+        selected_item = self.tree.selection()
+        if selected_item:
+            item = self.tree.item(selected_item)
+            val_str = item['values'][3]
+            self.edit_val_var.set(val_str)
+
+    def update_register(self):
+        """Manual register update from GUI"""
+        selected_item = self.tree.selection()
+        if not selected_item:
+            return
+        
+        try:
+            val_str = self.edit_val_var.get()
+            val = int(val_str, 16) if val_str.startswith('0x') else int(val_str)
+            
+            if val < 0 or val > 65535:
+                messagebox.showerror("Error", "Value must be between 0 and 65535")
+                return
+            
+            iid = selected_item[0]
+            addr = int(iid)
+            
+            # Update both stores
+            self.update_register_direct(addr, val)
+            self.log(f"✓ Updated Register {addr} to 0x{val:04X}")
+            
+        except ValueError:
+            messagebox.showerror("Error", "Invalid hex/integer value")
+
+    def log(self, msg):
+        self.my_log(msg)
 
     def start_server(self):
-        logging.basicConfig(level=logging.INFO)
-        logging.getLogger("pymodbus").setLevel(logging.DEBUG)
-        if self.server_running:
-            self.log("Server already running!")
-            return
-
-        port = self.var_port.get()
-        baud = int(self.var_baud.get())
-
-        self.log("=" * 60)
-        self.log("Starting Complete Modbus RTU Server...")
-        self.log(f"Port: {port}, Baud: {baud}")
-        self.log(f"Slave IDs: 110, 111")
-        self.log("=" * 60)
-
-        # Preflight check: fail fast and keep UI intuitive
         try:
-            self._preflight_check_serial(port, baud)
+            port = self.com_port_var.get()
+            if not port:
+                messagebox.showerror("Error", "Select a COM port")
+                return
+
+            try:
+                slave_id = self.slave_id_var.get()
+                baud = self.baudrate_var.get()
+            except ValueError:
+                messagebox.showerror("Error", "Invalid Slave ID or Baudrate")
+                return
+
+            self.log(f"Starting Server on {port} (Slave ID: {slave_id})...")
+            
+            # Initialize Data Store with 1000 registers
+            initial_regs = [0] * 1000
+            
+            # Populate with default values
+            for reg in self.register_map:
+                addr = reg["addr"]
+                val = reg["val"]
+                if addr < 1000:
+                    initial_regs[addr] = val
+            
+            if ModbusSequentialDataBlock is None or ModbusServerContext is None:
+                raise ImportError("Modbus classes not found. Check Pymodbus installation.")
+
+            # CRITICAL FIX: Create datastore blocks
+            di_block = ModbusSequentialDataBlock(0, [0]*1000)
+            co_block = ModbusSequentialDataBlock(0, [0]*1000)
+            hr_block = ModbusSequentialDataBlock(0, initial_regs.copy())
+            ir_block = ModbusSequentialDataBlock(0, initial_regs.copy())
+            
+            self.log("✓ Using v3.6+ API...")
+            
+            # Create slave context using our shim class
+            slave_context = ModbusSlaveContext(
+                di=di_block, 
+                co=co_block, 
+                hr=hr_block, 
+                ir=ir_block
+            )
+            
+            # In v3.6+, the first parameter is the datastore, not a slaves dict
+            # To support multiple slaves, we need a different approach
+            
+            # Create slave context dict mapping slave ID to our shim
+            # AUTOMATICALLY ADD SLAVE 111 for dual-device support
+            slaves = {slave_id: slave_context}
+            if slave_id != 111:
+                slaves[111] = slave_context
+                self.log("✓ Auto-added Slave ID 111 for dual-device simulation")
+
+            try:
+                # Proper initialization with 'devices' arg (PyModbus v3.x)
+                self.context = ModbusServerContext(devices=slaves, single=False)
+                self.log(f"✓ Created ServerContext with slaves {list(slaves.keys())}")
+            except Exception as e:
+                self.log(f"Standard context creation failed: {e}")
+                # Fallback - single context (passed as first positional arg 'devices')
+                self.context = ModbusServerContext(slave_context, single=True)
+                self.log(f"⚠ Fallback to single=True mode")
+            
+            # Debug: Check what's in the context
+            try:
+                self.log(f"Context type: {type(self.context)}")
+                if hasattr(self.context, '__dict__'):
+                    self.log(f"Context attrs: {list(self.context.__dict__.keys())}")
+            except:
+                pass
+            
+            # Create wrapper for setValues compatibility
+            class DatastoreWrapper:
+                def __init__(self, hr_block, ir_block):
+                    self.hr_block = hr_block
+                    self.ir_block = ir_block
+                
+                def setValues(self, fx, address, values):
+                    """Update register values - updates both HR and IR"""
+                    if fx == 3:  # Holding Registers
+                        for i, val in enumerate(values):
+                            self.hr_block.setValues(address + i, [val])
+                    elif fx == 4:  # Input Registers
+                        for i, val in enumerate(values):
+                            self.ir_block.setValues(address + i, [val])
+            
+            self.store = DatastoreWrapper(hr_block, ir_block)
+            
+            if StartSerialServer is None and StartAsyncSerialServer is None and ModbusSerialServer is None:
+                raise ImportError("No Server implementation found")
+
+            self.start_btn.config(state="disabled")
+            self.stop_btn.config(state="normal")
+            self.log("✓ Starting server thread...")
+            
+            # Force GUI update before starting thread
+            self.root.update()
+
+            self.server_thread = threading.Thread(
+                target=self.run_server_thread, 
+                args=(port, baud, self.context),
+                daemon=True,
+                name="ModbusServerThread"
+            )
+            
+            self.log("✓ Thread object created, calling start()...")
+            self.root.update()
+            
+            self.server_thread.start()
+            
+            self.log("✓ start() called, checking if alive...")
+            self.root.update()
+            
+            # Verify thread started
+            import time
+            time.sleep(0.5)
+            
+            if self.server_thread.is_alive():
+                self.log("✓ Server Thread is ALIVE and running")
+            else:
+                self.log("✗ WARNING: Server thread died immediately!")
+            
+            self.log("✓ Server startup complete - GUI should be responsive")
+            
         except Exception as e:
-            self.server_running = False
-            self._set_server_ui_state(False, f"✗ Failed to start server: cannot open port '{port}': {type(e).__name__}: {e}")
-            return
+            self.start_btn.config(state="normal")
+            self.stop_btn.config(state="disabled")
+            self.log(f"✗ FAILED TO START SERVER: {e}")
+            import traceback
+            self.log(traceback.format_exc())
+            messagebox.showerror("Error Starting Server", str(e))
 
-        # Covers a wide range so register addressing differences don't cause illegal-address reads.
-        # Keeps everything else the same (same addresses in setValues()).
-        IR_BASE = 0
-        IR_LEN = 2000   # plenty for 772..813 and more
-        HR_BASE = 0
-        HR_LEN = 2000
-
-        self.ir_block_110 = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
-        self.ir_block_111 = sparse.ModbusSparseDataBlock({IR_BASE: [0] * IR_LEN})
-
-        self.hr_block_110 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
-        self.hr_block_111 = sparse.ModbusSparseDataBlock({HR_BASE: [0] * HR_LEN})
-
-        # Populate the dictionaries so update_registers() can find them
-        self.ir_blocks = {
-            110: self.ir_block_110,
-            111: self.ir_block_111
-        }
-        self.hr_blocks = {
-            110: self.hr_block_110,
-            111: self.hr_block_111
-        }
-
-        # Create device contexts with BOTH input and holding registers
-        store_110 = context.ModbusDeviceContext(ir=self.ir_block_110, hr=self.hr_block_110)
-        store_111 = context.ModbusDeviceContext(ir=self.ir_block_111, hr=self.hr_block_111)
-
-        # Create server context with BOTH devices
-        self.server_context = context.ModbusServerContext(
-            devices={
-                110: store_110,
-                111: store_111
-            },
-            single=False
-        )
-
-        # Start server thread
-        self.server_running = True
-        self.btn_start.config(state='disabled', text="Starting...")
-
-        self.server_thread = threading.Thread(target=self._run_server, args=(port, baud), daemon=True)
-        self.server_thread.start()
-
-        self.log("✓ Server thread started")
-
-    def _compute_block_range(self, fc):
-        """
-        Compute a contiguous block range from the enabled registers in the map.
-
-        Uses the 'address' and 'type' fields to allocate enough registers for multi-word values.
-        """
-        enabled = []
-        for cfg in self.register_map.values():
-            if cfg.get("fc") != fc:
-                continue
-            if not cfg.get("enabled", True):
-                continue
-
-            addr = int(cfg["address"])
-            typ = cfg["type"]
-            words = 1
-            if typ in ("uint32", "float32"):
-                words = 2
-
-            enabled.append((addr, addr + words - 1))
-
-        if not enabled:
-            return None, None
-
-        base = min(a for a, _ in enabled)
-        end = max(b for _, b in enabled)
-        length = (end - base) + 1
-        return base, length
-
-    def _run_server(self, port, baud):
-        """Run the async server in a thread"""
+    def run_server_thread(self, port, baud, context):
+        """Run Modbus server in background thread - PATCHED for v3.11.4"""
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-            async def serve():
-                self.log("✓ Async server starting...")
-                await StartAsyncSerialServer(
-                    context=self.server_context,
+            # Thread-safe logging
+            def thread_log(msg):
+                self.root.after(0, lambda: self.my_log(msg))
+            
+            thread_log(f"═══════════════════════════════════════")
+            thread_log(f"SERVER THREAD STARTING (v3.11.4 Patch)")
+            thread_log(f"Port: {port}")
+            thread_log(f"Baudrate: {baud}")
+            thread_log(f"═══════════════════════════════════════")
+            
+            # Test if port is accessible
+            try:
+                import serial
+                test_port = serial.Serial(port, baud, timeout=0.1)
+                thread_log(f"✓ Port {port} opened successfully")
+                test_port.close()
+            except Exception as e:
+                thread_log(f"✗ WARNING: Cannot open {port}: {e}")
+                return
+            
+            # pymodbus server initialization
+            try:
+                from pymodbus.server import StartSerialServer
+                from pymodbus.framer import FramerType
+                
+                thread_log("✓ Using StartSerialServer (v3.11.4)...")
+                
+                # CRITICAL FIX: Use FramerType.RTU
+                StartSerialServer(
+                    context=context,
                     port=port,
+                    framer=FramerType.RTU,
                     baudrate=baud,
                     bytesize=8,
                     parity='N',
                     stopbits=1,
                     timeout=1
                 )
-                self.log("✓ Server is now listening for requests!")
-                self.log(f"✓ Responding to slave IDs: {self.var_slave_ids.get()}")
-                self.log("✓ Input Registers (FC 04) and Holding Registers (FC 03) ready")
-
-            loop.run_until_complete(serve())
-            loop.run_forever()
-
+                
+                thread_log("✓ StartSerialServer exited")
+                
+            except Exception as e1:
+                thread_log(f"✗ StartSerialServer failed: {e1}")
+                import traceback
+                thread_log(traceback.format_exc())
+                
         except Exception as e:
-            self.server_running = False
-            self.log(f"✗ ERROR: {type(e).__name__}: {e}")
-            import traceback
-            self.log(traceback.format_exc())
+            def log_error():
+                self.my_log(f"═══════════════════════════════════════")
+                self.my_log(f"✗✗✗ FATAL SERVER THREAD ERROR ✗✗✗")
+                self.my_log(f"{e}")
+                import traceback
+                self.my_log(traceback.format_exc())
+                self.my_log(f"═══════════════════════════════════════")
+            self.root.after(0, log_error)
 
-            # Make UI reflect reality again
-            self._set_server_ui_state(False, "✗ Server stopped (failed to start).")
-
-    def _pack_words_32(self, packed_4bytes):
-        """
-        Convert 4 bytes to two 16-bit words in the configured order mode.
-
-        Modes:
-          - ABCD: big-endian words, no swap (high word first)
-          - CDAB: big-endian bytes, swapped words (low word first)  [current default]
-          - BADC: swap bytes within each word (AB->BA, CD->DC)
-          - DCBA: full reverse
-        """
-        mode = self.var_byte_order.get().strip().upper()
-
-        # Start from the current "ABCD" byte layout.
-        b0, b1, b2, b3 = packed_4bytes[0], packed_4bytes[1], packed_4bytes[2], packed_4bytes[3]
-
-        if mode == "ABCD":
-            bb = bytes([b0, b1, b2, b3])
-        elif mode == "CDAB":
-            bb = bytes([b2, b3, b0, b1])
-        elif mode == "BADC":
-            bb = bytes([b1, b0, b3, b2])
-        elif mode == "DCBA":
-            bb = bytes([b3, b2, b1, b0])
-        else:
-            # Fall back safely to the existing behavior.
-            bb = bytes([b2, b3, b0, b1])
-
-        word0 = struct.unpack('>H', bb[0:2])[0]
-        word1 = struct.unpack('>H', bb[2:4])[0]
-        return [word0, word1]
-
-    def update_registers(self):
-        """Update Modbus registers with current values"""
-        if self.server_running and self.ir_blocks:
+    def stop_server(self):
+        self.log("⚠ Stopping server... (Restart App to fully reset port)")
+        
+        # PATCH: Use ServerStop to actually kill the thread
+        if ServerStop:
             try:
-                # Helper functions
-                def pack_uint32(value):
-                    """Pack uint32 using the configured byte/word order."""
-                    packed = struct.pack('>I', int(value))
-                    return self._pack_words_32(packed)
-
-                def pack_uint16(value):
-                    return [int(value) & 0xFFFF]
-
-                def pack_float32(value):
-                    """Pack float32 using the configured byte/word order."""
-                    packed = struct.pack('>f', float(value))
-                    return self._pack_words_32(packed)
-
-                # Keep alarm flags in sync with checkbox UI
-                self.update_alarm_flags()
-
-                # Update all configured devices
-                for sid in list(self.ir_blocks.keys()):
-                    ir_block = self.ir_blocks[sid]
-                    hr_block = self.hr_blocks[sid]
-
-                    # INPUT REGISTERS (FC 04)
-                    if self.register_map.get("forward_total", {}).get("enabled", True):
-                        ir_block.setValues(self.register_map["forward_total"]["address"], pack_uint32(self.var_forward_total.get()))
-
-                    if self.register_map.get("unit_info", {}).get("enabled", True):
-                        ir_block.setValues(self.register_map["unit_info"]["address"], pack_uint16(self.var_unit_info.get()))
-
-                    if self.register_map.get("alarm_flags", {}).get("enabled", True):
-                        ir_block.setValues(self.register_map["alarm_flags"]["address"], pack_uint16(self.var_alarm_flags.get()))
-
-                    if self.register_map.get("flow_rate", {}).get("enabled", True):
-                        ir_block.setValues(self.register_map["flow_rate"]["address"], pack_float32(self.var_flow_rate.get()))
-
-                    if self.register_map.get("overflow_count", {}).get("enabled", True):
-                        ir_block.setValues(self.register_map["overflow_count"]["address"], pack_uint16(self.var_forward_overflow.get()))
-
-                    if self.register_map.get("conductivity", {}).get("enabled", True):
-                        ir_block.setValues(self.register_map["conductivity"]["address"], pack_float32(self.var_conductivity.get()))
-
-                    # HOLDING REGISTERS (FC 03)
-                    if self.register_map.get("flow_range", {}).get("enabled", True):
-                        hr_block.setValues(self.register_map["flow_range"]["address"], pack_float32(self.var_flow_range.get()))
-
-                    if self.register_map.get("alm_high_val", {}).get("enabled", True):
-                        hr_block.setValues(self.register_map["alm_high_val"]["address"], pack_float32(self.var_alm_high_val.get()))
-
-                    if self.register_map.get("alm_low_val", {}).get("enabled", True):
-                        hr_block.setValues(self.register_map["alm_low_val"]["address"], pack_float32(self.var_alm_low_val.get()))
-
-            except Exception:
-                pass  # Silently ignore update errors
-
-        # Schedule next update (user-configurable period)
+                ServerStop()
+                self.log("✓ ServerStop() called.")
+            except Exception as e:
+                self.log(f"Error calling ServerStop: {e}")
+        
         try:
-            period = int(self.var_update_period_ms.get())
-            if period < 50:
-                period = 50
+            # Stop internal thread reference
+            if self.server_thread and self.server_thread.is_alive():
+                 self.log("Thread stop signal sent. (Background thread may persist until app exit)")
         except Exception:
-            period = 500
-
-        self.root.after(period, self.update_registers)
-
-    # --- Profile save/load (starting values + settings + register map) ---
-
-    def _get_profile_dict(self):
-        """Collect current settings + starting values into a JSON-serializable dict."""
-        return {
-            "connection": {
-                "port": self.var_port.get(),
-                "baud": self.var_baud.get(),
-                "slave_ids": self.var_slave_ids.get(),
-            },
-            "server": {
-                "update_period_ms": int(self.var_update_period_ms.get()),
-                "byte_order": self.var_byte_order.get(),
-            },
-            "ui": {
-                "flow_max": float(self.var_flow_max.get()),
-                "flow_precision": int(self.var_flow_precision.get()),
-                "cond_max": float(self.var_cond_max.get()),
-                "cond_precision": int(self.var_cond_precision.get()),
-            },
-            "register_map": self.register_map,
-            "values": {
-                "flow_rate": float(self.var_flow_rate.get()),
-                "alarm_flags": int(self.var_alarm_flags.get()),
-                "forward_total": int(self.var_forward_total.get()),
-                "forward_overflow": int(self.var_forward_overflow.get()),
-                "unit_info": int(self.var_unit_info.get()),
-                "conductivity": float(self.var_conductivity.get()),
-                "flow_range": float(self.var_flow_range.get()),
-                "alm_high_val": float(self.var_alm_high_val.get()),
-                "alm_low_val": float(self.var_alm_low_val.get()),
-                "alarm_empty": bool(self.var_alarm_empty.get()),
-                "alarm_excitation": bool(self.var_alarm_excitation.get()),
-                "alarm_high": bool(self.var_alarm_high.get()),
-                "alarm_low": bool(self.var_alarm_low.get()),
-            }
-        }
-
-    def _apply_profile_dict(self, data):
-        """Apply a previously saved profile dict onto the GUI variables."""
-        conn = data.get("connection", {})
-        self.var_port.set(conn.get("port", self.var_port.get()))
-        self.var_baud.set(conn.get("baud", self.var_baud.get()))
-        self.var_slave_ids.set(conn.get("slave_ids", self.var_slave_ids.get()))
-
-        server = data.get("server", {})
-        if "update_period_ms" in server:
-            self.var_update_period_ms.set(int(server["update_period_ms"]))
-        if "byte_order" in server:
-            self.var_byte_order.set(str(server["byte_order"]))
-
-        ui = data.get("ui", {})
-        if "flow_max" in ui:
-            self.var_flow_max.set(float(ui["flow_max"]))
-        if "flow_precision" in ui:
-            self.var_flow_precision.set(int(ui["flow_precision"]))
-        if "cond_max" in ui:
-            self.var_cond_max.set(float(ui["cond_max"]))
-        if "cond_precision" in ui:
-            self.var_cond_precision.set(int(ui["cond_precision"]))
-
-        if "register_map" in data and isinstance(data["register_map"], dict):
-            self.register_map = data["register_map"]
-            self._refresh_register_map_editor()
-
-        vals = data.get("values", {})
-        if "flow_rate" in vals: self.var_flow_rate.set(float(vals["flow_rate"]))
-        if "alarm_flags" in vals: self.var_alarm_flags.set(int(vals["alarm_flags"]))
-        if "forward_total" in vals: self.var_forward_total.set(int(vals["forward_total"]))
-        if "forward_overflow" in vals: self.var_forward_overflow.set(int(vals["forward_overflow"]))
-        if "unit_info" in vals: self.var_unit_info.set(int(vals["unit_info"]))
-        if "conductivity" in vals: self.var_conductivity.set(float(vals["conductivity"]))
-        if "flow_range" in vals: self.var_flow_range.set(float(vals["flow_range"]))
-        if "alm_high_val" in vals: self.var_alm_high_val.set(float(vals["alm_high_val"]))
-        if "alm_low_val" in vals: self.var_alm_low_val.set(float(vals["alm_low_val"]))
-
-        if "alarm_empty" in vals: self.var_alarm_empty.set(bool(vals["alarm_empty"]))
-        if "alarm_excitation" in vals: self.var_alarm_excitation.set(bool(vals["alarm_excitation"]))
-        if "alarm_high" in vals: self.var_alarm_high.set(bool(vals["alarm_high"]))
-        if "alarm_low" in vals: self.var_alarm_low.set(bool(vals["alarm_low"]))
-
-        # Apply settings that affect widgets (sliders) right away.
-        self.apply_settings()
-
-    def save_profile(self):
-        """Save current configuration and values to a JSON profile."""
-        path = filedialog.asksaveasfilename(
-            title="Save Profile",
-            defaultextension=".json",
-            filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
-        )
-        if not path:
-            return
-
-        try:
-            data = self._get_profile_dict()
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, sort_keys=True)
-            self.log(f"✓ Profile saved: {path}")
-        except Exception as e:
-            messagebox.showerror("Save Failed", f"Failed to save profile:\n{e}")
-
-    def load_profile(self):
-        """Load a JSON profile and apply it to the GUI."""
-        path = filedialog.askopenfilename(
-            title="Load Profile",
-            filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
-        )
-        if not path:
-            return
-
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            self._apply_profile_dict(data)
-            self.log(f"✓ Profile loaded: {path}")
-        except Exception as e:
-            messagebox.showerror("Load Failed", f"Failed to load profile:\n{e}")
+            pass
+            
+        self.start_btn.config(state="normal")
+        self.stop_btn.config(state="disabled")
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = CompleteFlowMeterGUI(root)
-    root.mainloop()
+    try:
+        root = tk.Tk()
+        app = FlowMeterSimulatorApp(root)
+        root.mainloop()
+    except KeyboardInterrupt:
+        pass
