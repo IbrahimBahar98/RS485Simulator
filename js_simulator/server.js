@@ -374,6 +374,13 @@ io.on('connection', (socket) => {
         io.emit('inverter-status', { id, enabled });
     });
 
+    socket.on('get-register', ({ id, addr }) => {
+        const mem = getMem(id || 1);
+        const val = mem[addr] || 0;
+        socket.emit('register-value', { id, addr, val });
+    });
+
+
     socket.on('get-inverter-status', () => {
         const status = {};
         [1, 2, 3, 4, 5].forEach(id => status[id] = enabledIDs.has(id));
