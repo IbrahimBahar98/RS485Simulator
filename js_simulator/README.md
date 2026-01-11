@@ -38,7 +38,43 @@ A desktop application to simulate FR500A-compatible Modbus RTU inverters for tes
 4. **Enable/Disable**: Uncheck "Enabled" to stop responding to that inverter's ID.
 5. **Edit Values**: Modify Frequency, Voltage, etc. using the input fields.
 
+## Building the Executable (.exe)
+
+You can package the application as a standalone Windows executable that doesn't require Node.js to be installed.
+
+### Prerequisites
+- **Node.js** v14 or higher
+- All dependencies installed (`npm install`)
+
+### Build Steps
+1. **Install dependencies** (if not already done):
+   ```bash
+   cmd /c "npm install"
+   ```
+
+2. **Build the executable**:
+   ```bash
+   cmd /c "npm run build"
+   ```
+
+3. **Find the output**: The packaged application will be in:
+   ```
+   dist/Modbus-Inverter-Simulator-win32-x64/
+   ```
+
+### Distributing the Application
+- Copy the entire `Modbus-Inverter-Simulator-win32-x64` folder to the target machine.
+- Run `Modbus-Inverter-Simulator.exe` - no installation required!
+- The folder contains all necessary runtime files (~200MB).
+
+### Build Configuration
+The build is configured in `package.json` using `electron-packager`:
+- **Platform**: Windows (win32)
+- **Architecture**: 64-bit (x64)
+- **Output**: `dist/` folder
+
 ## Troubleshooting
 - **Port Busy**: Ensure no other app is using the COM port.
 - **PowerShell Error**: Use `cmd /c "npm start"` instead of `npm start`.
 - **Permission Issues**: Run terminal as Administrator if `npm install` fails.
+- **Build Fails**: Ensure all dependencies are installed with `npm install` first.

@@ -1,3 +1,17 @@
+# Folders
 InverterComH/
-*.pdf
 node_modules/
+
+# Build outputs
+dist/
+dist-packager/
+
+# Logs and temp files
+*.log
+build_log.txt
+
+# PDF documentation
+*.pdf
+
+# Lock files (optional - uncomment to ignore)
+# package-lock.json
