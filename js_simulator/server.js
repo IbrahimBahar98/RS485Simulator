@@ -12,18 +12,30 @@ const crc = require('crc'); // We'll need a crc lib or impl one.
 const APP_PORT = 3000;
 
 // --- State ---
+// Dynamic device management: Map<slaveId, {type: 'inverter'|'flowmeter', enabled: boolean}>
+const devices = new Map();
 // Memory map keyed by Unit ID -> Uint16Array(65536)
 const memory = {};
-// Track which IDs are enabled (respond to Modbus)
-const enabledIDs = new Set([1, 2, 3, 4, 5]); // All enabled by default
 
-const defaults = {
-    // ===== FR500A/FR510A Complete Register Map =====
+// Legacy compatibility helpers
+function getEnabledIDs() {
+    return [...devices.entries()].filter(([_, d]) => d.enabled).map(([id, _]) => id);
+}
+function isDeviceEnabled(id) {
+    const device = devices.get(id);
+    return device ? device.enabled : false;
+}
+function getDeviceType(id) {
+    const device = devices.get(id);
+    return device ? device.type : 'inverter';
+}
 
-    // --- Control Registers (Write-Only) ---
+// ===== INVERTER (FR500A/FR510A) Register Defaults =====
+const inverterDefaults = {
+    // Control Registers (Write-Only)
     0x2000: 0,                  // CONTROL_COMMAND (1=Run, 5/6/0=Stop)
 
-    // --- Status Registers (Read-Only) - 0x30xx Range ---
+    // Status Registers (Read-Only) - 0x30xx Range
     0x3000: 5000,               // FREQUENCY_RUNNING (x100 Hz = 50.00 Hz)
     0x3002: 2200,               // VOLTAGE_OUTPUT (x10 V = 220.0 V)
     0x3003: 50,                 // CURRENT_OUTPUT (x10 A = 5.0 A)
@@ -34,17 +46,17 @@ const defaults = {
     0x3023: 999,                // POWER_CONSUMPTION / TOTAL_ENERGY (kWh)
     0x3100: 0,                  // FAULT_CODE_LATEST (0 = No Fault)
 
-    // --- Parameter Registers (0x8xxx) ---
+    // Parameter Registers (0x8xxx)
     0x8000: 0,                  // USER_PASSWORD_SETTING (Write-Only)
     0x8001: 0,                  // DISPLAY_OF_PARAMETERS / PARAMETER_PROTECTION
     0x8006: 0,                  // PARAMETER_EDITING_MODE
     0x8200: 0,                  // START_COMMAND_MODE (0=Keypad, 2=Comm)
     0x840A: 1,                  // DEVICE_ID (Modbus Slave Address)
 
-    // --- Other FR500A Registers ---
+    // Other FR500A Registers
     0x0B15: 45,                 // TEMPERATURE_SETPOINT (°C)
 
-    // --- Mirrored Registers (0x03xx = U00 Group for FC04 Input Regs) ---
+    // Mirrored Registers (0x03xx = U00 Group for FC04 Input Regs)
     0x0300: 5000,               // U00.00 Output Frequency
     0x0302: 2200,               // U00.02 Output Voltage
     0x0303: 50,                 // U00.03 Output Current
@@ -55,13 +67,81 @@ const defaults = {
     0x0323: 999                 // U00.35 Power Consumption
 };
 
+// ===== FLOW METER (CR009) Register Defaults =====
+const flowMeterDefaults = {
+    // Input Registers (FC 04) - Flow Meter Readings
+    772: 0,                     // Forward Total (Word 0 - MSW)
+    773: 0,                     // Forward Total (Word 1 - LSW)
+    774: 0x0403,                // Unit Info (Total=L, Flow=L/s)
+    777: 0,                     // Alarm Flags (bitfield)
+    778: 0,                     // Flow Rate (Word 0 - MSW) - Float
+    779: 0,                     // Flow Rate (Word 1 - LSW)
+    786: 0,                     // Forward Overflow Count
+    812: 0,                     // Conductivity (Word 0 - MSW) - Float
+    813: 0,                     // Conductivity (Word 1 - LSW)
+
+    // Holding Registers (FC 03) - Configuration
+    261: 0x43D4,                // Flow Range MSW (424.0 float)
+    262: 0x0000,                // Flow Range LSW
+    281: 0x42C8,                // Alarm High MSW (100.0 float)
+    282: 0x0000,                // Alarm High LSW
+    284: 0x4120,                // Alarm Low MSW (10.0 float)
+    285: 0x0000                 // Alarm Low LSW
+};
+
+// Keep defaults reference for backward compatibility
+const defaults = inverterDefaults;
+
 function getMem(unitID) {
     if (!memory[unitID]) {
         memory[unitID] = new Uint16Array(65536);
-        // Initialize defaults
-        for (const [addr, val] of Object.entries(defaults)) {
+        // Initialize based on device type
+        const type = getDeviceType(unitID);
+        const defs = type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+        for (const [addr, val] of Object.entries(defs)) {
             memory[unitID][parseInt(addr)] = val;
         }
+    }
+    return memory[unitID];
+}
+
+// Add a new device
+function addDevice(slaveId, type = 'inverter') {
+    if (devices.has(slaveId)) {
+        return { success: false, error: 'Device with this Slave ID already exists' };
+    }
+    devices.set(slaveId, { type, enabled: true });
+    // Initialize memory for this device
+    memory[slaveId] = new Uint16Array(65536);
+    const defs = type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+    for (const [addr, val] of Object.entries(defs)) {
+        memory[slaveId][parseInt(addr)] = val;
+    }
+    return { success: true };
+}
+
+// Remove a device
+function removeDevice(slaveId) {
+    if (!devices.has(slaveId)) {
+        return { success: false, error: 'Device not found' };
+    }
+    devices.delete(slaveId);
+    delete memory[slaveId];
+    return { success: true };
+}
+
+// Update device type
+function setDeviceType(unitID, type) {
+    const device = devices.get(unitID);
+    if (device) {
+        device.type = type;
+        devices.set(unitID, device);
+    }
+    // Clear and reinitialize memory for this unit
+    memory[unitID] = new Uint16Array(65536);
+    const defs = type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+    for (const [addr, val] of Object.entries(defs)) {
+        memory[unitID][parseInt(addr)] = val;
     }
     return memory[unitID];
 }
@@ -163,8 +243,12 @@ function handleFrame(frame) {
     const unitID = frame[0];
     const fc = frame[1];
 
-    // Skip if this ID is disabled
-    if (!enabledIDs.has(unitID)) {
+    // Skip if this device doesn't exist or is disabled
+    if (!devices.has(unitID)) {
+        // Silently ignore - device not configured
+        return;
+    }
+    if (!isDeviceEnabled(unitID)) {
         io.emit('log', { type: 'INFO', msg: `ID:${unitID} is DISABLED - ignoring request` });
         return;
     }
@@ -294,16 +378,19 @@ function handleParameterWrite(addr, val, unitID) {
 
 // --- Socket Events ---
 io.on('connection', (socket) => {
-    // Send state for requested IDs? 
-    // Or just all known? Let's send everything we have in memory.
-    // Client can filter.
-    const allData = {};
-    for (const id in memory) {
-        const keyRegs = [...Object.keys(defaults).map(Number), 0x2000, 0x8200, 0x0B15];
-        allData[id] = {};
-        keyRegs.forEach(r => allData[id][r] = memory[id][r]);
+    // Send current devices list to new client
+    socket.emit('devices-list', getDevicesList());
+
+    // Also send register state for each device
+    for (const [slaveId, device] of devices) {
+        const mem = getMem(slaveId);
+        const defs = device.type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+        const regData = {};
+        for (const addr of Object.keys(defs)) {
+            regData[parseInt(addr)] = mem[parseInt(addr)];
+        }
+        socket.emit('device-state', { id: slaveId, type: device.type, registers: regData });
     }
-    socket.emit('initial-state', allData);
 
     socket.on('start-server', ({ port, baud }) => {
         if (serialPort && serialPort.isOpen) return;
@@ -364,22 +451,88 @@ io.on('connection', (socket) => {
     });
 
     socket.on('toggle-inverter', ({ id, enabled }) => {
-        if (enabled) {
-            enabledIDs.add(id);
-            io.emit('log', { type: 'INFO', msg: `Inverter ${id} ENABLED` });
-        } else {
-            enabledIDs.delete(id);
-            io.emit('log', { type: 'INFO', msg: `Inverter ${id} DISABLED` });
+        const device = devices.get(id);
+        if (device) {
+            device.enabled = enabled;
+            devices.set(id, device);
+            io.emit('log', { type: 'INFO', msg: `Device ${id} ${enabled ? 'ENABLED' : 'DISABLED'}` });
+            io.emit('device-updated', { id, ...device });
         }
-        io.emit('inverter-status', { id, enabled });
     });
 
     socket.on('get-inverter-status', () => {
         const status = {};
-        [1, 2, 3, 4, 5].forEach(id => status[id] = enabledIDs.has(id));
+        for (const [id, device] of devices) {
+            status[id] = device.enabled;
+        }
         socket.emit('all-inverter-status', status);
     });
+
+    // Device type management
+    socket.on('set-device-type', ({ id, type }) => {
+        const device = devices.get(id);
+        if (device) {
+            const oldType = device.type;
+            setDeviceType(id, type);
+            io.emit('log', { type: 'INFO', msg: `Device ${id} changed from ${oldType} to ${type}` });
+            io.emit('device-updated', { id, ...devices.get(id) });
+
+            // Send the new register state for this device
+            const mem = getMem(id);
+            const defs = type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+            const regData = {};
+            for (const addr of Object.keys(defs)) {
+                regData[parseInt(addr)] = mem[parseInt(addr)];
+            }
+            socket.emit('device-state', { id, type, registers: regData });
+        }
+    });
+
+    socket.on('get-device-types', () => {
+        const types = {};
+        for (const [id, device] of devices) {
+            types[id] = device.type;
+        }
+        socket.emit('all-device-types', types);
+    });
+
+    // Dynamic device management
+    socket.on('add-device', ({ slaveId, type }) => {
+        const result = addDevice(parseInt(slaveId), type);
+        if (result.success) {
+            io.emit('log', { type: 'INFO', msg: `Added ${type} device with Slave ID ${slaveId}` });
+            io.emit('device-added', { slaveId: parseInt(slaveId), type, enabled: true });
+            io.emit('devices-list', getDevicesList());
+        } else {
+            socket.emit('error', { message: result.error });
+            io.emit('log', { type: 'ERR', msg: result.error });
+        }
+    });
+
+    socket.on('remove-device', ({ slaveId }) => {
+        const result = removeDevice(parseInt(slaveId));
+        if (result.success) {
+            io.emit('log', { type: 'INFO', msg: `Removed device with Slave ID ${slaveId}` });
+            io.emit('device-removed', { slaveId: parseInt(slaveId) });
+            io.emit('devices-list', getDevicesList());
+        } else {
+            socket.emit('error', { message: result.error });
+        }
+    });
+
+    socket.on('get-devices', () => {
+        socket.emit('devices-list', getDevicesList());
+    });
 });
+
+// Helper to get devices as array for client
+function getDevicesList() {
+    const list = [];
+    for (const [slaveId, device] of devices) {
+        list.push({ slaveId, type: device.type, enabled: device.enabled });
+    }
+    return list;
+}
 
 server.listen(APP_PORT, () => {
     console.log(`Web Interface running at http://localhost:${APP_PORT}`);
