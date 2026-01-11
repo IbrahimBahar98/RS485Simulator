@@ -18,14 +18,41 @@ const memory = {};
 const enabledIDs = new Set([1, 2, 3, 4, 5]); // All enabled by default
 
 const defaults = {
-    0x3000: 5000, 0x0300: 5000, // Freq
-    0x3002: 2200, 0x0302: 2200, // Volt
-    0x3003: 50, 0x0303: 50,   // Curr
-    0x3004: 11, 0x0304: 11,   // Power
-    0x3005: 1450, 0x0305: 1450, // Speed
-    0x3006: 3100, 0x0306: 3100, // Bus
-    0x3017: 350, 0x0317: 350,  // Temp
-    0x3023: 999, 0x0323: 999   // Energy
+    // ===== FR500A/FR510A Complete Register Map =====
+
+    // --- Control Registers (Write-Only) ---
+    0x2000: 0,                  // CONTROL_COMMAND (1=Run, 5/6/0=Stop)
+
+    // --- Status Registers (Read-Only) - 0x30xx Range ---
+    0x3000: 5000,               // FREQUENCY_RUNNING (x100 Hz = 50.00 Hz)
+    0x3002: 2200,               // VOLTAGE_OUTPUT (x10 V = 220.0 V)
+    0x3003: 50,                 // CURRENT_OUTPUT (x10 A = 5.0 A)
+    0x3004: 11,                 // POWER_OUTPUT (x10 kW = 1.1 kW)
+    0x3005: 1450,               // SPEED_MOTOR_ESTIMATED (rpm)
+    0x3006: 3100,               // VOLTAGE_BUS (x10 V = 310.0 V DC Bus)
+    0x3017: 350,                // TEMPERATURE_INVERTER (x10 °C = 35.0 °C)
+    0x3023: 999,                // POWER_CONSUMPTION / TOTAL_ENERGY (kWh)
+    0x3100: 0,                  // FAULT_CODE_LATEST (0 = No Fault)
+
+    // --- Parameter Registers (0x8xxx) ---
+    0x8000: 0,                  // USER_PASSWORD_SETTING (Write-Only)
+    0x8001: 0,                  // DISPLAY_OF_PARAMETERS / PARAMETER_PROTECTION
+    0x8006: 0,                  // PARAMETER_EDITING_MODE
+    0x8200: 0,                  // START_COMMAND_MODE (0=Keypad, 2=Comm)
+    0x840A: 1,                  // DEVICE_ID (Modbus Slave Address)
+
+    // --- Other FR500A Registers ---
+    0x0B15: 45,                 // TEMPERATURE_SETPOINT (°C)
+
+    // --- Mirrored Registers (0x03xx = U00 Group for FC04 Input Regs) ---
+    0x0300: 5000,               // U00.00 Output Frequency
+    0x0302: 2200,               // U00.02 Output Voltage
+    0x0303: 50,                 // U00.03 Output Current
+    0x0304: 11,                 // U00.04 Output Power
+    0x0305: 1450,               // U00.05 Motor Speed
+    0x0306: 3100,               // U00.06 Bus Voltage
+    0x0317: 350,                // U00.23 Inverter Temperature
+    0x0323: 999                 // U00.35 Power Consumption
 };
 
 function getMem(unitID) {
@@ -181,6 +208,9 @@ function handleFrame(frame) {
         // Handle Logic
         if (addr === 0x2000) handleControlCommand(val, unitID);
 
+        // Handle Parameter Writes (FR500A Protection Sequence)
+        handleParameterWrite(addr, val, unitID);
+
         // Echo Request as Response
         response = Buffer.from(frame);
 
@@ -197,6 +227,7 @@ function handleFrame(frame) {
             mem[addr + i] = val;
             io.emit('reg-update', { id: unitID, addr: addr + i, val });
             if ((addr + i) === 0x2000) handleControlCommand(val, unitID);
+            handleParameterWrite(addr + i, val, unitID);
         }
 
         // Response: ID(1) FC(1) Addr(2) Count(2) CRC(2)
@@ -234,6 +265,33 @@ function handleControlCommand(val, unitID) {
     }
 }
 
+// Handle FR500A Parameter Writes (Protection Sequence)
+function handleParameterWrite(addr, val, unitID) {
+    const paramNames = {
+        0x8000: 'PASSWORD',
+        0x8001: 'DISPLAY_PARAMS',
+        0x8006: 'PARAM_EDIT_MODE',
+        0x8200: 'START_CMD_MODE',
+        0x840A: 'DEVICE_ID'
+    };
+
+    if (paramNames[addr]) {
+        const name = paramNames[addr];
+        let detail = '';
+
+        // Interpret values
+        if (addr === 0x8200) {
+            detail = val === 0 ? ' (Keypad)' : val === 2 ? ' (RS485/Comm)' : ` (${val})`;
+        } else if (addr === 0x8001) {
+            detail = val === 1 ? ' (Display Only)' : ` (${val})`;
+        } else if (addr === 0x8006) {
+            detail = val === 2 ? ' (RS485 Only Editing)' : ` (${val})`;
+        }
+
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} ${name} = ${val}${detail}` });
+    }
+}
+
 // --- Socket Events ---
 io.on('connection', (socket) => {
     // Send state for requested IDs? 
@@ -267,6 +325,12 @@ io.on('connection', (socket) => {
             serialPort.on('open', () => {
                 io.emit('server-status', true);
                 io.emit('log', { type: 'INFO', msg: `Server Started on ${port}` });
+            });
+
+            serialPort.on('close', () => {
+                console.log('Serial port closed');
+                io.emit('server-status', false);
+                io.emit('log', { type: 'INFO', msg: 'Serial port closed' });
             });
 
         } catch (e) {
