@@ -690,7 +690,7 @@ class FlowMeterSimulatorApp:
                     bytesize=8,
                     parity='N',
                     stopbits=1,
-                    timeout=1
+                    timeout=0.100
                 )
                 
                 thread_log("✓ StartSerialServer exited")
