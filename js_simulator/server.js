@@ -1,31 +1,59 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const ModbusRTU = require('modbus-serial');
 const { SerialPort } = require('serialport');
 const path = require('path');
+const crc = require('crc'); // We'll need a crc lib or impl one.
+// Actually, let's implement simple CRC16-Modbus to avoid extra deps if possible,
+// or use modbus-serial just for CRC if it exposes it?
+// let's just add a simple CRC function.
 
 // --- Configuration ---
 const APP_PORT = 3000;
 
 // --- State ---
-const registers = new Uint16Array(65536); // Full 64k address space
-let modbusServer = null;
-let isRunning = false;
+// Memory map keyed by Unit ID -> Uint16Array(65536)
+const memory = {};
+// Track which IDs are enabled (respond to Modbus)
+const enabledIDs = new Set([1, 2, 3, 4, 5]); // All enabled by default
 
-// Pre-populate defaults (FR500A)
 const defaults = {
     0x3000: 5000, 0x0300: 5000, // Freq
     0x3002: 2200, 0x0302: 2200, // Volt
-    0x3003: 50,   0x0303: 50,   // Curr
-    0x3004: 11,   0x0304: 11,   // Power
+    0x3003: 50, 0x0303: 50,   // Curr
+    0x3004: 11, 0x0304: 11,   // Power
     0x3005: 1450, 0x0305: 1450, // Speed
     0x3006: 3100, 0x0306: 3100, // Bus
-    0x3017: 350,  0x0317: 350,  // Temp
-    0x3023: 999,  0x0323: 999   // Energy
+    0x3017: 350, 0x0317: 350,  // Temp
+    0x3023: 999, 0x0323: 999   // Energy
 };
-for (const [addr, val] of Object.entries(defaults)) {
-    registers[parseInt(addr)] = val;
+
+function getMem(unitID) {
+    if (!memory[unitID]) {
+        memory[unitID] = new Uint16Array(65536);
+        // Initialize defaults
+        for (const [addr, val] of Object.entries(defaults)) {
+            memory[unitID][parseInt(addr)] = val;
+        }
+    }
+    return memory[unitID];
+}
+
+// --- CRC16 Modbus Implementation ---
+function calculateCRC(buffer) {
+    let crc = 0xFFFF;
+    for (let pos = 0; pos < buffer.length; pos++) {
+        crc ^= buffer[pos];
+        for (let i = 8; i !== 0; i--) {
+            if ((crc & 0x0001) !== 0) {
+                crc >>= 1;
+                crc ^= 0xA001;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+    return crc;
 }
 
 // --- Express & Socket.io ---
@@ -44,121 +72,248 @@ app.get('/api/ports', async (req, res) => {
     }
 });
 
-// --- Modbus Vector Hook ---
-const vector = {
-    getInputRegister: function(addr, unitID) {
-        return registers[addr];
-    },
-    getHoldingRegister: function(addr, unitID) {
-        return registers[addr];
-    },
-    getCoil: function(addr, unitID) {
-        return registers[addr] > 0;
-    },
-    setRegister: function(addr, value, unitID) {
-        // Update Memory
-        registers[addr] = value;
-        
-        // Notify Frontend
-        io.emit('reg-update', { addr, val: value });
-        io.emit('log', { type: 'RX', msg: `Write ID:${unitID} Addr:0x${addr.toString(16)} Val:${value}` });
+let serialPort = null;
+let buffer = Buffer.alloc(0);
 
-        // --- Custom Logic: Stop/Run ---
-        if (addr === 0x2000) {
-            handleControlCommand(value, unitID);
+// --- Custom RTU Server Logic ---
+function processBuffer() {
+    // Min Modbus RTU Frame: ID(1) + Func(1) + Data(N) + CRC(2). Min length 4 (e.g. error/poll?)
+    // Typically Read Holding is 8 bytes.
+    if (buffer.length < 4) return;
+
+    // Check for valid frames.
+    // Optimization: Assume traffic is clean or wait for silence (RTU).
+    // Simple heuristic: Try to parse valid frame from start.
+
+    // We only care about Function Codes 03 (Read Holding) and 04 (Read Input), 06 (Write Single), 16 (Write Multi)
+    // Packet Structure (Read): ID(1) FC(1) StartH(1) StartL(1) CntH(1) CntL(1) CRC(2) = 8 bytes
+    // Packet Structure (Write Single): ID(1) FC(1) AddrH(1) AddrL(1) ValH(1) ValL(1) CRC(2) = 8 bytes
+
+    // TODO: Better framing (timeout based). 
+    // For now, if we have >= 8 bytes, try to parse.
+
+    if (buffer.length >= 8) {
+        // Check CRC of first 8 bytes
+        const frame = buffer.subarray(0, 8);
+        const receivedCRC = frame.readUInt16LE(6);
+        const calcCRC = calculateCRC(frame.subarray(0, 6));
+
+        if (receivedCRC === calcCRC) {
+            handleFrame(frame);
+            buffer = buffer.subarray(8); // Consume
+            processBuffer();
+            return;
         }
-    },
-    setCoil: function(addr, value, unitID) {
-        registers[addr] = value ? 1 : 0;
-    },
-    readDeviceIdentification: function(addr) {
-        return {
-            0x00: "Simulated Inverter",
-            0x01: "1.0",
-            0x02: "1.0"
-        };
     }
-};
 
-function handleControlCommand(val, unitID) {
-    if (val === 5 || val === 6 || val === 0) { // Stop/Freewheel
-        io.emit('log', { type: 'INFO', msg: `ID:${unitID} STOP Command (0x${val.toString(16)}) -> Zeroing Status` });
-        const zeros = [
-            0x3000, 0x0300, // Freq
-            0x3003, 0x0303, // Curr
-            0x3004, 0x0304, // Power
-            0x3005, 0x0305, // Speed
-        ];
-        zeros.forEach(r => {
-            registers[r] = 0;
-            io.emit('reg-update', { addr: r, val: 0 });
-        });
-    } else if (val === 1) { // Run
-        io.emit('log', { type: 'INFO', msg: `ID:${unitID} RUN Command -> Restoring Defaults` });
-        for (const [addr, defVal] of Object.entries(defaults)) {
-            // Only restore dynamic values, not configuration
-            if ([0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305].includes(parseInt(addr))) {
-                registers[parseInt(addr)] = defVal;
-                io.emit('reg-update', { addr: parseInt(addr), val: defVal });
+    // Check for Write Multiple (FC 16)
+    // ID(1) FC(1) Start(2) Cnt(2) Bytes(1) Data(N) CRC(2)
+    if (buffer.length > 9) {
+        const fc = buffer[1];
+        if (fc === 16) {
+            const byteCnt = buffer[6];
+            const totalLen = 9 + byteCnt;
+            if (buffer.length >= totalLen) {
+                const frame = buffer.subarray(0, totalLen);
+                const receivedCRC = frame.readUInt16LE(totalLen - 2);
+                const calcCRC = calculateCRC(frame.subarray(0, totalLen - 2));
+
+                if (receivedCRC === calcCRC) {
+                    handleFrame(frame);
+                    buffer = buffer.subarray(totalLen);
+                    processBuffer();
+                    return;
+                }
             }
         }
+    }
+
+    // Garbage collection: if buffer too big, trim?
+    if (buffer.length > 256) buffer = Buffer.alloc(0);
+}
+
+function handleFrame(frame) {
+    const unitID = frame[0];
+    const fc = frame[1];
+
+    // Skip if this ID is disabled
+    if (!enabledIDs.has(unitID)) {
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} is DISABLED - ignoring request` });
+        return;
+    }
+
+    const mem = getMem(unitID); // Get/Create memory for THIS ID
+
+    // We accept ALL enabled UnitIDs
+
+    let response = null;
+
+    if (fc === 3 || fc === 4) { // Read Holding/Input
+        const addr = frame.readUInt16BE(2);
+        const count = frame.readUInt16BE(4);
+
+        io.emit('log', { type: 'RX', msg: `Read ID:${unitID} FC:${fc} Addr:0x${addr.toString(16)} Len:${count}` });
+
+        // Build Response: ID(1) FC(1) Bytes(1) Data(N*2) CRC(2)
+        const bytes = count * 2;
+        const respLen = 3 + bytes + 2;
+        response = Buffer.alloc(respLen);
+        response.writeUInt8(unitID, 0);
+        response.writeUInt8(fc, 1);
+        response.writeUInt8(bytes, 2);
+
+        for (let i = 0; i < count; i++) {
+            const val = mem[addr + i] || 0;
+            response.writeUInt16BE(val, 3 + (i * 2));
+        }
+
+        const crcVal = calculateCRC(response.subarray(0, respLen - 2));
+        response.writeUInt16LE(crcVal, respLen - 2);
+
+    } else if (fc === 6) { // Write Single
+        const addr = frame.readUInt16BE(2);
+        const val = frame.readUInt16BE(4);
+
+        mem[addr] = val;
+        io.emit('reg-update', { id: unitID, addr, val }); // Broadcast ID
+        io.emit('log', { type: 'RX', msg: `Write ID:${unitID} Addr:0x${addr.toString(16)} Val:${val}` });
+
+        // Handle Logic
+        if (addr === 0x2000) handleControlCommand(val, unitID);
+
+        // Echo Request as Response
+        response = Buffer.from(frame);
+
+    } else if (fc === 16) { // Write Multi
+        const addr = frame.readUInt16BE(2);
+        const count = frame.readUInt16BE(4);
+        const byteCount = frame.readUInt8(6);
+        const data = frame.subarray(7, 7 + byteCount);
+
+        io.emit('log', { type: 'RX', msg: `WriteMulti ID:${unitID} Addr:0x${addr.toString(16)} Count:${count}` });
+
+        for (let i = 0; i < count; i++) {
+            const val = data.readUInt16BE(i * 2);
+            mem[addr + i] = val;
+            io.emit('reg-update', { id: unitID, addr: addr + i, val });
+            if ((addr + i) === 0x2000) handleControlCommand(val, unitID);
+        }
+
+        // Response: ID(1) FC(1) Addr(2) Count(2) CRC(2)
+        response = Buffer.alloc(8);
+        response.writeUInt8(unitID, 0);
+        response.writeUInt8(fc, 1);
+        response.writeUInt16BE(addr, 2);
+        response.writeUInt16BE(count, 4);
+        const crcVal = calculateCRC(response.subarray(0, 6));
+        response.writeUInt16LE(crcVal, 6);
+    }
+
+    if (response) {
+        // Log TX? High volume.
+        // io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Len:${response.length}` });
+        serialPort.write(response);
+    }
+}
+
+function handleControlCommand(val, unitID) {
+    const mem = getMem(unitID);
+    if (val === 5 || val === 6 || val === 0) { // Stop
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} STOP Command` });
+        const zeros = [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305];
+        zeros.forEach(r => {
+            mem[r] = 0;
+            io.emit('reg-update', { id: unitID, addr: r, val: 0 });
+        });
+    } else if (val === 1) { // Run
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} RUN Command` });
+        [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305].forEach(r => {
+            mem[r] = defaults[r];
+            io.emit('reg-update', { id: unitID, addr: r, val: defaults[r] });
+        });
     }
 }
 
 // --- Socket Events ---
 io.on('connection', (socket) => {
-    console.log('Client connected');
-    // Send initial state
-    // Just send key registers to avoid flooding
-    const keyRegs = [
-        ...Object.keys(defaults).map(Number), 
-        0x2000, 0x8200, 0x0B15
-    ];
-    const state = {};
-    keyRegs.forEach(r => state[r] = registers[r]);
-    socket.emit('initial-state', state);
+    // Send state for requested IDs? 
+    // Or just all known? Let's send everything we have in memory.
+    // Client can filter.
+    const allData = {};
+    for (const id in memory) {
+        const keyRegs = [...Object.keys(defaults).map(Number), 0x2000, 0x8200, 0x0B15];
+        allData[id] = {};
+        keyRegs.forEach(r => allData[id][r] = memory[id][r]);
+    }
+    socket.emit('initial-state', allData);
 
     socket.on('start-server', ({ port, baud }) => {
-        if (isRunning) return;
+        if (serialPort && serialPort.isOpen) return;
         try {
-            console.log(`Starting Modbus Server on ${port} @ ${baud}`);
-            // Modbus Server Setup
-            modbusServer = new ModbusRTU.ServerSerial(vector, {
-                port: port,
-                baudRate: parseInt(baud),
-                debug: true,
-                unitID: 1 // Default, but we need to accept all?
+            console.log(`Starting Custom Modbus Server on ${port} @ ${baud}`);
+            serialPort = new SerialPort({ path: port, baudRate: parseInt(baud) });
+
+            serialPort.on('data', (data) => {
+                buffer = Buffer.concat([buffer, data]);
+                processBuffer();
             });
-            
-            modbusServer.on('socketError', (err) => {
+
+            serialPort.on('error', (err) => {
                 console.error(err);
                 io.emit('log', { type: 'ERR', msg: err.message });
-                isRunning = false;
                 io.emit('server-status', false);
             });
 
-            // Hack to accept multiple UnitIDs?
-            // modbus-serial ServerSerial uses 'modbus-serial/servers/servertcp.js' logic wrapped.
-            // It calls vector.getInputRegister(addr, unitID).
-            // So creating one server instance should handle requests for ANY unitID 
-            // provided the vector function doesn't check 'unitID' strictly.
-            // Our vector impl accepts all IDs.
-            
-            isRunning = true;
-            io.emit('server-status', true);
-            io.emit('log', { type: 'INFO', msg: `Server Started on ${port}` });
-            
+            serialPort.on('open', () => {
+                io.emit('server-status', true);
+                io.emit('log', { type: 'INFO', msg: `Server Started on ${port}` });
+            });
+
         } catch (e) {
             console.error(e);
             io.emit('log', { type: 'ERR', msg: e.message });
         }
     });
 
-    socket.on('set-register', ({ addr, val }) => {
-        registers[addr] = val;
-        io.emit('reg-update', { addr, val });
-        // Handle control logic if set from GUI too
-        if (addr === 0x2000) handleControlCommand(val, 0); 
+    socket.on('stop-server', () => {
+        if (serialPort && serialPort.isOpen) {
+            serialPort.close((err) => {
+                if (err) {
+                    io.emit('log', { type: 'ERR', msg: err.message });
+                } else {
+                    io.emit('server-status', false);
+                    io.emit('log', { type: 'INFO', msg: 'Server Stopped' });
+                    console.log('Modbus Server Stopped');
+                }
+            });
+            buffer = Buffer.alloc(0); // Clear buffer
+        }
+    });
+
+    socket.on('set-register', ({ id, addr, val }) => {
+        // ID is required now
+        const targetID = id || 1;
+        const mem = getMem(targetID);
+        mem[addr] = val;
+        io.emit('reg-update', { id: targetID, addr, val });
+        if (addr === 0x2000) handleControlCommand(val, targetID);
+    });
+
+    socket.on('toggle-inverter', ({ id, enabled }) => {
+        if (enabled) {
+            enabledIDs.add(id);
+            io.emit('log', { type: 'INFO', msg: `Inverter ${id} ENABLED` });
+        } else {
+            enabledIDs.delete(id);
+            io.emit('log', { type: 'INFO', msg: `Inverter ${id} DISABLED` });
+        }
+        io.emit('inverter-status', { id, enabled });
+    });
+
+    socket.on('get-inverter-status', () => {
+        const status = {};
+        [1, 2, 3, 4, 5].forEach(id => status[id] = enabledIDs.has(id));
+        socket.emit('all-inverter-status', status);
     });
 });
 

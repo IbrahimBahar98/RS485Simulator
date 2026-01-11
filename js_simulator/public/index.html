@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modbus Inverter Simulator (JS)</title>
+    <title>Modbus Inverter Simulator</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -14,6 +15,7 @@
             --error: #f44336;
             --border: #3e3e3e;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
@@ -21,12 +23,17 @@
             margin: 0;
             padding: 20px;
             display: grid;
-            grid-template-rows: auto 1fr auto;
+            grid-template-rows: auto auto 1fr auto;
             height: 100vh;
             box-sizing: border-box;
         }
-        h1, h2, h3 { margin: 0 0 10px 0; }
-        
+
+        h1,
+        h2,
+        h3 {
+            margin: 0 0 10px 0;
+        }
+
         /* Top Bar */
         .top-bar {
             background-color: var(--panel-bg);
@@ -36,31 +43,73 @@
             align-items: center;
             gap: 15px;
             border: 1px solid var(--border);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        select, input, button {
+
+        select,
+        input,
+        button {
             background-color: #3d3d3d;
             border: 1px solid var(--border);
             color: white;
             padding: 8px 12px;
             border-radius: 4px;
         }
+
         button {
             background-color: var(--accent);
             cursor: pointer;
             font-weight: bold;
         }
-        button:hover { filter: brightness(1.1); }
-        button:disabled { filter: grayscale(1); cursor: not-allowed; }
-        
+
+        button:hover {
+            filter: brightness(1.1);
+        }
+
+        button:disabled {
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+
+        button.stop-btn {
+            background-color: var(--error);
+        }
+
+        button.run-btn {
+            background-color: var(--success);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background-color: #383838;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .tab-btn.active {
+            background-color: var(--panel-bg);
+            color: var(--accent);
+            font-weight: bold;
+        }
+
         /* Main Grid */
         .main-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 20px;
-            overflow: hidden; /* Fix for inner scrolling */
+            overflow: hidden;
         }
-        
+
         /* Panels */
         .panel {
             background-color: var(--panel-bg);
@@ -71,31 +120,80 @@
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         /* Dashboard */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
         }
+
         .card {
             background-color: #383838;
             padding: 15px;
             border-radius: 6px;
             text-align: center;
         }
-        .card-label { font-size: 0.9em; color: #aaa; margin-bottom: 5px; }
-        .card-value { font-size: 1.5em; font-weight: bold; color: var(--accent); }
-        .card-unit { font-size: 0.8em; color: #aaa; }
-        
+
+        .card-label {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .card-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .card-unit {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
         .control-group {
             margin-top: 10px;
             display: flex;
             gap: 5px;
             justify-content: center;
         }
-        .control-group input { width: 60px; }
-        
+
+        .control-group input {
+            width: 60px;
+        }
+
+        /* Actions */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Reg Table */
+        .reg-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        .reg-table th,
+        .reg-table td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .reg-table th {
+            color: #aaa;
+        }
+
+        .reg-val {
+            font-family: monospace;
+            color: var(--accent);
+        }
+
         /* Logs */
         .log-container {
             flex: 1;
@@ -107,93 +205,70 @@
             font-family: monospace;
             font-size: 0.9em;
         }
-        .log-entry { margin: 2px 0; border-bottom: 1px solid #222; }
-        .log-rx { color: #4caf50; }
-        .log-tx { color: #2196f3; }
-        .log-err { color: #f44336; }
-        .log-info { color: #aaa; }
 
-        /* Reg Table */
-        .reg-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
+        .log-entry {
+            margin: 2px 0;
+            border-bottom: 1px solid #222;
         }
-        .reg-table th, .reg-table td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid var(--border);
+
+        .log-rx {
+            color: #4caf50;
         }
-        .reg-table th { color: #aaa; }
-        .reg-val { font-family: monospace; color: var(--accent); }
+
+        .log-tx {
+            color: #2196f3;
+        }
+
+        .log-err {
+            color: #f44336;
+        }
+
+        .log-info {
+            color: #aaa;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="top-bar">
         <h2>Inverter Simulator</h2>
-        <select id="port-select"><option>Loading...</option></select>
+        <select id="port-select">
+            <option>Loading...</option>
+        </select>
         <select id="baud-select">
             <option value="9600">9600</option>
             <option value="19200">19200</option>
-            <option value="38400">38400</option>
-            <option value="115200">115200</option>
         </select>
         <button id="btn-start" onclick="startServer()">Start Server</button>
+        <button id="btn-stop" onclick="stopServer()" class="stop-btn" disabled>Stop Server</button>
         <span id="status-badge" style="margin-left:auto; color: #888;">Stopped</span>
     </div>
 
+    <div class="tabs" id="tab-container">
+        <!-- Generated by JS -->
+    </div>
+
     <div class="main-grid">
-        <!-- Left Column: Dashboard & Controls -->
         <div class="panel">
-            <h3>Live Status (IDs 1-5, 110-114)</h3>
-            <div class="dashboard">
-                <!-- Freq -->
-                <div class="card">
-                    <div class="card-label">Frequency</div>
-                    <div class="card-value" id="disp-freq">50.00</div>
-                    <div class="card-unit">Hz</div>
-                    <div class="control-group">
-                        <input type="number" id="set-freq" value="50.0">
-                        <button onclick="setReg(0x3000, 'set-freq', 100)">Set</button>
-                    </div>
-                </div>
-                <!-- Volt -->
-                <div class="card">
-                    <div class="card-label">Voltage</div>
-                    <div class="card-value" id="disp-volt">220.0</div>
-                    <div class="card-unit">V</div>
-                    <div class="control-group">
-                        <input type="number" id="set-volt" value="220.0">
-                        <button onclick="setReg(0x3002, 'set-volt', 10)">Set</button>
-                    </div>
-                </div>
-                <!-- Current -->
-                <div class="card">
-                    <div class="card-label">Current</div>
-                    <div class="card-value" id="disp-curr">5.0</div>
-                    <div class="card-unit">A</div>
-                    <div class="control-group">
-                        <input type="number" id="set-curr" value="5.0">
-                        <button onclick="setReg(0x3003, 'set-curr', 10)">Set</button>
-                    </div>
-                </div>
-                <!-- Power -->
-                <div class="card">
-                    <div class="card-label">Power</div>
-                    <div class="card-value" id="disp-pwr">1.1</div>
-                    <div class="card-unit">kW</div>
-                    <div class="control-group">
-                        <input type="number" id="set-pwr" value="1.1">
-                        <button onclick="setReg(0x3004, 'set-pwr', 10)">Set</button>
-                    </div>
-                </div>
+            <h3>Inverter <span id="current-id">1</span> Status <label style="margin-left:20px; font-size:0.8em;"><input
+                        type="checkbox" id="enable-checkbox" checked onchange="toggleInverter(this.checked)">
+                    Enabled</label></h3>
+            <div class="dashboard" id="dashboard">
+                <!-- Generated by JS -->
             </div>
 
             <h3 style="margin-top:20px;">Key Registers</h3>
-            <div style="overflow-y:auto; flex:1">
+            <div style="overflow-y:auto; flex:1; max-height:200px;">
                 <table class="reg-table">
-                    <thead><tr><th>Addr</th><th>Name</th><th>Value</th><th>Hex</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Addr</th>
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Hex</th>
+                        </tr>
+                    </thead>
                     <tbody id="reg-table-body">
                         <!-- Populated by JS -->
                     </tbody>
@@ -201,33 +276,50 @@
             </div>
         </div>
 
-        <!-- Right Column: Logs -->
         <div class="panel">
             <h3>Bus Traffic</h3>
             <div class="log-container" id="log-box"></div>
-            <button onclick="document.getElementById('log-box').innerHTML=''" style="margin-top:10px; background:#444;">Clear Log</button>
+            <button onclick="document.getElementById('log-box').innerHTML=''"
+                style="margin-top:10px; background:#444;">Clear Log</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        
-        // --- State ---
-        const registers = {};
+        const SLAVE_IDS = [1, 2, 3, 4, 5];
+        let currentID = 1;
+
+        // Per-ID state
+        const state = {};
+        const inverterEnabled = {};
+        SLAVE_IDS.forEach(id => {
+            state[id] = {};
+            inverterEnabled[id] = true;
+        });
+
         const map = [
-            { a: 0x2000, n: "Control Cmd", s: 1 },
-            { a: 0x3000, n: "Frequency", s: 100 },
-            { a: 0x3002, n: "Voltage", s: 10 },
-            { a: 0x3003, n: "Current", s: 10 },
-            { a: 0x3004, n: "Power", s: 10 },
-            { a: 0x3005, n: "Speed", s: 1 },
-            { a: 0x3006, n: "Bus Volt", s: 10 },
-            { a: 0x3017, n: "Temp", s: 10 },
-            { a: 0x3023, n: "Energy", s: 1 },
-            { a: 0x8200, n: "Start Mode", s: 1 },
-            { a: 0x0B15, n: "Temp SP", s: 1 },
-            { a: 0x0300, n: "Freq (03xx)", s: 100 }
+            { a: 0x3000, n: "Frequency", s: 100, u: "Hz" },
+            { a: 0x3002, n: "Voltage", s: 10, u: "V" },
+            { a: 0x3003, n: "Current", s: 10, u: "A" },
+            { a: 0x3004, n: "Power", s: 10, u: "kW" },
+            { a: 0x3005, n: "Speed", s: 1, u: "rpm" },
+            { a: 0x3017, n: "Temp", s: 10, u: "°C" }
+        ];
+
+        const allRegs = [
+            { a: 0x2000, n: "Control Cmd" },
+            { a: 0x3000, n: "Frequency" },
+            { a: 0x3002, n: "Voltage" },
+            { a: 0x3003, n: "Current" },
+            { a: 0x3004, n: "Power" },
+            { a: 0x3005, n: "Speed" },
+            { a: 0x3006, n: "Bus Volt" },
+            { a: 0x3017, n: "Temp" },
+            { a: 0x3023, n: "Energy" },
+            { a: 0x8200, n: "Start Mode" },
+            { a: 0x0B15, n: "Temp SP" },
+            { a: 0x0300, n: "Freq (03xx)" }
         ];
 
         // --- Init ---
@@ -237,49 +329,89 @@
             const ports = await res.json();
             const sel = document.getElementById('port-select');
             sel.innerHTML = ports.map(p => `<option value="${p}">${p}</option>`).join('');
-            
-            // Render Table
+
+            // Generate Tabs
+            const tabContainer = document.getElementById('tab-container');
+            tabContainer.innerHTML = SLAVE_IDS.map(id =>
+                `<button class="tab-btn ${id === 1 ? 'active' : ''}" onclick="selectTab(${id})">Inverter ${id}</button>`
+            ).join('');
+
+            // Generate Dashboard Cards
+            const dashboard = document.getElementById('dashboard');
+            dashboard.innerHTML = map.map(r => `
+                <div class="card">
+                    <div class="card-label">${r.n}</div>
+                    <div class="card-value" id="val-${r.a}">-</div>
+                    <div class="card-unit">${r.u}</div>
+                    <div class="control-group">
+                        <input type="number" id="set-${r.a}" value="0">
+                        <button onclick="setReg(${r.a}, 'set-${r.a}', ${r.s})">Set</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Generate Register Table
             const tbody = document.getElementById('reg-table-body');
-            tbody.innerHTML = map.map(r => `
-                <tr id="row-${r.a}">
-                    <td>0x${r.a.toString(16).toUpperCase()}</td>
+            tbody.innerHTML = allRegs.map(r => `
+                <tr id="row-${currentID}-${r.a}">
+                    <td>0x${r.a.toString(16).toUpperCase().padStart(4, '0')}</td>
                     <td>${r.n}</td>
-                    <td class="reg-val" id="val-${r.a}">-</td>
-                    <td class="reg-val" id="hex-${r.a}">-</td>
+                    <td class="reg-val" id="tval-${r.a}">-</td>
+                    <td class="reg-val" id="thex-${r.a}">-</td>
                 </tr>
             `).join('');
         }
         init();
+
+        function selectTab(id) {
+            currentID = id;
+            document.getElementById('current-id').innerText = id;
+            document.getElementById('enable-checkbox').checked = inverterEnabled[id];
+
+            // Update active tab style
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', SLAVE_IDS[idx] === id);
+            });
+
+            // Refresh displayed values from state
+            map.forEach(r => {
+                const val = state[id][r.a] || 0;
+                document.getElementById(`val-${r.a}`).innerText = (val / r.s).toFixed(r.s > 1 ? 2 : 0);
+            });
+        }
 
         // --- Actions ---
         function startServer() {
             const port = document.getElementById('port-select').value;
             const baud = document.getElementById('baud-select').value;
             socket.emit('start-server', { port, baud });
-            document.getElementById('btn-start').innerText = "Starting...";
-            document.getElementById('btn-start').disabled = true;
+        }
+
+        function stopServer() {
+            socket.emit('stop-server');
+        }
+
+        function toggleInverter(enabled) {
+            socket.emit('toggle-inverter', { id: currentID, enabled });
         }
 
         function setReg(addr, inputId, scale) {
             const val = parseFloat(document.getElementById(inputId).value);
             const intVal = Math.round(val * scale);
-            socket.emit('set-register', { addr, val: intVal });
+            socket.emit('set-register', { id: currentID, addr, val: intVal });
+        }
+
+        function sendCommand(cmd) {
+            socket.emit('set-register', { id: currentID, addr: 0x2000, val: cmd });
         }
 
         // --- Socket Handling ---
         socket.on('server-status', (running) => {
             const badge = document.getElementById('status-badge');
-            const btn = document.getElementById('btn-start');
-            if (running) {
-                badge.innerText = "RUNNING";
-                badge.style.color = "#4caf50";
-                btn.innerText = "Running";
-            } else {
-                badge.innerText = "STOPPED";
-                badge.style.color = "#f44336";
-                btn.innerText = "Start Server";
-                btn.disabled = false;
-            }
+            badge.innerText = running ? "RUNNING" : "STOPPED";
+            badge.style.color = running ? "#4caf50" : "#f44336";
+            document.getElementById('btn-start').disabled = running;
+            document.getElementById('btn-stop').disabled = !running;
         });
 
         socket.on('log', (entry) => {
@@ -291,38 +423,65 @@
             box.scrollTop = box.scrollHeight;
         });
 
-        socket.on('initial-state', (state) => {
-            for (const [addr, val] of Object.entries(state)) {
-                updateReg(parseInt(addr), val);
+        socket.on('initial-state', (allData) => {
+            for (const id in allData) {
+                if (state[id]) {
+                    for (const addr in allData[id]) {
+                        state[id][parseInt(addr)] = allData[id][addr];
+                    }
+                }
+            }
+            selectTab(currentID); // Refresh UI
+        });
+
+        socket.on('reg-update', ({ id, addr, val }) => {
+            if (state[id]) {
+                state[id][addr] = val;
+            }
+            // If this is the currently viewed tab, update UI
+            if (id === currentID) {
+                const mapItem = map.find(m => m.a === addr);
+                if (mapItem) {
+                    document.getElementById(`val-${addr}`).innerText = (val / mapItem.s).toFixed(mapItem.s > 1 ? 2 : 0);
+                }
+                // Update register table
+                const tval = document.getElementById(`tval-${addr}`);
+                const thex = document.getElementById(`thex-${addr}`);
+                if (tval) {
+                    tval.innerText = val;
+                    thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
+                }
             }
         });
 
-        socket.on('reg-update', ({ addr, val }) => {
-            updateReg(addr, val);
+        socket.on('inverter-status', ({ id, enabled }) => {
+            inverterEnabled[id] = enabled;
+            if (id === currentID) {
+                document.getElementById('enable-checkbox').checked = enabled;
+            }
+            // Update tab style to show disabled
+            const tabIdx = SLAVE_IDS.indexOf(id);
+            if (tabIdx >= 0) {
+                const tabBtn = document.querySelectorAll('.tab-btn')[tabIdx];
+                tabBtn.style.opacity = enabled ? '1' : '0.5';
+            }
         });
 
-        function updateReg(addr, val) {
-            registers[addr] = val;
-            
-            // Update Table
-            const elVal = document.getElementById(`val-${addr}`);
-            const elHex = document.getElementById(`hex-${addr}`);
-            if (elVal) {
-                elVal.innerText = val;
-                elHex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
+        socket.on('all-inverter-status', (status) => {
+            for (const id in status) {
+                inverterEnabled[parseInt(id)] = status[id];
             }
+            selectTab(currentID);
+            SLAVE_IDS.forEach((id, idx) => {
+                const tabBtn = document.querySelectorAll('.tab-btn')[idx];
+                tabBtn.style.opacity = inverterEnabled[id] ? '1' : '0.5';
+            });
+        });
 
-            // Update Dashboard Cards
-            if (addr === 0x3000 || addr === 0x0300) updateCard('disp-freq', val, 100);
-            if (addr === 0x3002 || addr === 0x0302) updateCard('disp-volt', val, 10);
-            if (addr === 0x3003 || addr === 0x0303) updateCard('disp-curr', val, 10);
-            if (addr === 0x3004 || addr === 0x0304) updateCard('disp-pwr', val, 10);
-        }
-
-        function updateCard(id, val, scale) {
-            document.getElementById(id).innerText = (val / scale).toFixed(scale > 1 ? 2 : 0);
-        }
+        // Request initial status
+        socket.emit('get-inverter-status');
 
     </script>
 </body>
+
 </html>
