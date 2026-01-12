@@ -301,6 +301,14 @@
                     </tbody>
                 </table>
             </div>
+            <div
+                style="margin-top:10px; border-top:1px solid #444; padding-top:10px; display:flex; gap:5px; align-items:center;">
+                <input type="text" id="new-reg-addr" placeholder="Addr (Hex)"
+                    style="width:80px; background:#222; color:#fff; border:1px solid #444; padding:5px;">
+                <input type="text" id="new-reg-name" placeholder="Name (Optional)"
+                    style="width:140px; background:#222; color:#fff; border:1px solid #444; padding:5px;">
+                <button onclick="addCustomRegister()" style="background:var(--accent); padding:5px 10px;">+ Add</button>
+            </div>
         </div>
 
         <div class="panel">
@@ -396,6 +404,7 @@
 
         // Current active registers (changes based on device type)
         let allRegs = inverterRegs;
+        let customRegs = {}; // { slaveId: [ {a: addr, n: name} ] }
 
         // --- Init ---
         async function init() {
@@ -448,18 +457,61 @@
 
         function regenerateRegTable() {
             const type = deviceTypes[currentID] || 'inverter';
-            allRegs = type === 'flowmeter' ? flowMeterRegs : inverterRegs;
+            const defaults = type === 'flowmeter' ? flowMeterRegs : inverterRegs;
+            const customs = customRegs[currentID] || [];
+            allRegs = [...defaults, ...customs];
 
             const tbody = document.getElementById('reg-table-body');
             tbody.innerHTML = allRegs.map(r => `
                 <tr id="row-${currentID}-${r.a}">
-                    <td>${r.a.toString(10)}</td>
+                    <td>${r.a.toString(10)} (0x${r.a.toString(16).toUpperCase()})</td>
                     <td>${r.n}</td>
-                    <td class="reg-val" id="tval-${r.a}">-</td>
+                    <td><input type="number" id="tval-${r.a}" onchange="setRegDirect(this, ${r.a})" style="width:80px; background:#222; border:1px solid #444; color:var(--accent); font-family:monospace; padding:2px;"></td>
                     <td class="reg-val" id="thex-${r.a}">-</td>
                 </tr>
             `).join('');
         }
+
+        function addCustomRegister() {
+            const addrStr = document.getElementById('new-reg-addr').value;
+            const name = document.getElementById('new-reg-name').value || "Custom";
+            let addr;
+
+            if (addrStr.toLowerCase().startsWith('0x')) {
+                addr = parseInt(addrStr, 16);
+            } else {
+                addr = parseInt(addrStr); // Treat as decimal if no 0x prefix, or maybe require Hex? Let's assume Hex for input safety or check?
+                // Actually user prompt said "Addr (Hex)" in my old code. 
+                // Let's force Hex if user removed placeholder.
+                // Assuming Hex input for consistency with technical users.
+                addr = parseInt(addrStr, 16);
+            }
+
+            if (isNaN(addr)) { alert('Invalid Address (Hex)'); return; }
+
+            if (!customRegs[currentID]) customRegs[currentID] = [];
+            // Check duplicate
+            if (customRegs[currentID].find(r => r.a === addr)) { alert('Register already in list'); return; }
+
+            customRegs[currentID].push({ a: addr, n: name });
+            regenerateRegTable();
+
+            // Fetch value immediately
+            socket.emit('get-register', { id: currentID, addr });
+
+            // Create initial empty state if needed so it displays '-' until fetch
+            if (state[currentID]) state[currentID][addr] = state[currentID][addr] || 0;
+            // But we rely on socket response.
+        }
+
+        // Add setRegDirect back (user removed it?)
+        function setRegDirect(input, addr) {
+            const val = parseInt(input.value);
+            if (!isNaN(val)) {
+                socket.emit('set-register', { id: currentID, addr, val });
+            }
+        }
+
 
         function selectTab(id) {
             currentID = id;
@@ -609,11 +661,25 @@
                 const tval = document.getElementById(`tval-${addr}`);
                 const thex = document.getElementById(`thex-${addr}`);
                 if (tval) {
-                    tval.innerText = val;
+                    tval.value = val;
                     thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
                 }
             }
         });
+
+        socket.on('register-value', ({ id, addr, val }) => {
+            if (state[id]) state[id][addr] = val;
+
+            if (id === currentID) {
+                const tval = document.getElementById(`tval-${addr}`);
+                const thex = document.getElementById(`thex-${addr}`);
+                if (tval) {
+                    tval.value = val;
+                    thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
+                }
+            }
+        });
+
         socket.on('device-state', ({ id, type, registers }) => {
             // Update state with new register values
             state[id] = registers;

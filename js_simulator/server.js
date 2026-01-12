@@ -460,6 +460,13 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('get-register', ({ id, addr }) => {
+        const mem = getMem(id || 1);
+        const val = mem[addr] || 0;
+        socket.emit('register-value', { id, addr, val });
+    });
+
+
     socket.on('get-inverter-status', () => {
         const status = {};
         for (const [id, device] of devices) {
