@@ -13,7 +13,16 @@ const APP_PORT = 3000;
 
 // --- State ---
 // Dynamic device management: Map<slaveId, {type: 'inverter'|'flowmeter', enabled: boolean}>
-const devices = new Map();
+const devices = new Map([
+    [1, { type: 'inverter', enabled: true }],
+    [2, { type: 'inverter', enabled: true }],
+    [3, { type: 'inverter', enabled: true }],
+    [4, { type: 'inverter', enabled: true }],
+    [5, { type: 'inverter', enabled: true }],
+    // Python script compatibility: Auto-add Slave 100 and 111 for Flow Meter testing
+    [110, { type: 'flowmeter', enabled: true }],
+    [111, { type: 'flowmeter', enabled: true }]
+]);
 // Memory map keyed by Unit ID -> Uint16Array(65536)
 const memory = {};
 
@@ -184,59 +193,71 @@ let buffer = Buffer.alloc(0);
 
 // --- Custom RTU Server Logic ---
 function processBuffer() {
-    // Min Modbus RTU Frame: ID(1) + Func(1) + Data(N) + CRC(2). Min length 4 (e.g. error/poll?)
-    // Typically Read Holding is 8 bytes.
-    if (buffer.length < 4) return;
+    let start = 0;
+    while (start + 4 <= buffer.length) { // 4 is min Modbus frame size
+        // 1. Peek at potential header
+        const unitID = buffer[start];
+        const fc = buffer[start + 1];
 
-    // Check for valid frames.
-    // Optimization: Assume traffic is clean or wait for silence (RTU).
-    // Simple heuristic: Try to parse valid frame from start.
+        // Quick validation of UnitID and FC
+        // We only support specific FCs for this sim
+        if (![3, 4, 6, 16].includes(fc)) {
+            start++;
+            continue;
+        }
 
-    // We only care about Function Codes 03 (Read Holding) and 04 (Read Input), 06 (Write Single), 16 (Write Multi)
-    // Packet Structure (Read): ID(1) FC(1) StartH(1) StartL(1) CntH(1) CntL(1) CRC(2) = 8 bytes
-    // Packet Structure (Write Single): ID(1) FC(1) AddrH(1) AddrL(1) ValH(1) ValL(1) CRC(2) = 8 bytes
+        // 2. Determine expected frame length
+        let len = 0;
+        if (fc === 3 || fc === 4 || fc === 6) {
+            len = 8; // Fixed length for Read/Write Single
+        } else if (fc === 16) {
+            // Write Multi: ID(1) FC(1) Addr(2) Cnt(2) ByteCnt(1) Data(N) CRC(2)
+            // Minimum head for FC16 is 7 bytes (to read ByteCnt)
+            if (start + 7 > buffer.length) {
+                // Not enough data yet to determine length, stop and wait
+                break;
+            }
+            const byteCnt = buffer[start + 6];
+            len = 9 + byteCnt;
+        }
 
-    // TODO: Better framing (timeout based). 
-    // For now, if we have >= 8 bytes, try to parse.
+        // 3. Check if we have enough data
+        if (start + len > buffer.length) {
+            // Wait for more data
+            break;
+        }
 
-    if (buffer.length >= 8) {
-        // Check CRC of first 8 bytes
-        const frame = buffer.subarray(0, 8);
-        const receivedCRC = frame.readUInt16LE(6);
-        const calcCRC = calculateCRC(frame.subarray(0, 6));
+        // 4. Verify CRC
+        const frame = buffer.subarray(start, start + len);
+        const receivedCRC = frame.readUInt16LE(len - 2);
+        const calcCRC = calculateCRC(frame.subarray(0, len - 2));
 
         if (receivedCRC === calcCRC) {
+            // VALID FRAME FRAME
             handleFrame(frame);
-            buffer = buffer.subarray(8); // Consume
-            processBuffer();
-            return;
+            // Consume this frame
+            start += len;
+            // Update main buffer status immediately to avoid reprocessing
+            buffer = buffer.subarray(start);
+            start = 0; // Restart from new beginning
+            continue; // Continue processing remaining buffer
+        } else {
+            // CRC failed, this is not a valid frame start
+            // Shift by 1 byte and try again
+            start++;
         }
     }
 
-    // Check for Write Multiple (FC 16)
-    // ID(1) FC(1) Start(2) Cnt(2) Bytes(1) Data(N) CRC(2)
-    if (buffer.length > 9) {
-        const fc = buffer[1];
-        if (fc === 16) {
-            const byteCnt = buffer[6];
-            const totalLen = 9 + byteCnt;
-            if (buffer.length >= totalLen) {
-                const frame = buffer.subarray(0, totalLen);
-                const receivedCRC = frame.readUInt16LE(totalLen - 2);
-                const calcCRC = calculateCRC(frame.subarray(0, totalLen - 2));
-
-                if (receivedCRC === calcCRC) {
-                    handleFrame(frame);
-                    buffer = buffer.subarray(totalLen);
-                    processBuffer();
-                    return;
-                }
-            }
-        }
+    // Trim consumed garbage
+    if (start > 0) {
+        buffer = buffer.subarray(start);
     }
 
-    // Garbage collection: if buffer too big, trim?
-    if (buffer.length > 256) buffer = Buffer.alloc(0);
+    // Safety Cap to prevent infinite memory growth if no valid frames ever arrive
+    if (buffer.length > 1024) {
+        io.emit('log', { type: 'INFO', msg: 'Buffer overflow - flushing' });
+        buffer = Buffer.alloc(0);
+    }
 }
 
 function handleFrame(frame) {
@@ -325,24 +346,26 @@ function handleFrame(frame) {
     }
 
     if (response) {
-        // Log TX? High volume.
-        // io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Len:${response.length}` });
+        // Log TX to help user verify response
+        const hex = response.toString('hex').toUpperCase();
+        io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
         serialPort.write(response);
     }
 }
 
 function handleControlCommand(val, unitID) {
+    io.emit('log', { type: 'INFO', msg: `ID:${unitID} Control Cmd: 0x${val.toString(16)} (${val})` });
     const mem = getMem(unitID);
     if (val === 5 || val === 6 || val === 0) { // Stop
         io.emit('log', { type: 'INFO', msg: `ID:${unitID} STOP Command` });
-        const zeros = [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305];
+        const zeros = [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305, 0x3023, 0x0323];
         zeros.forEach(r => {
             mem[r] = 0;
             io.emit('reg-update', { id: unitID, addr: r, val: 0 });
         });
     } else if (val === 1) { // Run
         io.emit('log', { type: 'INFO', msg: `ID:${unitID} RUN Command` });
-        [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305].forEach(r => {
+        [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305, 0x3023, 0x0323].forEach(r => {
             mem[r] = defaults[r];
             io.emit('reg-update', { id: unitID, addr: r, val: defaults[r] });
         });

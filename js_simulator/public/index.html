@@ -471,10 +471,10 @@
             const tbody = document.getElementById('reg-table-body');
             tbody.innerHTML = allRegs.map(r => `
                 <tr id="row-${currentID}-${r.a}">
-                    <td>${r.a.toString(10)} (0x${r.a.toString(16).toUpperCase()})</td>
+                    <td>0x${r.a.toString(16).toUpperCase().padStart(4, '0')}</td>
                     <td>${r.n}</td>
-                    <td><input type="number" id="tval-${r.a}" onchange="setRegDirect(this, ${r.a})" style="width:80px; background:#222; border:1px solid #444; color:var(--accent); font-family:monospace; padding:2px;"></td>
-                    <td class="reg-val" id="thex-${r.a}">-</td>
+                    <td><input type="text" id="tval-${r.a}" class="table-input" onchange="setRegDirect(this, ${r.a})" placeholder="-" style="border: 1px solid #444; background: #222; width: 100%;"></td>
+                    <td id="thex-${r.a}">-</td>
                 </tr>
             `).join('');
         }
@@ -525,13 +525,15 @@
             document.getElementById('current-id').innerText = id;
             document.getElementById('enable-checkbox').checked = inverterEnabled[id];
 
-            // Update device type dropdown
             const typeSelect = document.getElementById('device-type-select');
             typeSelect.value = deviceTypes[id] || 'inverter';
 
             // Update active tab style
             document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-                btn.classList.toggle('active', SLAVE_IDS[idx] === id);
+                const device = devicesList[idx];
+                // Only mark active if it matches a valid device in the list
+                // (The last button is "+ Add Device" which won't match)
+                btn.classList.toggle('active', device && device.slaveId === id);
             });
 
             // Regenerate dashboard and register table for this device type
@@ -544,6 +546,17 @@
                 if (valEl) {
                     const val = state[id][r.a] || 0;
                     valEl.innerText = (val / r.s).toFixed(r.s > 1 ? 2 : 0);
+                }
+            });
+
+            // Update register table
+            allRegs.forEach(r => {
+                const tval = document.getElementById(`tval-${r.a}`);
+                const thex = document.getElementById(`thex-${r.a}`);
+                if (tval && state[id]) {
+                    const val = state[id][r.a] || 0;
+                    tval.value = val;
+                    thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
                 }
             });
         }
@@ -753,6 +766,8 @@
             if (id === currentID) {
                 document.getElementById('enable-checkbox').checked = enabled;
                 document.getElementById('device-type-select').value = type;
+                // Refresh UI to show correct dashboard/registers for new type
+                selectTab(currentID);
             }
         });
 
