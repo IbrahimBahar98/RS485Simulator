@@ -653,6 +653,12 @@
             div.className = `log-entry log-${entry.type.toLowerCase()}`;
             div.innerText = `[${new Date().toLocaleTimeString()}] ${entry.msg}`;
             box.appendChild(div);
+
+            // Limit log entries to 100
+            while (box.children.length > 100) {
+                box.removeChild(box.firstChild);
+            }
+
             box.scrollTop = box.scrollHeight;
         });
 
@@ -683,6 +689,29 @@
                 if (tval) {
                     tval.value = val;
                     thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
+                }
+            }
+        });
+
+        socket.on('regs-update-batch', ({ id, updates }) => {
+            if (state[id]) {
+                Object.assign(state[id], updates);
+            }
+            // If this is the currently viewed tab, update UI
+            if (id === currentID) {
+                for (const [addrStr, val] of Object.entries(updates)) {
+                    const addr = parseInt(addrStr);
+                    const mapItem = map.find(m => m.a === addr);
+                    if (mapItem) {
+                        document.getElementById(`val-${addr}`).innerText = (val / mapItem.s).toFixed(mapItem.s > 1 ? 2 : 0);
+                    }
+                    // Update register table
+                    const tval = document.getElementById(`tval-${addr}`);
+                    const thex = document.getElementById(`thex-${addr}`);
+                    if (tval) {
+                        tval.value = val;
+                        thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
+                    }
                 }
             }
         });

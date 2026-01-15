@@ -356,19 +356,66 @@ function handleFrame(frame) {
 function handleControlCommand(val, unitID) {
     io.emit('log', { type: 'INFO', msg: `ID:${unitID} Control Cmd: 0x${val.toString(16)} (${val})` });
     const mem = getMem(unitID);
+
+    // Registers to update (Freq, Volt, Current, Power, Speed, Energy) + Mirrored U00 group
+    const regs = [
+        0x3000, 0x0300, // Frequency
+        0x3002, 0x0302, // Output Voltage
+        0x3003, 0x0303, // Output Current
+        0x3004, 0x0304, // Output Power
+        0x3005, 0x0305, // Motor Speed
+        0x3023, 0x0323  // Energy
+    ];
+
+    const updates = {};
+
     if (val === 5 || val === 6 || val === 0) { // Stop
         io.emit('log', { type: 'INFO', msg: `ID:${unitID} STOP Command` });
-        const zeros = [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305, 0x3023, 0x0323];
-        zeros.forEach(r => {
+        regs.forEach(r => {
             mem[r] = 0;
-            io.emit('reg-update', { id: unitID, addr: r, val: 0 });
+            updates[r] = 0;
         });
     } else if (val === 1) { // Run
         io.emit('log', { type: 'INFO', msg: `ID:${unitID} RUN Command` });
-        [0x3000, 0x0300, 0x3003, 0x0303, 0x3004, 0x0304, 0x3005, 0x0305, 0x3023, 0x0323].forEach(r => {
-            mem[r] = defaults[r];
-            io.emit('reg-update', { id: unitID, addr: r, val: defaults[r] });
+
+        // Calculate values based on Inverter ID to make testing easier
+        const id = unitID;
+        const values = {
+            // Freq (0x3000): x100 Hz. ID=1 -> 10Hz -> 1000
+            0x3000: id * 10 * 100,
+            0x0300: id * 10 * 100,
+
+            // Volt (0x3002): x10 V. ID=1 -> 110V -> 1100. (100 + 10*ID)
+            0x3002: (100 + id * 10) * 10,
+            0x0302: (100 + id * 10) * 10,
+
+            // Current (0x3003): x10 A. ID=1 -> 1A -> 10
+            0x3003: id * 10,
+            0x0303: id * 10,
+
+            // Power (0x3004): x10 kW. ID=1 -> 1kW -> 10
+            0x3004: id * 10,
+            0x0304: id * 10,
+
+            // Speed (0x3005): RPM. ID=1 -> 100 RPM?
+            0x3005: id * 100,
+            0x0305: id * 100,
+
+            // Energy (0x3023): kWh. ID=1 -> 1
+            0x3023: id,
+            0x0323: id
+        };
+
+        regs.forEach(r => {
+            const newVal = values[r] !== undefined ? values[r] : 0;
+            mem[r] = newVal;
+            updates[r] = newVal;
         });
+    }
+
+    // Emit batch update if any changes
+    if (Object.keys(updates).length > 0) {
+        io.emit('regs-update-batch', { id: unitID, updates });
     }
 }
 
