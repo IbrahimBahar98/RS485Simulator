@@ -1,6 +1,8 @@
 # Folders
 InverterComH/
 node_modules/
+coverage/
+.vscode/
 
 # Build outputs
 dist/
@@ -8,10 +10,27 @@ dist-packager/
 
 # Logs and temp files
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 build_log.txt
+
+# Simulator Persistence (Local Data)
+js_simulator/devices.json
+js_simulator/memory.json
 
 # PDF documentation
 *.pdf
+
+# Environment variables
+.env
+.env.local
+
+# OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
 # Lock files (optional - uncomment to ignore)
 # package-lock.json
