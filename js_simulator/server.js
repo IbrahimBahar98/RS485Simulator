@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { SerialPort } = require('serialport');
 const path = require('path');
+const fs = require('fs');
 const crc = require('crc'); // We'll need a crc lib or impl one.
 // Actually, let's implement simple CRC16-Modbus to avoid extra deps if possible,
 // or use modbus-serial just for CRC if it exposes it?
@@ -10,10 +11,12 @@ const crc = require('crc'); // We'll need a crc lib or impl one.
 
 // --- Configuration ---
 const APP_PORT = 3000;
+const DEVICES_CONFIG_FILE = path.join(__dirname, 'devices.json');
+const MEMORY_CONFIG_FILE = path.join(__dirname, 'memory.json');
 
 // --- State ---
-// Dynamic device management: Map<slaveId, {type: 'inverter'|'flowmeter', enabled: boolean}>
-const devices = new Map([
+// Dynamic device management: Map<slaveId, {type: 'inverter'|'flowmeter'|'energymeter', enabled: boolean}>
+let devices = new Map([
     [1, { type: 'inverter', enabled: true }],
     [2, { type: 'inverter', enabled: true }],
     [3, { type: 'inverter', enabled: true }],
@@ -25,6 +28,94 @@ const devices = new Map([
 ]);
 // Memory map keyed by Unit ID -> Uint16Array(65536)
 const memory = {};
+
+// --- Persistence Functions ---
+function loadDevicesConfig() {
+    try {
+        if (fs.existsSync(DEVICES_CONFIG_FILE)) {
+            const data = fs.readFileSync(DEVICES_CONFIG_FILE, 'utf8');
+            const config = JSON.parse(data);
+            devices.clear();
+            // Load saved devices
+            for (const [idStr, deviceData] of Object.entries(config.devices)) {
+                devices.set(parseInt(idStr), deviceData);
+            }
+            console.log(`Loaded ${devices.size} devices from ${DEVICES_CONFIG_FILE}`);
+        } else {
+            console.log(`No devices config file found. Using defaults.`);
+        }
+    } catch (err) {
+        console.error(`Error loading devices config: ${err.message}`);
+    }
+}
+
+function saveDevicesConfig() {
+    try {
+        const config = {
+            devices: {}
+        };
+        // Convert Map to object for JSON serialization
+        for (const [id, deviceData] of devices.entries()) {
+            config.devices[id.toString()] = deviceData;
+        }
+        fs.writeFileSync(DEVICES_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+        console.log(`Saved ${devices.size} devices to ${DEVICES_CONFIG_FILE}`);
+    } catch (err) {
+        console.error(`Error saving devices config: ${err.message}`);
+    }
+}
+
+function loadMemoryConfig() {
+    try {
+        if (fs.existsSync(MEMORY_CONFIG_FILE)) {
+            const data = fs.readFileSync(MEMORY_CONFIG_FILE, 'utf8');
+            const config = JSON.parse(data);
+            // Load memory for each device
+            for (const [idStr, memData] of Object.entries(config.memory || {})) {
+                const id = parseInt(idStr);
+                if (!memory[id]) {
+                    memory[id] = new Uint16Array(65536);
+                }
+                // Restore memory values
+                const values = memData.values || {};
+                for (const [addrStr, val] of Object.entries(values)) {
+                    memory[id][parseInt(addrStr)] = val;
+                }
+            }
+            console.log(`Loaded memory config from ${MEMORY_CONFIG_FILE}`);
+        }
+    } catch (err) {
+        console.error(`Error loading memory config: ${err.message}`);
+    }
+}
+
+function saveMemoryConfig() {
+    try {
+        const config = {
+            memory: {}
+        };
+        // Save non-zero memory values for each device
+        for (const [id, memArray] of Object.entries(memory)) {
+            const values = {};
+            for (let addr = 0; addr < memArray.length; addr++) {
+                if (memArray[addr] !== 0) {
+                    values[addr.toString()] = memArray[addr];
+                }
+            }
+            if (Object.keys(values).length > 0) {
+                config.memory[id] = { values };
+            }
+        }
+        fs.writeFileSync(MEMORY_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+        console.log(`Saved memory config to ${MEMORY_CONFIG_FILE}`);
+    } catch (err) {
+        console.error(`Error saving memory config: ${err.message}`);
+    }
+}
+
+// Load devices on startup
+loadDevicesConfig();
+loadMemoryConfig();
 
 // Legacy compatibility helpers
 function getEnabledIDs() {
@@ -98,6 +189,62 @@ const flowMeterDefaults = {
     285: 0x0000                 // Alarm Low LSW
 };
 
+// ===== ENERGY METER (ADL400) Register Defaults =====
+const energyMeterDefaults = {
+    // Voltage Registers (Input Registers - FC 04) - Default 0
+    0x0800: 0x0000,             // Phase A Voltage
+    0x0802: 0x0000,             // Phase B Voltage
+    0x0804: 0x0000,             // Phase C Voltage
+
+    // Current Registers (Input Registers - FC 04) - Default 0
+    0x080C: 0x0000,             // Phase A Current
+    0x080E: 0x0000,             // Phase B Current
+    0x0810: 0x0000,             // Phase C Current
+
+    // Active Power Registers (Input Registers - FC 04) - Default 0
+    0x0806: 0x0000,             // Phase A Active Power
+    0x0808: 0x0000,             // Phase B Active Power
+    0x080A: 0x0000,             // Phase C Active Power
+    0x060A: 0x0000,             // Total Active Power
+
+    // Power Factor - Default 1.0 (0x3F80 in IEEE 754 = 1.0)
+    0x082E: 0x3F80,             // Phase A Power Factor = 1.0
+    0x0830: 0x3F80,             // Phase B Power Factor = 1.0
+    0x0832: 0x3F80,             // Phase C Power Factor = 1.0
+
+    // Frequency - Default 0
+    0x0834: 0x0000,             // Frequency
+
+    // Energy Registers (Input Registers - FC 04) - Default 0
+    0x0842: 0x0000,             // Total Active Energy MSW
+    0x0844: 0x0000,             // Total Active Energy LSW
+    
+    0x0846: 0x0000,             // Total Reactive Energy MSW
+    0x0848: 0x0000,             // Total Reactive Energy LSW
+
+    // Import/Export Energy - Default 0
+    0x0864: 0x0000,             // Total Import Active Energy MSW
+    0x0866: 0x0000,             // Total Import Active Energy LSW
+    
+    0x0868: 0x0000,             // Total Export Active Energy MSW
+    0x086A: 0x0000,             // Total Export Active Energy LSW
+
+    // Process Archives (Frozen Values) - Default 0
+    0x6002: 0x0000,             // Daily Total Active Energy MSW
+    0x6004: 0x0000,             // Daily Total Active Energy LSW
+    
+    0x7002: 0x0000,             // Monthly Total Active Energy MSW
+    0x7004: 0x0000,             // Monthly Total Active Energy LSW
+
+    // Configuration Registers (Holding Registers - FC 03)
+    0x008D: 0x0001,             // PT Ratio = 1
+    0x008E: 0x0001,             // CT Ratio = 1
+    0x0100: 0x0000,             // Device Address
+    0x0101: 0x0000,             // Baud Rate
+    0x0102: 0x0000,             // Power on Times
+    0x0103: 0x0000              // Device Status
+};
+
 // Keep defaults reference for backward compatibility
 const defaults = inverterDefaults;
 
@@ -106,7 +253,9 @@ function getMem(unitID) {
         memory[unitID] = new Uint16Array(65536);
         // Initialize based on device type
         const type = getDeviceType(unitID);
-        const defs = type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+        let defs = inverterDefaults;
+        if (type === 'flowmeter') defs = flowMeterDefaults;
+        if (type === 'energymeter') defs = energyMeterDefaults;
         for (const [addr, val] of Object.entries(defs)) {
             memory[unitID][parseInt(addr)] = val;
         }
@@ -122,10 +271,13 @@ function addDevice(slaveId, type = 'inverter') {
     devices.set(slaveId, { type, enabled: true });
     // Initialize memory for this device
     memory[slaveId] = new Uint16Array(65536);
-    const defs = type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+    let defs = inverterDefaults;
+    if (type === 'flowmeter') defs = flowMeterDefaults;
+    if (type === 'energymeter') defs = energyMeterDefaults;
     for (const [addr, val] of Object.entries(defs)) {
         memory[slaveId][parseInt(addr)] = val;
     }
+    saveDevicesConfig(); // Save to file
     return { success: true };
 }
 
@@ -136,6 +288,7 @@ function removeDevice(slaveId) {
     }
     devices.delete(slaveId);
     delete memory[slaveId];
+    saveDevicesConfig(); // Save to file
     return { success: true };
 }
 
@@ -148,7 +301,9 @@ function setDeviceType(unitID, type) {
     }
     // Clear and reinitialize memory for this unit
     memory[unitID] = new Uint16Array(65536);
-    const defs = type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+    let defs = inverterDefaults;
+    if (type === 'flowmeter') defs = flowMeterDefaults;
+    if (type === 'energymeter') defs = energyMeterDefaults;
     for (const [addr, val] of Object.entries(defs)) {
         memory[unitID][parseInt(addr)] = val;
     }
@@ -516,6 +671,7 @@ io.on('connection', (socket) => {
         const targetID = id || 1;
         const mem = getMem(targetID);
         mem[addr] = val;
+        saveMemoryConfig(); // Save memory changes
         io.emit('reg-update', { id: targetID, addr, val });
         if (addr === 0x2000) handleControlCommand(val, targetID);
     });
@@ -525,6 +681,7 @@ io.on('connection', (socket) => {
         if (device) {
             device.enabled = enabled;
             devices.set(id, device);
+            saveDevicesConfig(); // Save to file
             io.emit('log', { type: 'INFO', msg: `Device ${id} ${enabled ? 'ENABLED' : 'DISABLED'}` });
             io.emit('device-updated', { id, ...device });
         }
@@ -551,6 +708,7 @@ io.on('connection', (socket) => {
         if (device) {
             const oldType = device.type;
             setDeviceType(id, type);
+            saveDevicesConfig(); // Save to file
             io.emit('log', { type: 'INFO', msg: `Device ${id} changed from ${oldType} to ${type}` });
             io.emit('device-updated', { id, ...devices.get(id) });
 

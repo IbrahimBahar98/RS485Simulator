@@ -1,0 +1,40 @@
+{
+  "devices": {
+    "1": {
+      "type": "inverter",
+      "enabled": true
+    },
+    "2": {
+      "type": "inverter",
+      "enabled": true
+    },
+    "3": {
+      "type": "inverter",
+      "enabled": true
+    },
+    "4": {
+      "type": "inverter",
+      "enabled": true
+    },
+    "5": {
+      "type": "inverter",
+      "enabled": true
+    },
+    "100": {
+      "type": "energymeter",
+      "enabled": true
+    },
+    "101": {
+      "type": "energymeter",
+      "enabled": true
+    },
+    "110": {
+      "type": "flowmeter",
+      "enabled": true
+    },
+    "111": {
+      "type": "flowmeter",
+      "enabled": true
+    }
+  }
+}
