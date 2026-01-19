@@ -260,6 +260,7 @@
                 <select id="new-device-type">
                     <option value="inverter">Inverter (FR500A)</option>
                     <option value="flowmeter">Flow Meter (CR009)</option>
+                    <option value="energymeter">Energy Meter (ADL400)</option>
                 </select>
             </label>
             <button onclick="addDevice()" class="run-btn">Add Device</button>
@@ -274,6 +275,7 @@
                 <select id="device-type-select" onchange="changeDeviceType(this.value)">
                     <option value="inverter">Inverter (FR500A)</option>
                     <option value="flowmeter">Flow Meter (CR009)</option>
+                    <option value="energymeter">Energy Meter (ADL400)</option>
                 </select>
                 <label style="font-size:0.8em;"><input type="checkbox" id="enable-checkbox" checked
                         onchange="toggleInverter(this.checked)">
@@ -352,6 +354,29 @@
             { a: 777, n: "Alarms", s: 1, u: "flags" }
         ];
 
+        // ===== ENERGY METER (ADL400) Dashboard Cards =====
+        const energyMeterMap = [
+            // Voltage Phases (Configurable)
+            { a: 0x0800, n: "Voltage Phase A", s: 1, u: "V", float: true },
+            { a: 0x0802, n: "Voltage Phase B", s: 1, u: "V", float: true },
+            { a: 0x0804, n: "Voltage Phase C", s: 1, u: "V", float: true },
+            
+            // Current Phases (Configurable)
+            { a: 0x080C, n: "Current Phase A", s: 1, u: "A", float: true },
+            { a: 0x080E, n: "Current Phase B", s: 1, u: "A", float: true },
+            { a: 0x0810, n: "Current Phase C", s: 1, u: "A", float: true },
+            
+            // Total Power & Parameters
+            { a: 0x060A, n: "Total Active Power", s: 1, u: "W", float: true },
+            { a: 0x0832, n: "Total Power Factor", s: 1, u: "PF", float: true },
+            { a: 0x0834, n: "Frequency", s: 1, u: "Hz", float: true },
+            
+            // Energy Values
+            { a: 0x0842, n: "Total Active Energy", s: 1, u: "kWh", uint32: true },
+            { a: 0x6002, n: "Daily Total Energy", s: 1, u: "kWh", uint32: true },
+            { a: 0x7002, n: "Monthly Total Energy", s: 1, u: "kWh", uint32: true }
+        ];
+
         // Current active map (changes based on device type)
         let map = inverterMap;
 
@@ -409,6 +434,41 @@
             { a: 285, n: "Alarm Low LSW" }
         ];
 
+        // ===== ENERGY METER (ADL400) Registers =====
+        const energyMeterRegs = [
+            // Voltage Registers (Input Registers - FC 04)
+            { a: 0x0800, n: "Phase A Voltage (V)" },
+            { a: 0x0802, n: "Phase B Voltage (V)" },
+            { a: 0x0804, n: "Phase C Voltage (V)" },
+            
+            // Current Registers
+            { a: 0x080C, n: "Phase A Current (A)" },
+            { a: 0x080E, n: "Phase B Current (A)" },
+            { a: 0x0810, n: "Phase C Current (A)" },
+            
+            // Power & Parameters
+            { a: 0x060A, n: "Total Active Power (W)" },
+            { a: 0x0832, n: "Total Power Factor" },
+            { a: 0x0834, n: "Frequency (Hz)" },
+            
+            // Energy Registers (kWh)
+            { a: 0x0842, n: "Total Active Energy (kWh)" },
+            { a: 0x0844, n: "Total Active Energy LSW (kWh)" },
+            
+            // Process Archives (Frozen Values)
+            { a: 0x6002, n: "Daily Total Active Energy (kWh)" },
+            { a: 0x6004, n: "Daily Total Active Energy LSW (kWh)" },
+            
+            { a: 0x7002, n: "Monthly Total Active Energy (kWh)" },
+            { a: 0x7004, n: "Monthly Total Active Energy LSW (kWh)" },
+            
+            // Configuration
+            { a: 0x008D, n: "PT Ratio" },
+            { a: 0x008E, n: "CT Ratio" },
+            { a: 0x0100, n: "Device Address" },
+            { a: 0x0101, n: "Baud Rate" }
+        ];
+
         // Current active registers (changes based on device type)
         let allRegs = inverterRegs;
         let customRegs = {}; // { slaveId: [ {a: addr, n: name} ] }
@@ -429,7 +489,9 @@
         function updateTabs() {
             const tabContainer = document.getElementById('tab-container');
             let html = devicesList.map(d => {
-                const label = d.type === 'flowmeter' ? 'FM' : 'INV';
+                let label = 'INV';
+                if (d.type === 'flowmeter') label = 'FM';
+                else if (d.type === 'energymeter') label = 'EM';
                 const opacity = d.enabled ? '1' : '0.5';
                 return `<button class="tab-btn ${d.slaveId === currentID ? 'active' : ''}" style="opacity:${opacity}" onclick="selectTab(${d.slaveId})">${label} #${d.slaveId}</button>`;
             }).join('');
@@ -446,7 +508,9 @@
 
         function regenerateDashboard() {
             const type = deviceTypes[currentID] || 'inverter';
-            map = type === 'flowmeter' ? flowMeterMap : inverterMap;
+            if (type === 'flowmeter') map = flowMeterMap;
+            else if (type === 'energymeter') map = energyMeterMap;
+            else map = inverterMap;
 
             const dashboard = document.getElementById('dashboard');
             dashboard.innerHTML = map.map(r => `
@@ -464,7 +528,10 @@
 
         function regenerateRegTable() {
             const type = deviceTypes[currentID] || 'inverter';
-            const defaults = type === 'flowmeter' ? flowMeterRegs : inverterRegs;
+            let defaults = inverterRegs;
+            if (type === 'flowmeter') defaults = flowMeterRegs;
+            else if (type === 'energymeter') defaults = energyMeterRegs;
+            
             const customs = customRegs[currentID] || [];
             allRegs = [...defaults, ...customs];
 
