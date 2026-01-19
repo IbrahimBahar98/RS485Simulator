@@ -213,7 +213,7 @@ const energyMeterDefaults = {
     0x0832: 0x3F80,             // Phase C Power Factor = 1.0
 
     // Frequency - Default 0
-    0x0834: 0x0000,             // Frequency
+    0x0834: 0x0032,             // Frequency
 
     // Energy Registers (Input Registers - FC 04) - Default 0
     0x0842: 0x0000,             // Total Active Energy MSW

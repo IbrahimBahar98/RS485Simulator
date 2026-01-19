@@ -28,6 +28,18 @@
       "type": "energymeter",
       "enabled": true
     },
+    "102": {
+      "type": "energymeter",
+      "enabled": true
+    },
+    "103": {
+      "type": "energymeter",
+      "enabled": true
+    },
+    "104": {
+      "type": "energymeter",
+      "enabled": true
+    },
     "110": {
       "type": "flowmeter",
       "enabled": true
