@@ -218,21 +218,21 @@ const energyMeterDefaults = {
     // Energy Registers (Input Registers - FC 04) - Default 0
     0x0842: 0x0000,             // Total Active Energy MSW
     0x0844: 0x0000,             // Total Active Energy LSW
-    
+
     0x0846: 0x0000,             // Total Reactive Energy MSW
     0x0848: 0x0000,             // Total Reactive Energy LSW
 
     // Import/Export Energy - Default 0
     0x0864: 0x0000,             // Total Import Active Energy MSW
     0x0866: 0x0000,             // Total Import Active Energy LSW
-    
+
     0x0868: 0x0000,             // Total Export Active Energy MSW
     0x086A: 0x0000,             // Total Export Active Energy LSW
 
     // Process Archives (Frozen Values) - Default 0
     0x6002: 0x0000,             // Daily Total Active Energy MSW
     0x6004: 0x0000,             // Daily Total Active Energy LSW
-    
+
     0x7002: 0x0000,             // Monthly Total Active Energy MSW
     0x7004: 0x0000,             // Monthly Total Active Energy LSW
 
@@ -331,6 +331,17 @@ function calculateCRC(buffer) {
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+// --- Global Error Handlers ---
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    io.emit('log', { type: 'ERR', msg: `Server Error: ${err.message}` });
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection:', reason);
+    io.emit('log', { type: 'ERR', msg: `Promise Rejection: ${reason}` });
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -601,6 +612,74 @@ function handleParameterWrite(addr, val, unitID) {
     }
 }
 
+// --- Simulation Logic ---
+function floatToModbus(val) {
+    const buf = Buffer.alloc(4);
+    buf.writeFloatBE(val);
+    return [buf.readUInt16BE(0), buf.readUInt16BE(2)];
+}
+
+let simInterval = null;
+
+function startSimulation() {
+    if (simInterval) clearInterval(simInterval);
+    simInterval = setInterval(() => {
+        if (!serialPort || !serialPort.isOpen) return;
+
+        for (const [id, device] of devices) {
+            if (!device.enabled) continue;
+
+            if (device.type === 'energymeter') {
+                const mem = getMem(id);
+                const updates = {};
+
+                // Helper to update MSW/LSW
+                const updateFloat = (addr, val) => {
+                    const [msw, lsw] = floatToModbus(val);
+                    if (mem[addr] !== msw) { mem[addr] = msw; updates[addr] = msw; }
+                    if (mem[addr + 1] !== lsw) { mem[addr + 1] = lsw; updates[addr + 1] = lsw; }
+                };
+
+                // Simulate Voltage (220V +/- 2%)
+                const voltage = 220 + (Math.random() * 8.8 - 4.4);
+                updateFloat(0x0800, voltage); // Phase A
+                updateFloat(0x0802, voltage * (1 + (Math.random() * 0.01 - 0.005))); // Phase B
+                updateFloat(0x0804, voltage * (1 + (Math.random() * 0.01 - 0.005))); // Phase C
+
+                // Simulate Current (random load 5A - 10A)
+                const current = 5 + Math.random() * 5;
+                updateFloat(0x080C, current); // Phase A
+                updateFloat(0x080E, current * 0.95); // Phase B
+                updateFloat(0x0810, current * 1.05); // Phase C
+
+                // Power (Active)
+                const powerA = voltage * current;
+                const powerB = voltage * (current * 0.95);
+                const powerC = voltage * (current * 1.05);
+                updateFloat(0x0806, powerA);
+                updateFloat(0x0808, powerB);
+                updateFloat(0x080A, powerC);
+
+                // Total Power
+                updateFloat(0x060A, powerA + powerB + powerC);
+
+                // Frequency (50Hz +/- 0.1)
+                const freq = 50 + (Math.random() * 0.2 - 0.1);
+                updateFloat(0x0834, freq);
+
+                if (Object.keys(updates).length > 0) {
+                    io.emit('regs-update-batch', { id, updates });
+                }
+            }
+        }
+    }, 1000);
+}
+
+function stopSimulation() {
+    if (simInterval) clearInterval(simInterval);
+    simInterval = null;
+}
+
 // --- Socket Events ---
 io.on('connection', (socket) => {
     // Send current devices list to new client
@@ -609,7 +688,9 @@ io.on('connection', (socket) => {
     // Also send register state for each device
     for (const [slaveId, device] of devices) {
         const mem = getMem(slaveId);
-        const defs = device.type === 'flowmeter' ? flowMeterDefaults : inverterDefaults;
+        let defs = inverterDefaults;
+        if (device.type === 'flowmeter') defs = flowMeterDefaults;
+        if (device.type === 'energymeter') defs = energyMeterDefaults;
         const regData = {};
         for (const addr of Object.keys(defs)) {
             regData[parseInt(addr)] = mem[parseInt(addr)];
@@ -637,12 +718,14 @@ io.on('connection', (socket) => {
             serialPort.on('open', () => {
                 io.emit('server-status', true);
                 io.emit('log', { type: 'INFO', msg: `Server Started on ${port}` });
+                startSimulation();
             });
 
             serialPort.on('close', () => {
                 console.log('Serial port closed');
                 io.emit('server-status', false);
                 io.emit('log', { type: 'INFO', msg: 'Serial port closed' });
+                stopSimulation();
             });
 
         } catch (e) {
