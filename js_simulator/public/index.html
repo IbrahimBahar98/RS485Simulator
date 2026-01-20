@@ -5,228 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modbus Device Simulator</title>
-    <style>
-        :root {
-            --bg-color: #1e1e1e;
-            --panel-bg: #2d2d2d;
-            --text-color: #e0e0e0;
-            --accent: #007acc;
-            --success: #4caf50;
-            --error: #f44336;
-            --border: #3e3e3e;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: grid;
-            grid-template-rows: auto auto 1fr auto;
-            height: 100vh;
-            box-sizing: border-box;
-        }
-
-        h1,
-        h2,
-        h3 {
-            margin: 0 0 10px 0;
-        }
-
-        /* Top Bar */
-        .top-bar {
-            background-color: var(--panel-bg);
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border: 1px solid var(--border);
-            margin-bottom: 15px;
-        }
-
-        select,
-        input,
-        button {
-            background-color: #3d3d3d;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: var(--accent);
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover {
-            filter: brightness(1.1);
-        }
-
-        button:disabled {
-            filter: grayscale(1);
-            cursor: not-allowed;
-        }
-
-        button.stop-btn {
-            background-color: var(--error);
-        }
-
-        button.run-btn {
-            background-color: var(--success);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-        }
-
-        .tab-btn {
-            padding: 10px 20px;
-            background-color: #383838;
-            border: 1px solid var(--border);
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            color: #aaa;
-        }
-
-        .tab-btn.active {
-            background-color: var(--panel-bg);
-            color: var(--accent);
-            font-weight: bold;
-        }
-
-        /* Main Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            overflow: hidden;
-        }
-
-        /* Panels */
-        .panel {
-            background-color: var(--panel-bg);
-            border-radius: 8px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Dashboard */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .card {
-            background-color: #383838;
-            padding: 15px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .card-label {
-            font-size: 0.9em;
-            color: #aaa;
-            margin-bottom: 5px;
-        }
-
-        .card-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .card-unit {
-            font-size: 0.8em;
-            color: #aaa;
-        }
-
-        .control-group {
-            margin-top: 10px;
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-        }
-
-        .control-group input {
-            width: 60px;
-        }
-
-        /* Actions */
-        .action-bar {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        /* Reg Table */
-        .reg-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-            margin-top: 15px;
-        }
-
-        .reg-table th,
-        .reg-table td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .reg-table th {
-            color: #aaa;
-        }
-
-        .reg-val {
-            font-family: monospace;
-            color: var(--accent);
-        }
-
-        /* Logs */
-        .log-container {
-            flex: 1;
-            background-color: #111;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 10px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9em;
-        }
-
-        .log-entry {
-            margin: 2px 0;
-            border-bottom: 1px solid #222;
-        }
-
-        .log-rx {
-            color: #4caf50;
-        }
-
-        .log-tx {
-            color: #2196f3;
-        }
-
-        .log-err {
-            color: #f44336;
-        }
-
-        .log-info {
-            color: #aaa;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -283,33 +62,41 @@
                 <button onclick="removeCurrentDevice()" class="stop-btn"
                     style="margin-left:auto; padding:5px 10px;">Remove Device</button>
             </div>
-            <div class="dashboard" id="dashboard">
-                <!-- Generated by JS -->
-            </div>
 
-            <h3 style="margin-top:20px;">Key Registers</h3>
-            <div style="overflow-y:auto; flex:1; max-height:200px;">
-                <table class="reg-table">
-                    <thead>
-                        <tr>
-                            <th>Addr</th>
-                            <th>Name</th>
-                            <th>Value</th>
-                            <th>Hex</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reg-table-body">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-            <div
-                style="margin-top:10px; border-top:1px solid #444; padding-top:10px; display:flex; gap:5px; align-items:center;">
-                <input type="text" id="new-reg-addr" placeholder="Addr (Hex)"
-                    style="width:80px; background:#222; color:#fff; border:1px solid #444; padding:5px;">
-                <input type="text" id="new-reg-name" placeholder="Name (Optional)"
-                    style="width:140px; background:#222; color:#fff; border:1px solid #444; padding:5px;">
-                <button onclick="addCustomRegister()" style="background:var(--accent); padding:5px 10px;">+ Add</button>
+            <!-- Inner Grid: Dashboard Cards (left) + Key Registers (right) -->
+            <div class="content-grid">
+                <!-- Left Side: Dashboard Cards -->
+                <div class="dashboard-section">
+                    <h4 class="section-title">Dashboard</h4>
+                    <div class="dashboard" id="dashboard">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right Side: Key Registers -->
+                <div class="registers-section">
+                    <h4 class="section-title">Key Registers</h4>
+                    <div class="registers-container">
+                        <table class="reg-table">
+                            <thead>
+                                <tr>
+                                    <th>Addr</th>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                    <th>Hex</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reg-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="add-register-form">
+                        <input type="text" id="new-reg-addr" placeholder="Addr (Hex)">
+                        <input type="text" id="new-reg-name" placeholder="Name">
+                        <button onclick="addCustomRegister()" class="add-btn">+ Add</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -349,32 +136,32 @@
         // ===== FLOW METER Dashboard Cards =====
         const flowMeterMap = [
             { a: 778, n: "Flow Rate", s: 1, u: "L/s", float: true, lsw: 779 },
-            { a: 772, n: "Fwd Total", s: 1, u: "L", uint32: true, lsw: 773 },
+            { a: 772, n: "Fwd Total", s: 1, u: "L", float: true, lsw: 773 },
             { a: 812, n: "Conductivity", s: 1, u: "μS/cm", float: true, lsw: 813 },
             { a: 777, n: "Alarms", s: 1, u: "flags" }
         ];
 
         // ===== ENERGY METER (ADL400) Dashboard Cards =====
         const energyMeterMap = [
-            // Voltage Phases (Configurable)
-            { a: 0x0800, n: "Voltage Phase A", s: 1, u: "V", float: true },
-            { a: 0x0802, n: "Voltage Phase B", s: 1, u: "V", float: true },
-            { a: 0x0804, n: "Voltage Phase C", s: 1, u: "V", float: true },
-            
-            // Current Phases (Configurable)
-            { a: 0x080C, n: "Current Phase A", s: 1, u: "A", float: true },
-            { a: 0x080E, n: "Current Phase B", s: 1, u: "A", float: true },
-            { a: 0x0810, n: "Current Phase C", s: 1, u: "A", float: true },
-            
-            // Total Power & Parameters
-            { a: 0x060A, n: "Total Active Power", s: 1, u: "W", float: true },
-            { a: 0x0832, n: "Total Power Factor", s: 1, u: "PF", float: true },
-            { a: 0x0834, n: "Frequency", s: 1, u: "Hz", float: true },
-            
-            // Energy Values
-            { a: 0x0842, n: "Total Active Energy", s: 1, u: "kWh", uint32: true },
-            { a: 0x6002, n: "Daily Total Energy", s: 1, u: "kWh", uint32: true },
-            { a: 0x7002, n: "Monthly Total Energy", s: 1, u: "kWh", uint32: true }
+            // Voltage Phases (Floats - 2 registers each)
+            { a: 0x0800, n: "Voltage Phase A", s: 1, u: "V", float: true, lsw: 0x0801 },
+            { a: 0x0802, n: "Voltage Phase B", s: 1, u: "V", float: true, lsw: 0x0803 },
+            { a: 0x0804, n: "Voltage Phase C", s: 1, u: "V", float: true, lsw: 0x0805 },
+
+            // Current Phases (Floats)
+            { a: 0x080C, n: "Current Phase A", s: 1, u: "A", float: true, lsw: 0x080D },
+            { a: 0x080E, n: "Current Phase B", s: 1, u: "A", float: true, lsw: 0x080F },
+            { a: 0x0810, n: "Current Phase C", s: 1, u: "A", float: true, lsw: 0x0811 },
+
+            // Total Power & Parameters (Floats)
+            { a: 0x060A, n: "Total Active Power", s: 1, u: "W", float: true, lsw: 0x060B },
+            { a: 0x0832, n: "Total Power Factor", s: 1, u: "PF", float: true, lsw: 0x0833 },
+            { a: 0x0834, n: "Frequency", s: 1, u: "Hz", float: true, lsw: 0x0835 },
+
+            // Energy Values (UInt32)
+            { a: 0x0842, n: "Total Active Energy", s: 1, u: "kWh", uint32: true, lsw: 0x0843 },
+            { a: 0x6002, n: "Daily Total Energy", s: 1, u: "kWh", uint32: true, lsw: 0x6003 },
+            { a: 0x7002, n: "Monthly Total Energy", s: 1, u: "kWh", uint32: true, lsw: 0x7003 }
         ];
 
         // Current active map (changes based on device type)
@@ -413,55 +200,43 @@
             { a: 0x3023, n: "U00.35 Energy" }
         ];
 
-        // ===== FLOW METER Registers =====
+        // ===== FLOW METER Registers (Merged 32-bit values) =====
         const flowMeterRegs = [
             // Input Registers (FC 04) - Readings
-            { a: 772, n: "Forward Total MSW" },
-            { a: 773, n: "Forward Total LSW" },
+            { a: 772, n: "Forward Total", float: true, lsw: 773 },
             { a: 774, n: "Unit Info" },
             { a: 777, n: "Alarm Flags" },
-            { a: 778, n: "Flow Rate MSW" },
-            { a: 779, n: "Flow Rate LSW" },
+            { a: 778, n: "Flow Rate", float: true, lsw: 779 },
             { a: 786, n: "Fwd Overflow Count" },
-            { a: 812, n: "Conductivity MSW" },
-            { a: 813, n: "Conductivity LSW" },
+            { a: 812, n: "Conductivity", float: true, lsw: 813 },
             // Holding Registers (FC 03) - Config
-            { a: 261, n: "Flow Range MSW" },
-            { a: 262, n: "Flow Range LSW" },
-            { a: 281, n: "Alarm High MSW" },
-            { a: 282, n: "Alarm High LSW" },
-            { a: 284, n: "Alarm Low MSW" },
-            { a: 285, n: "Alarm Low LSW" }
+            { a: 261, n: "Flow Range", float: true, lsw: 262 },
+            { a: 281, n: "Alarm High", float: true, lsw: 282 },
+            { a: 284, n: "Alarm Low", float: true, lsw: 285 }
         ];
 
-        // ===== ENERGY METER (ADL400) Registers =====
+        // ===== ENERGY METER (ADL400) Registers (Merged 32-bit values) =====
         const energyMeterRegs = [
-            // Voltage Registers (Input Registers - FC 04)
-            { a: 0x0800, n: "Phase A Voltage (V)" },
-            { a: 0x0802, n: "Phase B Voltage (V)" },
-            { a: 0x0804, n: "Phase C Voltage (V)" },
-            
-            // Current Registers
-            { a: 0x080C, n: "Phase A Current (A)" },
-            { a: 0x080E, n: "Phase B Current (A)" },
-            { a: 0x0810, n: "Phase C Current (A)" },
-            
-            // Power & Parameters
-            { a: 0x060A, n: "Total Active Power (W)" },
-            { a: 0x0832, n: "Total Power Factor" },
-            { a: 0x0834, n: "Frequency (Hz)" },
-            
-            // Energy Registers (kWh)
-            { a: 0x0842, n: "Total Active Energy (kWh)" },
-            { a: 0x0844, n: "Total Active Energy LSW (kWh)" },
-            
-            // Process Archives (Frozen Values)
-            { a: 0x6002, n: "Daily Total Active Energy (kWh)" },
-            { a: 0x6004, n: "Daily Total Active Energy LSW (kWh)" },
-            
-            { a: 0x7002, n: "Monthly Total Active Energy (kWh)" },
-            { a: 0x7004, n: "Monthly Total Active Energy LSW (kWh)" },
-            
+            // Voltage Registers (Floats)
+            { a: 0x0800, n: "Phase A Voltage", float: true, lsw: 0x0801 },
+            { a: 0x0802, n: "Phase B Voltage", float: true, lsw: 0x0803 },
+            { a: 0x0804, n: "Phase C Voltage", float: true, lsw: 0x0805 },
+
+            // Current Registers (Floats)
+            { a: 0x080C, n: "Phase A Current", float: true, lsw: 0x080D },
+            { a: 0x080E, n: "Phase B Current", float: true, lsw: 0x080F },
+            { a: 0x0810, n: "Phase C Current", float: true, lsw: 0x0811 },
+
+            // Power & Parameters (Floats)
+            { a: 0x060A, n: "Total Active Power", float: true, lsw: 0x060B },
+            { a: 0x0832, n: "Total Power Factor", float: true, lsw: 0x0833 },
+            { a: 0x0834, n: "Frequency", float: true, lsw: 0x0835 },
+
+            // Energy Registers (UInt32)
+            { a: 0x0842, n: "Total Active Energy (kWh)", uint32: true, lsw: 0x0843 },
+            { a: 0x6002, n: "Daily Total Energy (kWh)", uint32: true, lsw: 0x6003 },
+            { a: 0x7002, n: "Monthly Total Energy (kWh)", uint32: true, lsw: 0x7003 },
+
             // Configuration
             { a: 0x008D, n: "PT Ratio" },
             { a: 0x008E, n: "CT Ratio" },
@@ -531,19 +306,66 @@
             let defaults = inverterRegs;
             if (type === 'flowmeter') defaults = flowMeterRegs;
             else if (type === 'energymeter') defaults = energyMeterRegs;
-            
+
             const customs = customRegs[currentID] || [];
             allRegs = [...defaults, ...customs];
-
             const tbody = document.getElementById('reg-table-body');
-            tbody.innerHTML = allRegs.map(r => `
-                <tr id="row-${currentID}-${r.a}">
-                    <td>0x${r.a.toString(16).toUpperCase().padStart(4, '0')}</td>
-                    <td>${r.n}</td>
-                    <td><input type="text" id="tval-${r.a}" class="table-input" onchange="setRegDirect(this, ${r.a})" placeholder="-" style="border: 1px solid #444; background: #222; width: 100%;"></td>
+            tbody.innerHTML = allRegs.map(r => {
+                const addrHex = '0x' + r.a.toString(16).toUpperCase().padStart(4, '0');
+                const is32Bit = r.float || r.uint32;
+                const addrDisplay = is32Bit && r.lsw ? `${addrHex}+${r.lsw - r.a}` : addrHex;
+                const dataType = r.float ? 'Float' : (r.uint32 ? 'UInt32' : 'UInt16');
+                return `
+                <tr id="row-${currentID}-${r.a}" data-float="${!!r.float}" data-uint32="${!!r.uint32}" data-lsw="${r.lsw || 0}">
+                    <td>${addrDisplay}</td>
+                    <td>${r.n}${is32Bit ? ' <span style="color:#888;font-size:0.8em;">[' + dataType + ']</span>' : ''}</td>
+                    <td><input type="text" id="tval-${r.a}" class="table-input" onchange="setRegDirect(this, ${r.a}, ${!!r.float}, ${!!r.uint32}, ${r.lsw || 0})" placeholder="-"></td>
                     <td id="thex-${r.a}">-</td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
+
+            // Update values from state
+            updateRegTableValues();
+        }
+
+        function updateRegTableValues() {
+            if (!currentID) return;
+            // Initialize state if not present
+            if (!state[currentID]) state[currentID] = {};
+
+            allRegs.forEach(r => {
+                const tval = document.getElementById(`tval-${r.a}`);
+                const thex = document.getElementById(`thex-${r.a}`);
+                if (!tval) return;
+
+                if (r.float && r.lsw) {
+                    const msw = state[currentID][r.a] || 0;
+                    const lsw = state[currentID][r.lsw] || 0;
+                    const floatVal = registersToFloat(msw, lsw);
+                    tval.value = floatVal.toFixed(3);
+                    thex.innerText = `0x${msw.toString(16).toUpperCase().padStart(4, '0')} ${lsw.toString(16).toUpperCase().padStart(4, '0')}`;
+                } else if (r.uint32 && r.lsw) {
+                    const msw = state[currentID][r.a] || 0;
+                    const lsw = state[currentID][r.lsw] || 0;
+                    const uint32Val = (msw << 16) | lsw;
+                    tval.value = uint32Val;
+                    thex.innerText = `0x${uint32Val.toString(16).toUpperCase().padStart(8, '0')}`;
+                } else {
+                    const val = state[currentID][r.a] || 0;
+                    tval.value = val;
+                    thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
+                }
+            });
+        }
+
+        // Convert 2x16bit registers to float (Big Endian)
+        function registersToFloat(msw, lsw) {
+            const buffer = new ArrayBuffer(4);
+            const view = new DataView(buffer);
+            view.setUint16(0, msw, false); // Big Endian
+            view.setUint16(2, lsw, false);
+            return view.getFloat32(0, false);
         }
 
         function addCustomRegister() {
@@ -578,11 +400,27 @@
             // But we rely on socket response.
         }
 
-        // Add setRegDirect back (user removed it?)
-        function setRegDirect(input, addr) {
-            const val = parseInt(input.value);
-            if (!isNaN(val)) {
-                socket.emit('set-register', { id: currentID, addr, val });
+        function setRegDirect(input, addr, isFloat = false, isUint32 = false, lswAddr = 0) {
+            if (isFloat && lswAddr > 0) {
+                const floatVal = parseFloat(input.value);
+                if (!isNaN(floatVal)) {
+                    const regs = floatToRegisters(floatVal);
+                    socket.emit('set-register', { id: currentID, addr, val: regs.msw });
+                    socket.emit('set-register', { id: currentID, addr: lswAddr, val: regs.lsw });
+                }
+            } else if (isUint32 && lswAddr > 0) {
+                const uint32Val = parseInt(input.value);
+                if (!isNaN(uint32Val)) {
+                    const msw = (uint32Val >>> 16) & 0xFFFF;
+                    const lsw = uint32Val & 0xFFFF;
+                    socket.emit('set-register', { id: currentID, addr, val: msw });
+                    socket.emit('set-register', { id: currentID, addr: lswAddr, val: lsw });
+                }
+            } else {
+                const val = parseInt(input.value);
+                if (!isNaN(val)) {
+                    socket.emit('set-register', { id: currentID, addr, val });
+                }
             }
         }
 
@@ -598,8 +436,6 @@
             // Update active tab style
             document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
                 const device = devicesList[idx];
-                // Only mark active if it matches a valid device in the list
-                // (The last button is "+ Add Device" which won't match)
                 btn.classList.toggle('active', device && device.slaveId === id);
             });
 
@@ -608,22 +444,29 @@
             regenerateRegTable();
 
             // Refresh displayed values from state
+            updateDashboardValues();
+        }
+
+        function updateDashboardValues() {
+            if (!currentID || !state[currentID]) return;
+
             map.forEach(r => {
                 const valEl = document.getElementById(`val-${r.a}`);
-                if (valEl) {
-                    const val = state[id][r.a] || 0;
-                    valEl.innerText = (val / r.s).toFixed(r.s > 1 ? 2 : 0);
-                }
-            });
+                if (!valEl) return;
 
-            // Update register table
-            allRegs.forEach(r => {
-                const tval = document.getElementById(`tval-${r.a}`);
-                const thex = document.getElementById(`thex-${r.a}`);
-                if (tval && state[id]) {
-                    const val = state[id][r.a] || 0;
-                    tval.value = val;
-                    thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
+                if (r.float && r.lsw) {
+                    const msw = state[currentID][r.a] || 0;
+                    const lsw = state[currentID][r.lsw] || 0;
+                    const floatVal = registersToFloat(msw, lsw);
+                    valEl.innerText = floatVal.toFixed(2);
+                } else if (r.uint32 && r.lsw) {
+                    const msw = state[currentID][r.a] || 0;
+                    const lsw = state[currentID][r.lsw] || 0;
+                    const uint32Val = (msw << 16) | lsw;
+                    valEl.innerText = uint32Val;
+                } else {
+                    const val = state[currentID][r.a] || 0;
+                    valEl.innerText = (val / r.s).toFixed(r.s > 1 ? 2 : 0);
                 }
             });
         }
@@ -746,17 +589,8 @@
             }
             // If this is the currently viewed tab, update UI
             if (id === currentID) {
-                const mapItem = map.find(m => m.a === addr);
-                if (mapItem) {
-                    document.getElementById(`val-${addr}`).innerText = (val / mapItem.s).toFixed(mapItem.s > 1 ? 2 : 0);
-                }
-                // Update register table
-                const tval = document.getElementById(`tval-${addr}`);
-                const thex = document.getElementById(`thex-${addr}`);
-                if (tval) {
-                    tval.value = val;
-                    thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
-                }
+                updateDashboardValues();
+                updateRegTableValues();
             }
         });
 
@@ -766,20 +600,8 @@
             }
             // If this is the currently viewed tab, update UI
             if (id === currentID) {
-                for (const [addrStr, val] of Object.entries(updates)) {
-                    const addr = parseInt(addrStr);
-                    const mapItem = map.find(m => m.a === addr);
-                    if (mapItem) {
-                        document.getElementById(`val-${addr}`).innerText = (val / mapItem.s).toFixed(mapItem.s > 1 ? 2 : 0);
-                    }
-                    // Update register table
-                    const tval = document.getElementById(`tval-${addr}`);
-                    const thex = document.getElementById(`thex-${addr}`);
-                    if (tval) {
-                        tval.value = val;
-                        thex.innerText = `0x${val.toString(16).toUpperCase().padStart(4, '0')}`;
-                    }
-                }
+                updateDashboardValues();
+                updateRegTableValues();
             }
         });
 

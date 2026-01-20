@@ -6,7 +6,7 @@
     },
     "2": {
       "type": "inverter",
-      "enabled": true
+      "enabled": false
     },
     "3": {
       "type": "inverter",
@@ -26,7 +26,7 @@
     },
     "101": {
       "type": "energymeter",
-      "enabled": true
+      "enabled": false
     },
     "102": {
       "type": "energymeter",
