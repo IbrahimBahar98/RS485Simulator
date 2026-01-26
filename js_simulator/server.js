@@ -248,6 +248,120 @@ const energyMeterDefaults = {
 // Keep defaults reference for backward compatibility
 const defaults = inverterDefaults;
 
+// ===== FR500A/FR510A REGISTER WRITE RULES (Per Datasheet Appendix A) =====
+
+// Write-only Control Command Registers (0x2000-0x2004)
+const CONTROL_REGISTERS = {
+    0x2000: { name: 'CONTROL_COMMAND', values: [0, 1, 2, 3, 4, 5, 6, 7] }, // 0=Stop, 1=Forward, 2=Reverse, 3=Jog Fwd, 4=Jog Rev, 5=Slow Stop, 6=Freewheel, 7=Fault Reset
+    0x2001: { name: 'FREQUENCY_SETPOINT', min: 0, max: 60000 }, // 0-600.00Hz in 0.01Hz units
+    0x2002: { name: 'PID_GIVEN', min: 0, max: 1000 },           // 0-100.0%
+    0x2003: { name: 'PID_FEEDBACK', min: 0, max: 1000 },        // 0-100.0%
+    0x2004: { name: 'TORQUE_SETPOINT', min: -3000, max: 3000 }  // -300.0% to 300.0%
+};
+
+// Read-only Status Registers
+const READ_ONLY_REGISTERS = [0x2100, 0x2101];
+
+// Check if address is in U00 group (0x30xx) - Read-only monitoring registers
+const isU00Register = (addr) => (addr >= 0x3000 && addr <= 0x30FF);
+// Check if address is in U01 group (0x31xx) - Read-only fault record registers
+const isU01Register = (addr) => (addr >= 0x3100 && addr <= 0x31FF);
+
+// Password/Unlock state per device (unitID -> state)
+const deviceUnlockState = new Map();
+const UNLOCK_TIMEOUT_MS = 5 * 60 * 1000; // 5 min auto-lock per datasheet
+
+function getUnlockState(unitID) {
+    if (!deviceUnlockState.has(unitID)) {
+        deviceUnlockState.set(unitID, {
+            unlocked: false,
+            lastActivity: 0
+        });
+    }
+    return deviceUnlockState.get(unitID);
+}
+
+// Build Modbus exception response
+function buildExceptionResponse(unitID, fc, errorCode) {
+    const response = Buffer.alloc(5);
+    response.writeUInt8(unitID, 0);
+    response.writeUInt8(fc | 0x80, 1);  // Set high bit to indicate exception
+    response.writeUInt8(errorCode, 2);
+    const crc = calculateCRC(response.subarray(0, 3));
+    response.writeUInt16LE(crc, 3);
+    return response;
+}
+
+// Validate write requests per FR500A datasheet rules
+function validateWriteRequest(addr, val, unitID, io) {
+    const mem = getMem(unitID);
+    const unlockState = getUnlockState(unitID);
+
+    // Check timeout - auto-lock after 5 min inactivity
+    if (unlockState.unlocked && (Date.now() - unlockState.lastActivity > UNLOCK_TIMEOUT_MS)) {
+        unlockState.unlocked = false;
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} Auto-locked due to inactivity` });
+    }
+
+    // Always allow password register (F00.00 = 0x0000) to be written for unlock
+    if (addr === 0x0000) {
+        return { valid: true };
+    }
+
+    // Check if it's a read-only register (U00/U01 groups)
+    if (READ_ONLY_REGISTERS.includes(addr) || isU00Register(addr) || isU01Register(addr)) {
+        return { valid: false, errorCode: 0x02, reason: `Register 0x${addr.toString(16)} is read-only` };
+    }
+
+    // Check parameter protection (F00.02) - if set to 1, only F00.02 can be modified
+    const paramProtection = mem[0x0002] || 0;
+    if (paramProtection === 1 && addr !== 0x0002) {
+        if (!unlockState.unlocked) {
+            return { valid: false, errorCode: 0x04, reason: `Parameters locked. Write password to 0x0000 first` };
+        }
+    }
+
+    // Validate control command values
+    if (CONTROL_REGISTERS[addr]) {
+        const reg = CONTROL_REGISTERS[addr];
+        if (reg.values && !reg.values.includes(val)) {
+            return { valid: false, errorCode: 0x03, reason: `Invalid value ${val} for ${reg.name}` };
+        }
+        if (reg.min !== undefined && (val < reg.min || val > reg.max)) {
+            return { valid: false, errorCode: 0x03, reason: `Value ${val} out of range for ${reg.name}` };
+        }
+    }
+
+    // Update last activity time for unlock timeout
+    if (unlockState.unlocked) {
+        unlockState.lastActivity = Date.now();
+    }
+
+    return { valid: true };
+}
+
+// Handle password unlock when F00.00 is written
+function handlePasswordWrite(addr, val, unitID, io) {
+    if (addr !== 0x0000) return;
+
+    const mem = getMem(unitID);
+    const unlockState = getUnlockState(unitID);
+    const storedPassword = mem[0x0000] || 0;
+
+    if (storedPassword === 0) {
+        // No password set - setting a new password
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} Password SET` });
+    } else if (val === storedPassword) {
+        // Correct password - unlock
+        unlockState.unlocked = true;
+        unlockState.lastActivity = Date.now();
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} UNLOCKED via password` });
+    } else {
+        // Wrong password
+        io.emit('log', { type: 'WARN', msg: `ID:${unitID} Wrong password attempt` });
+    }
+}
+
 function getMem(unitID) {
     if (!memory[unitID]) {
         memory[unitID] = new Uint16Array(65536);
@@ -356,6 +470,10 @@ app.get('/api/ports', async (req, res) => {
 
 let serialPort = null;
 let buffer = Buffer.alloc(0);
+let intentionalStop = false;
+let lastWriteTime = 0;
+let writeCount = 0;
+let errorBeforeClose = null;
 
 // --- Custom RTU Server Logic ---
 function processBuffer() {
@@ -368,6 +486,11 @@ function processBuffer() {
         // Quick validation of UnitID and FC
         // We only support specific FCs for this sim
         if (![3, 4, 6, 16].includes(fc)) {
+            // Only warn if this looks like a valid device ID
+            if (devices.has(unitID)) {
+                // Throttle? No, just emit.
+                io.emit('log', { type: 'WARN', msg: `ID:${unitID} Unsupported FC:${fc}` });
+            }
             start++;
             continue;
         }
@@ -409,6 +532,9 @@ function processBuffer() {
             continue; // Continue processing remaining buffer
         } else {
             // CRC failed, this is not a valid frame start
+            if (devices.has(unitID) && [3, 4, 6, 16].includes(fc)) {
+                io.emit('log', { type: 'WARN', msg: `ID:${unitID} Bad CRC (Recv:${receivedCRC.toString(16)} Calc:${calcCRC.toString(16)})` });
+            }
             // Shift by 1 byte and try again
             start++;
         }
@@ -420,8 +546,11 @@ function processBuffer() {
     }
 
     // Safety Cap to prevent infinite memory growth if no valid frames ever arrive
+    if (buffer.length > 512) {
+        io.emit('log', { type: 'WARN', msg: `Buffer growing: ${buffer.length} bytes (potential overflow)` });
+    }
     if (buffer.length > 1024) {
-        io.emit('log', { type: 'INFO', msg: 'Buffer overflow - flushing' });
+        io.emit('log', { type: 'ERR', msg: 'Buffer overflow (1KB) - flushing to prevent crash' });
         buffer = Buffer.alloc(0);
     }
 }
@@ -472,18 +601,30 @@ function handleFrame(frame) {
         const addr = frame.readUInt16BE(2);
         const val = frame.readUInt16BE(4);
 
-        mem[addr] = val;
-        io.emit('reg-update', { id: unitID, addr, val }); // Broadcast ID
-        io.emit('log', { type: 'RX', msg: `Write ID:${unitID} Addr:0x${addr.toString(16)} Val:${val}` });
+        // Validate the write request per FR500A datasheet rules
+        const validation = validateWriteRequest(addr, val, unitID, io);
+        if (!validation.valid) {
+            io.emit('log', { type: 'WARN', msg: `ID:${unitID} Write REJECTED: ${validation.reason}` });
+            response = buildExceptionResponse(unitID, fc, validation.errorCode);
+        } else {
+            // Valid write - proceed
+            mem[addr] = val;
+            io.emit('reg-update', { id: unitID, addr, val });
+            io.emit('log', { type: 'RX', msg: `Write ID:${unitID} Addr:0x${addr.toString(16)} Val:${val}` });
 
-        // Handle Logic
-        if (addr === 0x2000) handleControlCommand(val, unitID);
+            // Handle password unlock
+            handlePasswordWrite(addr, val, unitID, io);
 
-        // Handle Parameter Writes (FR500A Protection Sequence)
-        handleParameterWrite(addr, val, unitID);
+            // Handle Control Commands
+            if (addr === 0x2000) handleControlCommand(val, unitID);
 
-        // Echo Request as Response
-        response = Buffer.from(frame);
+            // Handle Parameter Writes (FR500A Protection Sequence)
+            handleParameterWrite(addr, val, unitID);
+
+            // Echo Request as Response
+            response = Buffer.from(frame);
+        }
+
 
     } else if (fc === 16) { // Write Multi
         const addr = frame.readUInt16BE(2);
@@ -493,29 +634,67 @@ function handleFrame(frame) {
 
         io.emit('log', { type: 'RX', msg: `WriteMulti ID:${unitID} Addr:0x${addr.toString(16)} Count:${count}` });
 
-        for (let i = 0; i < count; i++) {
+        // Validate ALL registers first before writing any
+        let validationError = null;
+        for (let i = 0; i < count && !validationError; i++) {
+            const regAddr = addr + i;
             const val = data.readUInt16BE(i * 2);
-            mem[addr + i] = val;
-            io.emit('reg-update', { id: unitID, addr: addr + i, val });
-            if ((addr + i) === 0x2000) handleControlCommand(val, unitID);
-            handleParameterWrite(addr + i, val, unitID);
+            const validation = validateWriteRequest(regAddr, val, unitID, io);
+            if (!validation.valid) {
+                validationError = validation;
+                io.emit('log', { type: 'WARN', msg: `ID:${unitID} WriteMulti REJECTED at 0x${regAddr.toString(16)}: ${validation.reason}` });
+            }
         }
 
-        // Response: ID(1) FC(1) Addr(2) Count(2) CRC(2)
-        response = Buffer.alloc(8);
-        response.writeUInt8(unitID, 0);
-        response.writeUInt8(fc, 1);
-        response.writeUInt16BE(addr, 2);
-        response.writeUInt16BE(count, 4);
-        const crcVal = calculateCRC(response.subarray(0, 6));
-        response.writeUInt16LE(crcVal, 6);
+        if (validationError) {
+            response = buildExceptionResponse(unitID, fc, validationError.errorCode);
+        } else {
+            // All validated - now write all registers
+            for (let i = 0; i < count; i++) {
+                const regAddr = addr + i;
+                const val = data.readUInt16BE(i * 2);
+                mem[regAddr] = val;
+                io.emit('reg-update', { id: unitID, addr: regAddr, val });
+
+                // Handle password unlock
+                handlePasswordWrite(regAddr, val, unitID, io);
+
+                if (regAddr === 0x2000) handleControlCommand(val, unitID);
+                handleParameterWrite(regAddr, val, unitID);
+            }
+
+            // Response: ID(1) FC(1) Addr(2) Count(2) CRC(2)
+            response = Buffer.alloc(8);
+            response.writeUInt8(unitID, 0);
+            response.writeUInt8(fc, 1);
+            response.writeUInt16BE(addr, 2);
+            response.writeUInt16BE(count, 4);
+            const crcVal = calculateCRC(response.subarray(0, 6));
+            response.writeUInt16LE(crcVal, 6);
+        }
     }
 
     if (response) {
+        // Safety check: ensure port is still open before writing
+        if (!serialPort || !serialPort.isOpen) {
+            io.emit('log', { type: 'WARN', msg: `Write skipped - port not open (ID:${unitID})` });
+            return;
+        }
+
         // Log TX to help user verify response
         const hex = response.toString('hex').toUpperCase();
         io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
-        serialPort.write(response);
+
+        writeCount++;
+        lastWriteTime = Date.now();
+
+        serialPort.write(response, (err) => {
+            if (err) {
+                errorBeforeClose = err.message;
+                io.emit('log', { type: 'ERR', msg: `Write error: ${err.message}` });
+                console.error('Serial write error:', err);
+            }
+        });
     }
 }
 
@@ -541,8 +720,9 @@ function handleControlCommand(val, unitID) {
             mem[r] = 0;
             updates[r] = 0;
         });
-    } else if (val === 1) { // Run
-        io.emit('log', { type: 'INFO', msg: `ID:${unitID} RUN Command` });
+    } else if (val === 1 || val === 2 || val === 3 || val === 4) { // Run (1=Forward, 2=Reverse, 3=Jog Fwd, 4=Jog Rev)
+        const cmdNames = { 1: 'FORWARD RUN', 2: 'REVERSE RUN', 3: 'JOG FORWARD', 4: 'JOG REVERSE' };
+        io.emit('log', { type: 'INFO', msg: `ID:${unitID} ${cmdNames[val]} Command` });
 
         // Calculate values based on Inverter ID to make testing easier
         const id = unitID;
@@ -700,6 +880,7 @@ io.on('connection', (socket) => {
 
     socket.on('start-server', ({ port, baud }) => {
         if (serialPort && serialPort.isOpen) return;
+        intentionalStop = false;
         try {
             console.log(`Starting Custom Modbus Server on ${port} @ ${baud}`);
             serialPort = new SerialPort({ path: port, baudRate: parseInt(baud) });
@@ -710,8 +891,9 @@ io.on('connection', (socket) => {
             });
 
             serialPort.on('error', (err) => {
-                console.error(err);
-                io.emit('log', { type: 'ERR', msg: err.message });
+                errorBeforeClose = err.message;
+                console.error('Serial port error:', err);
+                io.emit('log', { type: 'ERR', msg: `Port error: ${err.message}` });
                 io.emit('server-status', false);
             });
 
@@ -722,9 +904,32 @@ io.on('connection', (socket) => {
             });
 
             serialPort.on('close', () => {
-                console.log('Serial port closed');
+                const timeSinceLastWrite = lastWriteTime ? (Date.now() - lastWriteTime) : -1;
+                const debugInfo = {
+                    intentionalStop,
+                    writeCount,
+                    timeSinceLastWriteMs: timeSinceLastWrite,
+                    bufferLength: buffer.length,
+                    errorBeforeClose
+                };
+
+                console.log('Serial port closed. Debug info:', JSON.stringify(debugInfo, null, 2));
                 io.emit('server-status', false);
-                io.emit('log', { type: 'INFO', msg: 'Serial port closed' });
+
+                if (!intentionalStop) {
+                    io.emit('log', {
+                        type: 'ERR',
+                        msg: `Unexpected Close! Writes:${writeCount} LastWrite:${timeSinceLastWrite}ms ago Buffer:${buffer.length}b Error:${errorBeforeClose || 'none'}`
+                    });
+                } else {
+                    io.emit('log', { type: 'INFO', msg: 'Serial port closed' });
+                }
+
+                // Reset tracking variables
+                writeCount = 0;
+                lastWriteTime = 0;
+                errorBeforeClose = null;
+
                 stopSimulation();
             });
 
@@ -736,12 +941,13 @@ io.on('connection', (socket) => {
 
     socket.on('stop-server', () => {
         if (serialPort && serialPort.isOpen) {
+            intentionalStop = true; // Mark as user-initiated
             serialPort.close((err) => {
                 if (err) {
                     io.emit('log', { type: 'ERR', msg: err.message });
                 } else {
                     io.emit('server-status', false);
-                    io.emit('log', { type: 'INFO', msg: 'Server Stopped' });
+                    io.emit('log', { type: 'INFO', msg: 'Server Stopped (User Request)' });
                     console.log('Modbus Server Stopped');
                 }
             });

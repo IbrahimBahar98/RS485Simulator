@@ -1,0 +1,14123 @@
+FR500A&FR510A Series Vector Control Inverter
+
+Preface
+
+Thank you for choosing FRECON developed and produced FR500A&FR510A series
+
+vector control inverter.
+
+FR500A&FR510A series vector control inverter is mainly positioned as a high-end market for
+OEM customers and the specific requirements of fan and pump load applications，its flexible design,
+both embedded SVC and VF control in one, can be widely used for speed control accuracy, torque
+response speed, low-frequency output characteristics and other situations with higher requirements.
+This user manual supplies a detailed description of FR500A &FR510A series vector control
+inverter includes product characterization, structural features, parameter setting, operation and
+commissioning, inspection maintenance and other contents. Be sure to carefully read through the
+safety precautions before use, and use this product on the premise that personnel and equipment
+safety is ensured.
+
+IMPORTANT NOTES
+
+◆To illustrate the details of the products，pictures in this manual based on products with outer
+casing or safety cover being removed. When using this product, please be sure to well install
+outer casing or covering by the rules, and operating in accordance with the manual contents.
+◆The illustrations this manual for illustration only and may vary with different products you have
+ordered.
+◆The company is committed to continuous improvement of products, product features will
+continue to upgrade, the information provided is subject to change without notice.
+◆If you are using have questions, please contact our regional agents or our customer service
+center. Customer Service Tel 0755 -33067999.
+◆The company's other products please visit our website. http://www.frecon.com.cn
+
+- 1 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Contents
+
+PREFACE ............................................................................................................................................... - 1 -
+
+CONTENTS ............................................................................................................................................ - 2 -
+
+CHAPTER 1 PRODUCT INFORMATION .............................................................................................- 3 -
+
+1.1 NAMEPLATE INFORMATION ............................................................................................................. - 3 -
+1.2 INFORMATION OF PRODUCT MODEL ...............................................................................................- 4 -
+1.3 TECHNICAL FEATURES ................................................................................................................... - 5 -
+1.4 CONFIGURATION, MOUNTING DIMENSIONS AND WEIGHT ............................................................... - 7 -
+1.5 EXTERNAL DIMENSIONS OF KEYPAD ............................................................................................ - 12 -
+
+CHAPTER 2 WIRING AND TERMINALS ...........................................................................................- 14 -
+
+2.1 WIRING WAY ................................................................................................................................ - 14 -
+2.2 TERMINAL CONFIGURATION ..........................................................................................................- 15 -
+
+CHAPTER 3 OPERATION AND DISPLAY ........................................................................................ - 20 -
+
+3.1 INTRODUCTION OF KEYPAD ..........................................................................................................- 20 -
+3.2 VIEWING AND MODIFYING FUNCTION CODES ...............................................................................- 22 -
+3.3 VIEWING STATUS PARAMETERS ................................................................................................... - 22 -
+3.4 MOTOR AUTO-TUNING ................................................................................................................. - 23 -
+3.5 PASSWORD SETTING ................................................................................................................... - 23 -
+3.6 KEYPAD LOCK ..............................................................................................................................- 23 -
+3.7 SHORTCUT MENUS FUNCTION CODE DESCRIPTION .......................................................................- 23 -
+
+CHAPTER 4 LIST OF PARAMETER ................................................................................................. - 24 -
+
+4.1 FIVE LED (DIGITAL) DISPLAY INDICATORS .................................................................................... - 25 -
+4.2 STANDARD FUNCTION PARAMETERS ............................................................................................- 25 -
+
+CHAPTER 5 MAINTENANCE AND TROUBLESHOOTING .............................................................- 70 -
+
+APPENDIX A: MODBUS COMMUNICATION PROTOCOL ............................................................. - 75 -
+
+APPENDIX B: BRAKING RESISTOR ................................................................................................ - 81 -
+
+APPENDIX C: PG CARD .................................................................................................................... - 82 -
+
+C.1 ABZ ENCODER PG CARD ............................................................................................................- 83 -
+C.2 ROTARY TRANSFORMER PG CARD .............................................................................................. - 86 -
+C.3 UVW ENCODER PG CARD ..........................................................................................................- 87 -
+C.4 ECN1313 PG CARD .................................................................................................................. - 89 -
+C.5 SIN-COS ENCODER PG CARD ..................................................................................................... - 90 -
+
+- 2 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Chapter 1 Product Information
+
+1.1 Nameplate information
+
+Fig.1-1 Nameplate information
+
+Model Explanation
+
+Model show on product nameplate contains information below.
+
+Fig.1-2 Model Explanation
+
+- 3 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+1.2 Information of Product Model
+
+Model No.
+
+FR500A-4T-0.7G/1.5PB
+FR500A-4T-1.5G/2.2PB
+FR500A-4T-2.2G/4.0PB
+FR500A-4T-4.0G/5.5PB
+FR500A-4T-5.5G/7.5PB
+FR500A-4T-7.5G/011PB
+FR500A-4T-011G/015PB
+FR500A-4T-015G/018PB
+FR500A-4T-018G/022PB
+FR500A-4T-022G/030PB
+FR500A-4T-030G/037PB
+FR500A-4T-037G/045P
+FR500A-4T-037G/045PB
+FR500A-4T-045G/055P
+FR500A-4T-045G/055PB
+FR500A-4T-055G/075P
+FR500A-4T-055G/075PB
+FR500A-4T-075G/090P
+FR500A-4T-075G/090PB
+FR500A-4T-090G/110P
+FR500A-4T-090G/110PB
+FR500A-4T-110G/132P
+FR500A-4T-132G/160P
+FR500A-4T-160G/185P
+FR500A-4T-185G/200P
+FR500A-4T-200G/220P
+FR500A-4T-220G/250P
+FR500A-4T-250G/280P
+FR500A-4T-280G/315P
+FR500A-4T-315G/355P
+FR500A-4T-355G/400P
+FR500A-4T-400G/450P
+FR500A-4T-450G/500P
+FR500A-4T-500G/560P
+FR500A-4T-560G/630P
+
+Table 1-1 FR500A Product model and technical data
+Rated
+Input current A
+
+Power
+capacity KVA
+
+Rated
+current A
+
+output
+
+3-Phase:380V，50/60Hz Range:-15%～+30%
+2.5
+4.2
+5.5
+9.5
+13
+17
+25
+32
+37
+45
+60
+
+3.4
+5.0
+5.8
+11
+14.6
+20.5
+26
+35
+38.5
+46.5
+62
+
+1.5
+3
+4
+6
+8.9
+11
+17
+21
+24
+30
+40
+
+57
+
+69
+
+85
+
+114
+
+134
+
+160
+192
+231
+240
+250
+280
+355
+396
+445
+500
+565
+623
+670
+770
+
+76
+
+92
+
+113
+
+157
+
+186
+
+220
+260
+310
+355
+382
+430
+475
+535
+610
+665
+785
+865
+890
+1025
+
+75
+
+91
+
+112
+
+150
+
+176
+
+210
+253
+304
+350
+377
+426
+470
+520
+600
+650
+725
+800
+860
+990
+
+Applicable
+motor
+
+kW
+
+HP
+
+0.75
+1.5
+2.2
+3.7, 4
+5.5
+7.5
+11
+15
+18.5
+22
+30
+
+37
+
+45
+
+55
+
+75
+
+90
+
+110
+132
+160
+185
+200
+220
+250
+280
+315
+355
+400
+450
+500
+560
+
+1
+2
+3
+5
+7.5
+10
+15
+20
+25
+30
+40
+
+50
+
+60
+
+70
+
+100
+
+125
+
+150
+175
+210
+250
+260
+300
+330
+370
+420
+470
+530
+600
+660
+750
+
+*Note：The model of FR510A series inverter only needs to replace FR500A in the above table with
+
+FR510A
+
+- 4 -
+
+1.3 Technical Features
+
+Project
+
+Specifications
+
+Table 1-2 Technical features
+
+FR500A&FR510A Series Vector Control Inverter
+
+Power input
+
+Power output
+
+Control
+characteristics
+
+Basic functions
+
+Basic functions
+
+Rated input
+voltage (V)
+Rated input
+current (A)
+Rated input
+frequency (Hz)
+Applicable
+motor(kW)
+Rated output
+current (A)
+The maximum
+output voltage
+(V)
+The maximum
+output frequency
+(Hz)
+
+V/F patterns
+
+Speed range
+
+Speed accuracy
+
+Speed
+fluctuation
+Torque response
+
+Starting torque
+
+Carrier
+frequency
+
+Overload
+capability
+
+Torque boost
+
+V/F Curve
+
+Acceleration and
+deceleration
+Curve
+
+DC brake
+
+Jog brake
+
+Simple PLC,
+Multi-speed
+
+Built-in PID
+
+3-phase 380 V (-15%～+30%)
+
+See table 1-1
+
+50Hz/60Hz，tolerance±5%
+
+See table 1-1
+
+See table 1-1
+
+0～rated input voltage, error<±3%
+
+0.00～600.00 Hz,unit0.01Hz
+
+V/f control
+Sensor-less vector control 1
+Sensor-less vector control 2
+Close loop vector control with PG card(Only FR510A)
+1:50 (V/f control)
+1:100 (sensor-less vector control 1)
+1:200（sensor-less vector control 2）
+1:1000（VC with PG card）(Only FR510A)
+±0.5% (V/F control)
+±0.2% (sensor-less vector control 1 & 2)
+
+±0.3% (sensor-less vector control 1 & 2)
+
+< 10ms (sensor-less vector control 1 & 2)
+0.5Hz: 180% (V/f control, sensor-less vector control 1)
+0.25Hz: 180% (sensor-less vector control 2)
+
+0.7kHz～16kHz
+
+G Model:150% Rated Current 60s,180% Rated Current
+10s,200% Rated Current 1s.
+P Model:120% Rated Current 60s,145% Rated Current
+10s,160% Rated Current 1s.
+Automatic torque boost；Manual torque boost 0.1%～30.0%
+Three ways: straight; multi-point type; N Th-type V / F curve
+(1.2 Th -type, 1.4 Th -type, 1.6 Th -type, 1.8 Th -type, 2 Th
+–type)
+Line or curve acceleration and deceleration mode.
+Four kinds of acceleration and deceleration time，Ramp
+Time Range :0.0～6000.0s
+DC brake start frequency: 0.00～600.00Hz
+DC brake time:0.0s～10.0s
+DC brake current:0.0%～150.0%
+Jog frequency range:0.00Hz～50.00Hz.
+Jog deceleration time: 0.0s～6000.0s.
+Through the built-in PLC or control terminal to achieve up to
+16 speed running
+Facilitate the realization of process control loop control
+system
+
+- 5 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Automatic
+voltage
+adjustment
+（AVR）
+Fast current limit
+function
+Over voltage
+Over current
+Command
+source
+
+Frequency given
+
+Run
+
+Input terminal
+
+output
+terminal
+
+When the grid voltage changes, can automatically maintain
+a constant output voltage
+
+Minimize over current fault protection inverter running
+
+System automatically limits of current and voltage during
+operation to prevent frequent
+Given the control panel, control terminal, serial
+communication port given.
+7 kinds of frequency sources: digital setting, keyboard
+potentiometer setting, analog
+Voltage, given analog current reference pulse is given, the
+serial port is given, multi-speed given, PLC is given, the
+process PI D reference. There are several ways to switch
+7 Switch input terminals, one way to make high-speed pulse
+input.
+3-channel analog inputs, including 2-way 0～10V / 0～
+20mA voltage and current options,
+a way to support -10～+10 V input
+2-way switch output terminal, which supports a maximum
+road speed 100kHz pulse output.
+2 relay output terminals.
+2 analog output terminal, and optional voltage and current.
+
+fixed length control, count function.
+
+Parameter copy, parameter backup, flexible parameter displayed & hidden.
+Common DC bus（Contains below 30 KW）.
+Various master & auxiliary command and switchover.
+Reliable speed search started.
+A variety of Accel / Decel curves programmable.
+Timing control,
+Three faults recorded.
+Over excitation brake, overvoltage stall protection programmable, under voltage
+stall protection programmable, restart upon power loss.
+Four kinds of Accel/Decel time.
+Motor thermal protection.
+Flexible fan control.
+Process PID control, simple PLC, 16-step speed control programmable.
+Wobble frequency control.
+Multi-functional key programmable, field-weakening control.
+High-precision torque control, V/f separated control, torque control at sensor-less
+vector control.
+Provide fault protection dozen: Overcurrent, Overvoltage, Undervoltage,
+Overtemperature, Overload Etc Protection.
+
+LED Display
+Key lock and
+function
+selection
+Run and stop
+monitoring
+information
+
+Place of
+operation
+
+Altitude
+
+Ambient
+
+Display Parameters
+
+Realize some or all of the keys locked, scope definition
+section keys to prevent misuse
+
+In the run or stop can be set to monitor U00 group four
+objects were.
+
+Indoors, no direct sunlight, free from dust, corrosive gases,
+flammable gases, oil mist, water vapor, water drop and salt,
+etc.
+0～2000m
+De-rate 1% for every 100m when the altitude is above 1000
+meters
+-10℃～40℃
+
+- 6 -
+
+Featured
+functions
+
+Protection
+function
+
+Display and
+keyboard
+
+Environment
+
+FR500A&FR510A Series Vector Control Inverter
+
+temperature
+Relative
+humidity
+Vibration
+Storage
+temperature
+Efficiency
+Installation
+IP grade
+Cooling
+method
+
+5～95%, no condensation
+
+Less than 5.9m/s2 (0.6g)
+
+-20℃～+70℃
+
+Rated power≥93%
+Wall-mounted or Flange mounting
+IP20
+
+Fan cooled
+
+Others
+
+1.4 Configuration, Mounting Dimensions and Weight
+
+◆0.7～2.2KW Dimensions and wall mounting dimensions
+
+1
+H
+
+H
+
+W1
+W
+
+D
+179
+
+Fig 1-6 0.7～4.0kW Wall installation diagram
+
+External and installation dimensions（mm）
+
+Model NO.
+
+W
+
+W1
+
+H
+
+H1
+
+D
+
+3-Phase:380V，50/60Hz
+
+Range:-15%～+30%
+
+Mounting
+Hole
+Diameter
+
+Weight
+（Kg）
+
+FR500A-4T-0.7G/1.5PB
+FR500A-4T-1.5G/2.2PB
+FR500A-4T-2.2G/4.0PB
+*Note：
+
+80
+
+60
+
+200
+
+190
+
+167
+
+6
+
+1.34
+
+1. The model of FR510A series inverter only needs to replace FR500A in the above table with
+
+FR510A.
+
+- 7 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+◆4～22KW Dimensions and wall mounting dimensions:
+
+W1
+
+Fig 1-7 4～22kW Wall installation diagram
+
+External and installation dimensions（mm）
+
+Model NO.
+
+W
+
+W1
+
+H
+
+H1
+
+D
+
+3-Phase:380V，50/60Hz
+
+Range:-15%～+30%
+
+116.6
+
+106.6
+
+186.6
+
+176.6
+
+175
+
+146
+
+131
+
+249
+
+236
+
+198
+
+183
+
+300
+
+287
+
+190
+（177）
+
+197
+（185）
+
+FR500A-4T-4.0G/5.5PB
+FR500A-4T-5.5G/7.5PB
+FR500A-4T-7.5G/011PB
+FR500A-4T-011G/015PB
+FR500A-4T-015G/018PB
+FR500A-4T-018G/022PB
+FR500A-4T-022G/030PB
+
+*Note：
+
+Mounting
+Hole
+Diameter
+
+Weight
+（Kg）
+
+4.5
+
+5.5
+
+5.5
+
+2.5
+
+3.9
+
+6.2
+
+1. The model of FR510A series inverter only needs to replace FR500A in the above table with
+
+FR510A.
+
+2. In the FR510A series inverter structure size table, the dimensions of the old version are in
+
+parentheses
+
+- 8 -
+
+◆ 30～280kW Dimensions and wall mounting dimensions:
+
+FR500A&FR510A Series Vector Control Inverter
+
+Fig 1-8 30～280KW Wall installation diagram
+
+External and installation dimensions（mm）
+
+Model NO.
+
+W
+
+W1
+
+H
+
+H1
+
+D
+
+FR500A-4T-030G/037PB
+
+FR500A-4T-037G/045P
+
+FR500A-4T-045G/055P
+FR500A-4T-055G/075P
+FR500A-4T-075G/090P
+FR500A-4T-090G/110P
+FR500A-4T-110G/132P
+FR500A-4T-132G/160P
+FR500A-4T-160G/185P
+FR500A-4T-185G/200P
+FR500A-4T-200G/220P
+FR500A-4T-220G/250P
+FR500A-4T-250G/280P
+FR500A-4T-280G/315P
+
+3-Phase:380V，50/60Hz
+
+250
+(245)
+250
+(300)
+
+300
+
+310
+
+310
+
+400
+
+500
+
+200
+(200)
+200
+(200)
+
+200
+
+200
+
+200
+
+300
+
+300
+
+Range:-15%～+30%
+227
+411
+(200)
+(391)
+227
+411
+(226)
+(466)
+
+432
+(410)
+432
+(485)
+
+485
+
+620
+
+650
+
+750
+
+855
+
+466
+
+226
+
+601
+
+280
+
+620
+
+724
+
+822
+
+350
+
+300
+
+370
+
+540
+
+340
+
+924.5
+
+896
+
+380
+
+Mounting
+Hole
+Diameter
+
+Weight
+（Kg）
+
+7
+(7)
+7
+(7)
+
+7
+
+9.5
+
+11.5
+
+11.5
+
+12
+
+12
+
+12.9
+(11.8)
+12.9
+(15)
+
+15
+
+26
+
+45
+
+68
+
+112
+
+120
+
+*Note：
+In the FR510A series inverter structure size table, the dimensions of the old version are in parentheses
+
+- 9 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+◆ 315～400kW Dimensions and wall mounting dimensions:
+
+W
+W1
+
+D
+
+1
+H
+
+H
+
+0
+5
+9
+
+Fig 1-8 315～400KW Wall installation diagram
+
+External and installation dimensions（mm）
+
+Model NO.
+
+W
+
+W1
+
+H
+
+H1
+
+D
+
+3-Phase:380V，50/60Hz
+
+FR500A-4T-315G/355P
+FR500A-4T-355G/400P
+FR500A-4T-400G/450P
+
+700
+（620）
+700
+
+500
+（400）
+500
+
+Range:-15%～+30%
+988.5
+（963） 390
+390
+988.5
+
+1025.5
+（996）
+1025.5
+
+Mounting
+Hole
+Diameter
+
+Weight
+（Kg）
+
+14
+（12）
+14
+
+195
+（133）
+195
+
+*Note：
+In the FR510A series inverter structure size table, the dimensions of the old version are in parentheses
+
+- 10 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+◆ 450～560kW Dimensions and wall mounting dimensions:
+
+W
+W 1
+
+d
+
+D
+
+H
+
+Fig 1-8 450～560KW Wall installation diagram
+
+External and installation dimensions（mm）
+
+Model NO.
+
+W
+
+W1
+
+H
+
+H1
+
+D
+
+3-Phase:380V，50/60Hz
+
+940
+（700）
+
+700
+（500）
+
+Range:-15%～+30%
+-
+（988.5）
+
+1684
+（1025.5）
+
+440
+（390）
+
+940
+
+700
+
+1684
+
+-
+
+440
+
+30
+
+Weight
+（Kg）
+
+Mounti
+ng Hole
+Diamet
+er
+
+30
+（14）
+
+（195）
+
+FR500A-4T-450G/500P
+
+FR500A-4T-500G/560P
+FR500A-4T-560G/630P
+
+*Note：
+
+1. The model of FR510A series inverter only needs to replace FR500A in the above table with
+
+FR510A.
+
+2. The data in parentheses in the above table is the size of previous version scheme.
+3. In the FR510A series inverter structure size table, the dimensions of the old version are in
+
+parentheses
+
+- 11 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+1.5 External Dimensions of Keypad
+
+Fig 1-11- 0.7～5.5KW Keyboard size diagram
+
+74.6
+
+R4.3
+
+5
+1
+0
+
+.
+
+.
+
+6
+6
+1
+1
+
+28
+
+15.5
+3.8
+2
+
+71.6
+
+7
+
+15.3
+
+5
+1
+
+.
+
+6
+3
+1
+1
+
+Fig 1-12- 7.5～450KW Keyboard size diagram
+
+External keyboard installation instruction:
+1. first install the panel according to inverter’s power range corresponding to the size of hole as shown
+
+on scheme 1-12,
+
+2. After that insert keyboard pad into the mounting panel and then insert the keyboard module into the
+keyboard pad.（Before removing the keyboard pad, first remove the keyboard, then remove as
+shown in the scheme）.
+
+- 12 -
+
+External keyboard installation:
+
+FR500A&FR510A Series Vector Control Inverter
+
+64+0.2
+-0
+
+80+0.2
+-0
+
+Keypad assembly Keypad tray
+
+2
+
+1
+
+Mounting plate
+(The thickness of the
+plate can`t be more
+than 1.5 mm)
+
+.
+
+2
+0
+0
++
+-
+9
+9
+
+.
+
+2
+0
+0
++
+-
+5
+3
+1
+
+4.0-5.5KW:Hole
+size of mounting plate
+
+7.5-355KW:Hole
+size of mounting plate
+
+Press 4 hooks on both sides of the
+ mounting ,the keypad tray will be get out
+
+Fig 1-13 4.0～450KW External keyboard installation hole size diagram
+
+- 13 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Chapter 2 Wiring and Terminals
+
+2.1 Wiring way
+
+Fig.2-1 FR500A&FR510A Inverter wiring diagram
+
+Remarks:
+1）◎refers to main circuit terminals.，○refers to control circuit terminals.
+2）User selects braking resistor based on real needs，Please refer to the braking resistor Selection
+Guide.
+3）Signal cable and power cable should be separated. Try to cross control cable and
+power cable in 90° if needed. The best selection of analog signal lines shielded twisted pair，Power
+cables use shielded three-core cable(The specifications of the motor cable than ordinary freshman
+profile)or Comply with manual drive.
+
+- 14 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+2.2 Terminal Configuration
+2.2.1 Main Circuit Terminals
+
+◆0.7～2.2KW Main Circuit Terminals
+
+Fig.2-2 0.7～2.2kW Schematic of main circuit terminals
+
+◆4～5.5KW Main Circuit Terminals
+
+(+) (-) R S T U V
+POWER
+
+Fig.2-3 4～5.5kW Schematic of main circuit terminals
+
+◆7.5～22KW Main Circuit Terminals
+
+RFI
+
+(+) (-)
+
+DC
+
+PB
+
+Fig.2-4 7.5～22kW Schematic of main circuit terminals
+
+- 15 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+◆30～37KW Main Circuit Terminals
+
+(+) (-)
+
+DC
+
+PB
+
+Fig.2-5 30～37kW Schematic of main circuit terminals
+
+◆45～90KW Main Circuit Terminals:
+
+(+) (-)
+
+DC
+
+PB
+
+Fig.2-6 45～90kW Schematic of main circuit terminals
+
+◆110～132KW , 250～280KW ,315～450KW Main Circuit Terminals:
+
+Fig.2-7 110～132KW , 250～280KW ,315～450KW Main Circuit Terminals
+
+- 16 -
+
+◆160～220KW Main Circuit Terminals:
+
+FR500A&FR510A Series Vector Control Inverter
+
+Fig.2-9 160～220KW Main Circuit Terminals
+
+Main circuit terminal functions
+
+Terminal marks
+
+R, S, T
+
+U, V, W
+
+(+), (-)
+
+PB
+
+Designation and function of terminals.
+AC power input terminals for connecting to 3-phase
+AC380V power supply.
+
+AC output terminals of inverter for connecting to 3-phase
+induction motor.
+
+Positive and negative terminals of internal DC bus.
+Positive and negative terminals of internal DC bus.
+Connecting terminals of braking resistor. One end
+connected to + and the other to PB.
+
+Grounding terminal.
+
+Remarks: No phase sequence requirements on wiring of the input side of inverter. Wiring
+Precautions:
+1）Power input terminals R, S , T
+◆ The cable connection on the input side of the AC drive has no phase sequence requirement.
+2）DC bus (+), (－)
+◆ Terminals (+) and (-) of DC bus have residual voltage after the AC drive is switched off. After
+indicator CHARGE goes off, wait at least 10 minutes before touching the equipment Otherwise, you
+may get electric shock.
+◆ Do not connect the braking resistor directly to the DC bus. Otherwise, it may damage the AC drive
+and even cause fire.
+3）Braking resistor connection terminals (+), PB
+◆ The cable length of the braking resistor shall be less than 5 m. Otherwise, it may damage the AC
+drive.
+4）AC drive output terminals U, V, W
+◆ The capacitor or surge absorber cannot be connected to the output side of the AC drive. Otherwise,
+it may cause frequent AC drive fault or even damage the AC drive.
+
+If the motor cable is too long, electrical resonance will be generated due to the impact of distributed
+capacitance. This will damage the motor insulation or generate higher leakage current, causing the AC
+drive to trip in overcurrent protection. If the motor cable is greater than 100 m long, an AC output
+reactor must be installed close to the AC drive.
+5）Terminal PE
+◆ This terminal must be reliably connected to the main earthing conductor. Otherwise, it may cause
+electric shock, mal-function or even damage to the AC drive.
+◆ Do not connect the earthing terminal to the neutral conductor of the power supply.
+
+- 17 -
+
+FR500A&FR510A Series Vector Control Inverter
+2.2.2 Control circuit terminals
+
+485+ 485-
+
+GND
+
+AO2
+
+AO1
+AI1 AI2
+
+DI1
+
+DI2
+
+DI3
+
+DI4
+
+DI7/HI
+
+R2A R2B R2C
+
++10V
+
+Y2/HO
+
+COM
+
+COM
+
+PLC
+
++24V
+
+R1A R1B R1C
+
+Fig.2-10a control circuit terminals (0.7～2.2kW)
+
+DI1
+
+DI2
+
+DI3
+
+DI4
+
+COM
+
+Y1 Y2
+
+GND
+
+AO1
+
+AO2
+
+485+
+
+485-
+
+R2A R2B R2C
+
++24V
+
+PLC
+
+COM
+
+DI5
+
+DI6
+
+DI7/HI
+
++10V
+
+AI1
+
+AI2
+
+AI3
+
+GND
+
+PE
+
+R1A R1B R1C
+
+Fig.2-10b Control circuit terminals(＞2.2KW)
+
+Type
+
+Table 3-1 Description of control circuit terminals
+Name
+
+Terminal
+
+Function Description
+
++10V-GND
+
+External +10 V
+power supply
+
+Power supply
+
++24V-COM
+
+PLC
+
+External +24V
+power
+supply Applying
+to Overvoltage
+Category II
+circuit
+
+Input terminal
+of
+external power
+supply
+
+AI1-GND
+
+Analog input 1
+
+Analog input
+
+AI2-GND
+
+Analog input 2
+
+Switch input
+
+AI3-GND
+
+Analog input 3
+
+DI1- COM
+
+DI2- COM
+
+DI3- COM
+
+DI4- COM
+
+Switch input
+terminals 1
+Switch input
+terminals 2
+Switch input
+terminals 3
+Switch input
+
+- 18 -
+
+Provide +10 V power supply to
+external unit.
+Generally, it provides power supply to
+external potentiometer with resistance
+range of 1–5 kΩ.
+Maximum output current: 10 mA
+
+Provide +24 V power supply to
+external unit.
+Generally, it provides power supply to
+DI/Do terminals and external sensors.
+Maximum output current: 200 mA
+
+Connect to +24 V by default.
+When DI1-DI7 need to be driven by
+external signal, PLC needs to be
+connected to external power supply
+and be disconnected from +24 V.
+Input voltage range: DC 0～10V/0～
+20mA，decided by toggle switches
+AI1, AI2 on the control board
+Impedance: 250 kΩ (voltage input),
+250 Ω (current input)
+Input Voltage Range: DC -10～+10V
+Input impedance:250kΩ
+
+Maximum input frequency:200Hz
+Impedance:2.4kΩ
+Voltage range for level input:9V～30V
+
+FR500A&FR510A Series Vector Control Inverter
+
+DI5- COM
+
+DI6- COM
+
+DI7/HI-COM
+
+AO1-GND
+
+AO2-GND
+
+Y1-COM
+
+Y2/HO-COM
+
+R1A-R1C
+
+R1B-R1C
+
+R2A-R2C
+
+R2B-R2C
+
+485+-485-
+
+GND
+
+PE
+
+terminals 4
+Switch input
+terminals 5
+Switch input
+terminals 6
+Switch input
+terminals 7 OR
+High-speed
+pulse input
+Analog output
+terminal 1
+Analog output
+terminal 2
+Open collector
+output 1
+Open collector
+output 2 OR
+High-speed
+pulse output
+Normally open
+terminal
+Normally
+closed terminal
+Normally open
+terminal
+Normally
+closed terminal
+485
+Communication
+Terminals
+485
+Communication
+shielded
+ground
+Shield Ground
+External
+operation
+panel interface
+
+Analog
+output
+
+Switch output
+
+Relay output
+
+485
+Communication
+
+Shield
+
+Auxiliary
+Interface
+
+Besides features of DI1–DI6, it can be
+used for high-speed pulse input.
+Maximum input frequency: 100 kHz
+
+Output voltage range:DC 0～10V/0～
+20mA，decided by toggle switches
+AO1, AO2 on the control board
+Impedance requirements≥10kΩ
+Voltage range:0～24V
+Current range:0～50mA
+Besides features of Y1, it can be used
+for High-speed pulse output channels.
+The maximum output
+frequency:100kHz
+
+Contact driving capacity:
+AC250V，3A，COSØ=0.4.
+DC 30V，1A
+
+Rate:
+4800/9600/19200/38400/57600/
+115200bps
+Termination resistor is set by the
+toggle switch on the control panel
+RS485
+
+Ground terminal for shield
+
+Use standard network cable
+Maximum cable distance: 50m
+
+- 19 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Chapter 3 Operation and Display
+
+3.1 Introduction of Keypad
+
+As a human-machine interface, you can modify the parameters, monitor the working status and
+start or stop the inverter by operating the keypad. Its appearance and function area as shown in the
+following figure:
+
+3.1.1 Key and potentiometer Functions on keypad
+
+Fig.3-1 Keypad
+
+There are 8 keys and a potentiometer on the keypad, whose functions are as shown in Table 4-1.
+
+Symbol
+
+Name
+
+Function
+
+Table 3-1 Key functions on keypad
+
+Escape
+
+Enter or exit Level I menu
+
+Enter
+
+Enter the menu interfaces level by level, and
+confirm the parameter setting
+
+Increment
+
+Increase data or function code
+
+Decrement
+
+Decrease data or function code
+
+Shift
+
+Multifunction
+
+Select the displayed parameters in turn in the stop
+or running state, and select the digit to be modified
+when modifying parameters
+Perform function switchover (such as jog run and
+quick switchover of
+command source or direction) according to the
+setting of F16.00
+
+potentiometer
+
+With the same function as AI1/AI2
+
+Run
+
+Start the inverter in the keypad control mode
+
+Stop/Reset
+
+Stop the inverter when it is in the running state and
+perform the reset operation when it is in the fault
+state. The functions of this key are restricted in
+F16.01.
+
++
+
+Key combinations
+
+The inverter will free stop when the run and stop
+key are pressed simultaneously
+
+- 20 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+3.1.2 Keypad Indicators
+
+There are 8 Indicators on the keypad, whose descriptions are as shown in Table 3-2.
+
+Table 3-2 Description of indicators
+
+Indicator
+
+Hz
+
+V
+A
+
+%
+
+All off
+
+FWD/REV
+
+LOC/REM
+
+Unit
+
+State
+
+(Green border）
+
+Name
+
+Frequency
+
+Voltage
+Current
+
+Percentage
+
+Other unit
+
+Forward or
+reverse
+
+Keypad,
+terminals or
+communication
+
+Running state
+
+（Red border）
+
+Fault state
+
+Meaning
+
+ON: currently displayed parameter is
+frequency
+ON: currently displayed parameter is voltage
+ON: currently displayed parameter is current
+ON: currently displayed parameter is
+percentage
+Other unit or no unit
+ON: the drive is running reverse
+OFF: the drive is running forward
+Flash: dormant state
+ON: Terminal control
+OFF: Keypad control
+Flash: Communication control
+ON: Running state
+OFF: Stopped state
+Flash: In process of stop
+ON: Fault state
+OFF: Normal state
+Flash: Warning state
+
+3.1.3 Keypad digital display
+
+The keypad has five LED (digital) display, it can display a given frequency, output frequency and
+
+other parameters, monitoring data and alarm code. Table 3-3 shows meanings of the characters
+displayed on Keypad.
+
+Displayed
+character
+
+Character
+Meaning
+
+Displayed
+character
+
+Character
+Meaning
+
+Displayed
+character
+
+Character
+Meaning
+
+Displayed
+character
+
+Character
+Meaning
+
+Table 3-3 Meanings of displayed characters
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+A
+
+b
+
+C
+
+c
+
+d
+
+E
+
+F
+
+G
+
+H
+
+h
+
+I
+
+J
+
+K
+
+L
+
+N
+
+n
+
+o
+
+p
+
+q
+
+r
+
+S
+
+T
+
+t
+
+U
+
+u
+
+y
+
+-
+
+8.
+
+.
+
+3.1.4 Message status
+
+A message appears when the state of completion of certain operations. Prompt message
+
+characters and their meanings are specified in Table 3-4.
+
+- 21 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Prompt symbol
+
+Meaning
+
+Prompt symbol
+
+Table 3-4 Prompt characters
+
+Err00～Err99
+
+A00～A99
+
+Fault type
+
+Alarm type
+
+TUNE
+
+-END-
+
+Meaning
+Motor parameter
+identification in
+process
+Write parameter
+
+3.2 Viewing and Modifying Function Codes
+
+The keypad of the FR500A&FR510A adopts three-level menu.
+The three-level menu consists of function code group (Level I), function code (Level II), and
+
+function code setting value (level III), as shown in the figure 3-2.
+
+Fig.3-2 Operation procedure on the keypad
+
+Explanation: In the level III menu, you can press the ESC key or ENT key to return to the level II
+
+menu. The difference is: If you do not have to modify the function code setting, press ENT will be
+automatically transferred to the next function code; If the function code settings are modified, it will
+display menu "-END-" 1 second when press ENT key, and redisplay the current function code settings,
+and it will be automatically transferred to the next function code when press the ENT key again. Press
+the ESC key to abandon the current parameter changes directly returns the current function code in
+level II.
+
+Here is an example of changing the value of F01.02 to 15.00 Hz.
+
+Fig.3-3 Example of changing the parameter value
+In Level III menu, if the parameter has no blinking digit, it means that the parameter cannot be
+
+modified. This may be because:
+
+（1）Such a function code is only readable, such as, AC drive model, actually detected parameter
+
+and running record parameter.
+
+（2）Such a function code cannot be modified in the running state and can only be changed at
+
+stop.
+3.3 Viewing Status Parameters
+
+There are stop state parameters and running state parameters.
+It has 4 status parameters in the stop or running state .You can press “>>” on the keypad to
+display status parameters. Which parameters are displayed is determined by the values of F16.03～
+F16.06（Running state parameters 1～4）, F16.07～F16.10（stop state parameters1～4），it can select
+the U00 group.
+
+- 22 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+3.4 Motor Auto-tuning
+
+Tuning is valid only when the keyboard command mode. Set tuning mode (stationary or rotating),
+
+press the ENT key to confirm, the keyboard will display TUNE, then press the RUN key, the inverter
+will drive motor acceleration and deceleration, positive inversion operation,and the run indicator lights.
+Tuning duration of about two minutes, when the display TUNE message disappears, returning to
+normal parameter display status, which means that the tuning is completed.
+3.5 Password Setting
+
+The inverter provides password protection function, it is set a user's password when F00.00 set to
+
+nonzero.If five minutes without operating the keypad, the password protection is effective, and the
+keypad will show “-----”, then the user must enter the correct password to enter the regular menu,
+otherwise inaccessible.
+
+There are three ways a user password into force:
+Method 1: Set F00.00 parameter to nonzero, then press the ESC + ENT key.
+Method 2: Set F00.00 parameter to nonzero, then do not use the keypad within five minutes.
+Method 3: Set F00.00 parameter to nonzero, then completely power down and then power.
+If you want to cancel the password protection functions, only through a password to enter, and set
+
+F00.00 to 0.
+3.6 Keypad lock
+3.6.1 Keypad lock
+
+The following three methods to any one immediately lock all or part of the keypad buttons; see the
+
+definition of the function code F16.02.
+
+Method 1:Set F16.02parameter to nonzero, then press the ESC + ENT key.
+Method 2:Set F16.02 parameter to nonzero, and then do not use the keypad within five minutes.
+Method 3:Set F16.02 parameter to nonzero, then completely power down and then power.
+
+3.6.2 Keypad unlock
+
+Press the ESC + >> keys to unlock. Unlocking operation does not change the value of F16.02,
+That means when Meet the keypad locking conditions, the keypad will be locked again. If you want the
+control panel no longer be locked, after unlocking the F16.02 must change the value to 0.
+3.7 Shortcut menus function code description
+
+Factory setting mode is changed to be shortcut menu mode (F00.01=1) in the software
+
+version above V1.07, group 17 is for the parameters of shortcut menu.
+
+The difference of display between shortcut manual and basic menu is in the second level
+
+menu, please refer to below the details of difference and the switching method.
+
+Menu mode
+
+Shortcut menu
+
+Basic menu
+
+Display
+difference
+
+Function
+difference
+
+The last digit of F01.01. function
+code is with radix point, no
+flashing
+
+without radix point, and flashing
+
+F01.01 function code is
+
+1. Press
+up-down switch in F17 function
+code
+
+for
+
+or
+
+can’t return back to
+
+2.
+first level menu
+Method 1. Setting F00.01=0 to
+basic menu
+
+Switch
+
+Method 2. Long Press
+when display second level
+menu, switch to basic menu
+automatically
+
+1. Press
+sequency.
+
+2. Press
+menu
+
+or
+
+up-down switch in
+
+return back to first level
+
+Method 1. Setting F00.01 to shortcut menu
+
+when
+Method 2. Long press
+display second level menu, switch to
+shortcut menu automatically
+
+If the shortcut menu is not enough, user can reset the shortcut menu, refer to group F17 for details.
+
+- 23 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Chapter 4 List of Parameter
+
+Group F00～F17 are standard function parameters. Group U00 is status monitoring parameters.
+
+Group U01 is fault record parameters.
+
+" means the value of this parameter can be modified in stop and running status of drive;
+
+The symbols in the function code table are described as follows:
+"
+"×" means the value of this parameter cannot be modified when drive is running;
+△
+"⊙" means this parameter is a measured value that cannot be modified;
+Default: The value when restored to factory default. Neither measured parameter value nor
+
+recorded value will be restored.
+
+Setting Range: the scope of setting and display of parameters
+FR500A&FR510A parameter groups are listed below:
+
+Category
+
+System Parameters
+
+Parameter Group
+
+F00: System Parameters
+F01: Frequency Command
+
+Basic Parameters
+
+F02: Start/Stop Control Start/Stop Control
+
+Input & Output Terminals
+
+Motor and Control Parameters
+
+Protection Parameters
+
+Application Parameters
+
+Communication Parameters
+Keys and Display of Keypad
+Parameters
+User-defined Display Parameters
+
+Monitoring Parameters
+
+F03: Accelerate/Decelerate Parameters
+F04: Digital Input
+F05: Digital Output
+F06: Analog and Pulse Input
+F07: Analog and Pulse Output
+F22: Virtual IO
+F08: Parameters of Motor 1
+F09: V/f Control Parameters of Motor 1
+F10: Vector Control Parameters of Motor 1
+F18: Parameters of Motor 2 (FR510A only)
+F19: V/f Control Parameters of Motor 2 (FR510A
+only)
+F20: Vector Control Parameters of Motor 2 (FR510A
+only)
+F11: Protection Parameters
+F12: Multi-Reference and Simple PLC Function
+F13: Process PID
+F14: Swing Frequency, Fixed Length , Count and
+Wakeup
+F21: Position control. (FR510A only)
+F15: Communication Parameters
+
+F16: Keys and Display of Keypad Parameters
+
+F17: User-defined Display Parameters
+U00: Status monitoring
+U01: Fault record
+
+- 24 -
+
+4.1 Five LED (digital) display indicators
+
+FR500A&FR510A Series Vector Control Inverter
+
+4.2 Standard Function Parameters
+
+Fig.4-1 LED indicators
+
+Param
+
+Parameter
+Name
+
+Table 4-1 Standard Function Parameters
+
+Setting Range
+
+Default
+
+Attr
+
+Group F00: System Parameters
+
+F00.00
+
+Setting of User
+Password
+
+0～65535
+
+F00.01
+
+Display of
+Parameters
+
+F00.02
+
+Parameter
+Protection
+
+F00.03
+
+G/P type
+display
+
+F00.04
+
+Parameter
+Initialization
+
+F00.06
+
+Parameter
+editing mode
+
+F00.07
+
+Motor selection
+
+F00.08
+
+Motor 1 control
+mode
+
+0: Display all parameters
+1: Only display F00.00, F00.01 and
+user-defined parameters
+F17.00～F17.29
+2: Only display F00.00, F00.01,
+and the parameters different with
+factory default
+0: All parameter programmable
+1: Only F00.02 and this parameter
+programmable
+0: G type (constant torque load)
+1: P type (variable torque load
+e.g. fan and pump)
+0: No operation
+1: Restore all parameters to factory
+default
+(excluding motor parameters)
+2: Clear fault record
+3: Back up current user parameters
+4: Restore user backup parameters
+5: Restore factory default.
+(include motor parameter)
+6: Power consumption zero
+clearing (U00.35)
+0:Editable via keypad and RS485.
+1:Editable via keypad
+2:Editable via RS485
+0: Motor 1
+1: Motor 2
+Unit’s place: Motor 1 control mode
+0: V/F control
+1:Sensor-less vector control 1
+2: Sensor-less vector control 2
+3: Vector control with PG card
+
+- 25 -
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+1
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+RAM
+Address
+
+0000
+
+0001
+
+0002
+
+0003
+
+0004
+
+0006
+
+0007
+
+0008
+
+FR500A&FR510A Series Vector Control Inverter
+
+F00.09
+
+DI7/HI input
+mode
+
+F00.10
+
+AI1\AI2\AI3
+input mode
+
+F00.11
+
+Y2/HO input
+mode
+
+F00.12
+
+PWM
+optimization
+
+F00.13
+
+F00.14
+
+F00.15
+
+F00.16
+
+Carrier
+frequency
+Upper carrier
+frequency
+Lower carrier
+frequency
+Output voltage
+
+F00.17
+
+AVR
+
+F00.18
+
+Fan control
+
+F00.19
+
+F00.20
+
+F00.21
+
+F00.22
+
+Factory
+password
+Inverter rated
+power
+Inverter rated
+voltage
+Inverter rated
+
+Ten’s place: Motor 2 control mode
+0: V/F control
+1:Sensor-less vector control 1
+2: Sensor-less vector control 2
+3. Vector control with PG card
+0: Digital input terminal 7
+1: Pulse input
+Unit's place: AI1
+0: Analog input
+1: Digital input
+Ten’s place: AI2
+(same as AI1)
+Hundred’s place: AI3
+(same as AI1)
+0: Digital 0utput terminal 2
+1: Pulse output
+Unit's place: PWM modulation
+mode
+
+0: Fixed carrier
+1: Random carrier
+2: Derating of fixed carrier
+3: Derating of random carrier
+
+Ten’s place: PWM modulation
+mode
+
+0: Seven-segment mode
+1: Five-segment mode
+2: Five-segment and
+
+seven-segment automatic
+switchover
+
+Hundred’s place: over-modulation
+coefficient
+
+0: Invalid
+1~9: 1.01~1.09 times of
+
+over-modulation
+
+0.700～16.000kHz
+
+0.700～16.000kHz
+
+0.700～16.000kHz
+
+5.0～150.0%
+0: Disabled
+1: Enabled
+2: AVR is disabled if the DC
+bus voltage > the rated
+voltage of DC bus, and it will be
+enabled if the DC bus voltage≤the
+rated voltage of DC bus.
+0: Run at power-on
+1: Fan working during running
+
+0～65535
+
+0.2～1000.0kW
+
+60～660V
+
+0.1～1500.0A
+
+- 26 -
+
+0
+
+000
+
+×
+
+×
+
+0009
+
+000A
+
+0
+
+×
+
+000B
+
+500
+
+×
+
+000C
+
+Model
+defined
+
+8.000kHz
+
+2.000kHz
+
+100.0%
+
+1
+
+1
+
+0
+
+Model
+defined
+Model
+defined
+Model
+
+△
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+⊙
+
+⊙
+
+⊙
+
+000D
+
+000E
+
+000F
+
+0010
+
+0011
+
+0012
+
+0013
+
+0014
+
+0015
+
+0016
+
+F00.23
+
+F00.24
+
+F00.25
+
+current
+Software
+version
+Dealer
+password
+Run time
+setting
+
+0.00～655.35
+
+0～65535
+
+0～65535h(0: Invalid)
+
+Group F01: Frequency Command
+
+FR500A&FR510A Series Vector Control Inverter
+
+defined
+Model
+defined
+
+0
+
+0h
+
+⊙
+
+×
+
+×
+
+0017
+
+0018
+
+0019
+
+F01.00
+
+Frequency
+source
+selection
+
+F01.01
+
+Master
+Frequency
+Command
+Source
+
+F01.02
+
+Master
+Frequency
+Digital setting
+
+F01.03
+
+Auxiliary
+Frequency
+Command
+Source
+
+F01.04
+
+F01.05
+
+F01.06
+
+F01.07
+
+F01.08
+
+F01.09
+
+F01.10
+
+F01.11
+
+Auxiliary
+frequency
+digital setting
+Auxiliary
+frequency
+range
+Auxiliary
+frequency coeff
+Jog frequency
+Maximum
+frequency
+
+Upper limit
+frequency
+
+Lower limit
+frequency
+Operation when
+
+0: Master frequency source
+1: Auxiliary frequency source
+2: Master +Auxiliary
+3: Master - Auxiliary
+4: MAX{Master, Auxiliary }
+5: MIN {Master, Auxiliary }
+6: AI1 ( Master + Auxiliary )
+7: AI2 ( Master +Auxiliary )
+0:Master digital setting (F01.02)
+1: keypad potentiometer
+2: Analog input AI1
+3: Communication
+4: Multi-reference
+5: PLC
+6: Process PID output
+7: X7/HI pulse input
+8: AI2
+9: AI3
+
+0
+
+1
+
+×
+
+0100
+
+×
+
+0101
+
+0.00～Fmax
+
+50.00Hz
+
+0102
+
+0: Auxiliary digital setting (F01.04)
+1: keypad potentiometer
+2: Analog input AI1
+3: Communication
+4: Multi-reference
+5: PLC
+6: Process PID output
+7: X7/HI pulse input
+8: Analog input AI2
+9: Analog input AI3
+
+0.00～Fmax
+
+0: Relative to maximum frequency
+
+1: Relative to master frequency
+
+0.0～1000.0%
+
+0.00～Fmax
+
+20.00～600.00Hz
+
+Fdown～Fmax
+Lower limit frequency～maximum
+frequency
+
+0.00～Fup
+
+0: Run at lower limit frequency
+
+0
+
+- 27 -
+
+△
+
+0
+
+×
+
+0103
+
+50.00Hz
+
+0
+
+100.0%
+
+5.00Hz
+
+50.00Hz
+
+50.00Hz
+
+0.00Hz
+
+0104
+
+0105
+
+0106
+
+0107
+
+0108
+
+0109
+
+010A
+
+010B
+
+△
+×
+
+△
+
+×
+△
+
+×
+
+×
+
+×
+
+△
+
+△
+
+×
+
+△
+×
+
+×
+
+010E
+
+0200
+
+0201
+
+0202
+
+0203
+
+FR500A&FR510A Series Vector Control Inverter
+
+1: Run at 0 Hz would be activated
+after the time delay set by F01.12
+
+F01.12
+
+command
+frequency lower
+than lower limit
+frequency
+Lower limit
+frequency
+running time
+Up to this
+frequency, start
+frequency
+compensation
+Frequency
+compensation
+per 50Hz
+Group F02: Start/Stop Control
+
+F01.13
+
+F01.14
+
+0.0～6000.0s
+
+0.00~600.00Hz
+
+60.0s
+
+×
+
+010C
+
+50.00Hz
+
+010D
+
+0.00~50.00Hz
+
+0.00Hz
+
+F02.00
+
+Run command
+
+F02.01
+
+F02.02
+
+F02.03
+
+Running
+direction
+Reverse-proof
+action
+Dead time
+between
+forward and
+reverse
+
+0: Keypad control (LED off)
+1: Terminal control (LED on)
+2: Communication control (LED
+blinking)
+0: Forward
+1: Reverse
+0: Reverse enabled
+1: Reverse disabled
+
+0
+
+0
+
+0
+
+0.0～6000.0s
+
+0.0s
+
+F02.04
+
+Start mode
+
+Unit’s place: Start Mode
+
+0:Start directly
+1:Rotational speed track and
+
+restart
+
+Ten’s place: short-circuit detection
+function
+
+0:Ungrounded short-circuit
+detection
+1:Grounding short-circuit
+
+detection before the first starts
+
+2:Grounding short-circuit
+
+detection before each starts
+Hundred’s place: Speed tracking
+
+0:Track from zero speed
+1:Track from max frequency
+Thousand’s place: Select if Jog
+function takes the priority
+
+0:Disable
+1:Enable
+
+Ten thousand’s place: Tracking
+direction
+
+0: Last direction when stop
+1: Positive direction
+2: Negative direction
+3: Starting direction
+
+00000
+
+×
+
+0204
+
+F02.05
+
+F02.06
+
+F02.07
+
+Start frequency
+Startup
+frequency
+holding time
+Startup DC
+brakin current
+
+0.00～10.00Hz
+
+0.0～100.0s
+
+0.0～150.0%
+
+- 28 -
+
+0.00Hz
+
+0.0s
+
+0.0%
+
+×
+
+×
+
+×
+
+0205
+
+0206
+
+0207
+
+FR500A&FR510A Series Vector Control Inverter
+
+F02.08
+
+F02.09
+
+F02.10
+
+F02.11
+
+DC braking
+time at start
+Speed search
+current
+Sped search
+decel time
+Sped search
+coefficient
+
+F02.12
+
+Stop mode
+
+F02.13
+
+F02.14
+
+F02.15
+
+F02.16
+
+Initial frequency
+of stop DC
+braking
+Stop DC
+braking current
+Waiting time of
+stop DC
+braking
+Stop DC
+braking time
+
+F02.17
+
+Dynamic brake
+
+F02.18
+
+Voltage of
+dynamic
+braking
+
+0.0～100.0s
+
+0.0～180.0%
+
+0.0～10.0s
+
+0.01～5.00
+
+0: Ramp to stop
+1: Coast to stop
+
+0.01～50.00Hz
+
+0.0～150.0%
+
+0.0～30.0s
+
+0.0～30.0s
+
+0: Disabled
+1: Enabled
+2: Enabled at running
+3: Enabled at deceleration
+
+480～800V
+
+F02.19
+
+Brake use ratio
+
+5.0～100.0%
+
+F02.21
+
+F02.20
+
+F02.22
+
+0Hz output
+selection
+Auto-start of
+power-on again
+Waiting time
+between
+auto-start and
+power-on again
+Group F03: Accel/Decel Parameters
+Accel time 1
+F03.00
+Decel time 1
+F03.01
+Accel time 2
+F03.02
+Decel time 2
+F03.03
+Accel time 3
+F03.04
+Decel time 3
+F03.05
+Accel time 4
+F03.06
+Decel time 4
+F03.07
+Jog accel time
+F03.08
+Jog decel time
+F03.09
+Accel/Decele
+curve
+Initial segment
+time of
+acceleration of
+S curve
+Time unit of
+
+F03.12
+
+F03.10
+
+F03.11
+
+0: 0.1s
+
+0: No voltage output
+1: Voltage output
+0: Invalid
+1: Valid
+
+0.0~10.0s
+
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0.0～6000.0s
+0: Linear Accel/Decel
+1: S-curve Accel/Decel
+
+0.0～6000.0s
+
+- 29 -
+
+0.0s
+
+130.0%
+
+1.0s
+
+0.30
+
+0
+
+2.00Hz
+
+0.0%
+
+0.0s
+
+0.0s
+
+0
+
+700V
+
+100.0%
+
+0
+
+0
+
+0.5s
+
+15.0s
+15.0s
+15.0s
+15.0s
+15.0s
+15.0s
+15.0s
+15.0s
+15.0s
+15.0s
+
+0
+
+0.0s
+
+0
+
+×
+
+△
+×
+
+△
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+△
+
+△
+
+△
+△
+△
+△
+△
+△
+△
+△
+△
+×
+△
+
+×
+
+×
+
+0208
+
+0209
+
+020A
+
+020B
+
+020C
+
+020D
+
+020E
+
+020F
+
+0210
+
+0211
+
+0212
+
+0213
+
+0214
+
+0215
+
+0216
+
+0300
+0301
+0302
+0303
+0304
+0305
+0306
+0307
+0308
+0309
+
+030A
+
+030B
+
+030C
+
+FR500A&FR510A Series Vector Control Inverter
+
+acceleration
+and
+deceleration
+Frequency
+switchover
+point between
+acceleration
+time 1 and
+acceleration
+time 2
+Frequency
+switchover
+point between
+deceleration
+time 1 and
+deceleration
+time 2
+End segment
+time of
+acceleration of
+S curve
+Initial segment
+time of
+deceleration of
+S curve
+End segment
+time of
+deceleration of
+S curve
+
+F03.13
+
+F03.14
+
+F03.15
+
+F03.16
+
+F03.17
+
+Group F04 Digital Input
+
+F04.00
+
+F04.01
+
+F04.02
+
+F04.03
+
+F04.04
+
+F04.05
+
+F04.06
+
+F04.07
+
+F04.08
+
+Function of
+terminal DI1
+Function of
+terminal DI2
+Function of
+terminal DI3
+Function of
+terminal DI4
+Function of
+terminal DI5
+Function of
+terminal DI6
+Function of
+terminal DI7
+Function of
+terminal AI1
+Function of
+terminal AI2
+
+F04.09
+
+Function of
+terminal AI3
+
+1: 0.01s
+
+0.00～Fmax
+
+0.00Hz
+
+×
+
+030D
+
+0.00～Fmax
+
+0.00Hz
+
+0.0s
+
+0.0s
+
+0.0s
+
+1
+
+2
+
+7
+
+13
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+00: No function
+01: Running forward (FWD)
+02: Running reverse (REV)
+03: Three-wire control
+04: JOG forward
+05: JOG reverse
+06: Coast to stop
+07: Fault reset (RESET)
+08: Running suspended
+09: External fault input
+10: Terminal UP
+11: Terminal DOWN
+12: UP/DOWN (including ∧/∨
+key) adjustment clear
+13: Multi-step frequency terminal 1
+14: Multi-step frequency terminal 2
+15: Multi-step frequency terminal 3
+16: Multi-step frequency terminal 4
+17: Accel/Decel time determinant 1
+18: Accel/Decel time determinant 2
+19: Accel/Decel disabled(ramp
+stop not inclusive)
+20: Switch to auxiliary speed
+setting
+21: PLC status reset
+22: Simple PLC paused
+23: Simple PLC paused
+24: PID adjustment direction
+
+- 30 -
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+030E
+
+030F
+
+0310
+
+0311
+
+0400
+
+0401
+
+0402
+
+0403
+
+0406
+
+0405
+
+0406
+
+0407
+
+0408
+
+0409
+
+FR500A&FR510A Series Vector Control Inverter
+
+25: PID integration paused
+26: PID parameter switch
+27: Swing frequency pause(output
+the current frequency)
+28: Swing frequency reset(output
+the central frequency)
+29: Run command switched to
+keypad control
+30: Run command switched to
+terminal control
+31: Run command switched to
+communication control
+32: Count input
+33: Count clear
+34: Length count
+35: Length clear
+36: DC brake input command at
+Stop
+37: Speed/torque control switch
+38: No reverse
+39: No forward
+40: zero-serve (FR510A only)
+41: Enable spindle orientation
+(FR510A only)
+42: Orientation position selection 1
+(FR510A only)
+43: Orientation position selection 2
+(FR510A only)
+44: Simple carry origin signal input
+(FR510A only)
+45: FWD carry (FR510A only)
+46: REV carry (FR510A only)
+47: Carry amount selection
+terminal 1 (FR510A only)
+48: Carry amount selection
+terminal 2 (FR510A only)
+49: Carry amount selection
+terminal 3 (FR510A only)
+70: Position given X7 direction
+input (FR510A only)
+71: Position Pulse Zero Clearing
+(FR510A only)
+72: Forward position offset enable
+(FR510A only)
+73: Reverse position offset enable
+(FR510A only)
+74: Pulse proportion selection of
+Ho output encoder (FR510A only)
+75: Current overrun
+switching(FR510A only)
+76: Carry enable(FR510A only)
+
+F04.10
+
+F04.11
+
+F04.12
+
+Filtering time of
+digital
+input terminal
+Delay time
+before terminal
+DI1 is valid
+Delay time
+before terminal
+
+0.000～1.000s
+
+0.0～300.0s
+
+0.0～300.0s
+
+- 31 -
+
+0.010s
+
+0.0s
+
+0.0s
+
+040A
+
+040B
+
+040D
+
+△
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+DI2 is valid
+
+Terminal DI1～
+DI5
+positive/negativ
+e logic
+
+Terminal DI6～
+AI3
+positive/negativ
+e logic
+
+FWD/REV
+terminal
+control mode
+
+F04.13
+
+F04.14
+
+F04.15
+
+F04.16
+
+Terminal
+UP/DOWN
+frequency
+adjustment
+control
+
+DI5, DI4, DI3, DI2, DI1
+0: Positive logic(Terminals are on
+at 0V/off at 24V)
+1: Negative Logic (Terminals are
+off at 0V/on at 24V)
+AI3, AI2, AI1, DI7, DI6
+0: Positive logic
+
+1: Negative Logic
+
+0: Two-wire mode 1
+1: Two-wire mode 2
+2: Three-wire mode 1
+3: Three-wire mode 2
+Unit's place: action when stop
+
+0: Clear
+1: Holding
+
+Ten’s place: action on power loss
+
+0: Clear
+1: Holding
+
+Hundreds place: integral function
+
+0: No integral function
+1: Integral function enabled
+Thousand’s place: Select if it can
+be reduced to negative frequency
+
+0: Disable
+1: Enable
+
+Ten thousand’s place: Jog action
+to clear UP/DOWN
+
+0: Not Clear
+1: Clear
+
+00000
+
+00000
+
+0
+
+×
+
+×
+
+×
+
+040C
+
+040E
+
+040F
+
+00001
+
+×
+
+0410
+
+F04.17
+
+F04.18
+
+F04.19
+
+F04.20
+
+Terminal
+UP/DOWN
+frequency
+change step
+size
+
+Terminal action
+selection when
+power on
+
+Delay time
+before terminal
+DI1 is invalid
+Delay time
+before terminal
+DI2 is invalid
+
+Group F05 Digital Output
+
+F05.00
+
+F05.01
+
+F05.02
+
+F05.03
+
+Y1 output
+function
+Y2 output
+function
+Relay 1 output
+function
+
+Relay 2 output
+function
+
+0.00～50.00Hz 0.00:Disabled
+
+1.00Hz/
+200ms
+
+0: Level effective
+1: Edge trigger +Level
+effective(When power on)
+2: Edge trigger +Level
+effective(Every start)
+
+0.0～300.0s
+
+0.0～300.0s
+
+00: No output
+01: Drive is running
+02: Fault output
+03: Frequency-level detection
+FDT1 output
+04: Frequency-level detection
+FDT2 output
+05: Drive in 0Hz running 1(no
+output at stop)
+
+- 32 -
+
+0
+
+0.0s
+
+0.0s
+
+1
+
+3
+
+2
+
+11
+
+0411
+
+0412
+
+0413
+
+0414
+
+0500
+
+0501
+
+0502
+
+0503
+
+△
+
+×
+
+△
+
+△
+
+×
+
+×
+
+×
+
+FR500A&FR510A Series Vector Control Inverter
+
+06: Drive in 0Hz running 2(output
+at stop)
+07: Upper limit frequency attained
+08: Lower limit frequency attained
+09: Frequency attained
+10: Inverter is ready to work
+11: Drive (motor) overloaded alarm
+12: Inverter overheat warning
+13: Current running time attained
+14: Accumulative power-on time
+attained
+15: Consecutive running time
+attained
+16: PLC cycle completed
+17: Set count value attained
+18: Designated count value
+attained
+19: Length attained
+20: Under load alarm
+21:Brake output
+22: DI1
+23: DI2
+24:When reach the range of set
+frequency(FDT1)
+25: Spindle orientation completion
+(FR510A only)
+26: PID feedback loss
+27: operation status (inching
+without output)
+28: communication setting
+(address 2007h)
+40: The current exceeds the limit
+
+F05.04
+
+F05.05
+
+F05.06
+
+F05.07
+
+Y1 output delay
+time
+Y2 output delay
+time
+R1 output delay
+time
+R2 output delay
+time
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+F05.08
+
+Enabled state
+of digital
+output
+
+Unit's place: Y1
+0: Positive logic
+1: Negative logic
+Ten’s place: Y2 (same as unit's
+place)
+Hundreds place: Relay 1 output
+(same as unit's place)
+Thousands place: Relay 2 output
+(same as unit's place)
+
+Detection width
+of
+frequency
+attained
+FDT1 upper
+bound
+FDT1 lower
+bound
+FDT2 upper
+
+F05.09
+
+F05.10
+
+F05.11
+
+F05.12
+
+0.00～20.00Hz
+
+0.00～Fmax
+
+0.00～Fmax
+
+0.00～Fmax
+
+- 33 -
+
+0.0s
+
+0.0s
+
+0.0s
+
+0.0s
+
+0000
+
+5.00Hz
+
+30.00Hz
+
+30.00Hz
+
+30.00Hz
+
+△
+
+△
+
+△
+
+△
+
+×
+
+×
+
+×
+
+×
+
+×
+
+0504
+
+0505
+
+0506
+
+0507
+
+0508
+
+0509
+
+050A
+
+050B
+
+050C
+
+FR500A&FR510A Series Vector Control Inverter
+
+F05.13
+
+F05.14
+
+F05.15
+
+F05.16
+
+F05.17
+
+F05.18
+
+F05.19
+
+F05.20
+
+F05.21
+
+F05.22
+
+F05.23
+
+F05.24
+
+F05.26
+
+F05.27
+
+bound
+FDT2 lower
+bound
+Consecutive
+running
+time
+Accumulative
+power-on
+time setting
+Accumulative
+running
+time setting
+Brake control
+selection
+Brake opened
+frequency
+Brake opened
+current
+Brake open
+waiting time
+Brake open
+operating time
+Brake closed
+frequency
+Brake close
+waiting time
+Brake close
+operating time
+Current overrun
+1
+Current overrun
+2
+
+0.00～Fmax
+
+30.00Hz
+
+0.0～6000.0Min 0.0:Disabled
+
+0.0Min
+
+0～65535h
+
+0:Disabled
+
+0～65535h
+
+0:Disabled
+
+0: Disabled
+1: Enabled
+
+0h
+
+0h
+
+0
+
+Closed frequency ~30.00Hz
+
+2.50Hz
+
+0.0~200.0%
+
+0.00~10.00s
+
+0.00~10.00s
+
+0.0%
+
+0.00s
+
+0.50s
+
+0.00Hz~opened frequency
+
+2.00Hz
+
+0.00~10.00s
+
+0.00~10.00s
+
+0.1～1500.0A
+
+0.1～1500.0A
+
+0.0%～input of inflection point1
+of curve AI1
+
+-100.0～100.0%
+
+Minimum input of curve AI1～Input
+of inflection point 2 of curve AI1
+
+-100.0～100.0%
+
+Input of inflection point 1 of curve
+AI1～Maximum input of curve AI1
+
+F06.02
+
+F06.01
+
+F06.00
+
+Group F06 Analog and Pulse Input
+Minimum input
+of curve
+AI1
+Set value
+corresponding
+to minimum
+input of
+curve AI1
+Input of
+inflection point
+1 of curve AI1
+Set value
+corresponding
+to input of
+inflection
+point 1 of curve
+AI1
+Input of
+inflection point
+2 of curve AI1
+Set value
+corresponding
+to input of
+inflection
+point 2 of curve
+
+F06.03
+
+F06.05
+
+F06.04
+
+-100.0～100.0%
+
+- 34 -
+
+0.00s
+
+0.50s
+
+0.0A
+
+0.0A
+
+1.0%
+
+0.0%
+
+100.0%
+
+100.0%
+
+100.0%
+
+100.0%
+
+050D
+
+050E
+
+050F
+
+0510
+
+0511
+
+0512
+
+0513
+
+0514
+
+0515
+
+0516
+
+0517
+
+0518
+
+051A
+
+051B
+
+0600
+
+0601
+
+0602
+
+0603
+
+0604
+
+0605
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+△
+×
+
+×
+
+×
+
+×
+
+×
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+F06.06
+
+F06.07
+
+F06.08
+
+F06.09
+
+F06.10
+
+F06.11
+
+F06.12
+
+F06.13
+
+F06.14
+
+F06.15
+
+F06.16
+
+F06.17
+
+F06.18
+
+F06.19
+
+AI1
+Maximum input
+of curve
+AI1
+Set value
+corresponding
+to maximum
+input of
+curve AI1
+Minimum input
+of curve
+AI2
+Set value
+corresponding
+to minimum
+input of
+curve AI2
+Input of
+inflection point
+1 of curve AI2
+Set value
+corresponding
+to input of
+inflection
+point 1 of curve
+AI2
+Input of
+inflection point
+2 of curve AI2
+Set value
+corresponding
+to input of
+inflection
+point 2 of curve
+AI2
+Maximum input
+of curve
+AI2
+Set value
+corresponding
+to maximum
+input of
+curve AI2
+Minimum input
+of curve
+AI3
+Set value
+corresponding
+to minimum
+input of
+curve AI3
+Input of
+inflection point
+1 of curve AI3
+Set value
+corresponding
+to input of
+inflection
+
+FR500A&FR510A Series Vector Control Inverter
+
+Input of inflection point 2 of curve
+AI1～100.0%
+
+100.0%
+
+0606
+
+-100.0～100.0%
+
+100.0%
+
+0.0%～input of inflection point1 of
+curve AI2
+
+1.0%
+
+-100.0～100.0%
+
+0.0%
+
+Minimum input of curve AI1～Input
+of inflection point 2 of curve AI2
+
+100.0%
+
+-100.0～100.0%
+
+100.0%
+
+Input of inflection point 1 of curve
+AI2～Maximum input of curve AI2
+
+100.0%
+
+-100.0～100.0%
+
+100.0%
+
+Input of inflection point A of curve
+AI2～100.0%
+
+100.0%
+
+-100.0～100.0%
+
+100.0%
+
+0.0%～input of inflection point1
+of curve AI3
+
+0.0%
+
+-100.0～100.0%
+
+-100.0%
+
+Minimum input of curve AI1～Input
+of inflection point 2 of curve AI3
+
+25.0%
+
+-100.0～100.0%
+
+-50.0%
+
+- 35 -
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+0607
+
+0608
+
+0609
+
+060A
+
+060B
+
+060C
+
+060D
+
+060E
+
+060F
+
+0610
+
+0611
+
+0612
+
+0613
+
+FR500A&FR510A Series Vector Control Inverter
+
+point 1 of curve
+AI3
+Input of
+inflection point
+2 of curve AI3
+Set value
+corresponding
+to input of
+inflection
+point 2 of curve
+AI3
+Maximum input
+of curve
+AI3
+Set value
+corresponding
+to maximum
+input of
+curve AI3
+Minimum input
+of curve
+keypad
+potentiometer
+Set value
+corresponding
+to minimum
+input of
+curve keypad
+potentiometer
+Maximum input
+of curve
+keypad
+potentiometer
+Set value
+corresponding
+to maximum
+input of
+curve keypad
+potentiometer
+AI1 terminal
+filtering time
+AI2 terminal
+filtering time
+AI3 terminal
+filtering time
+Keypad
+potentiometer
+filtering time
+Minimum input
+of curve HI
+Set value
+corresponding
+to minimum
+input of curve
+HI
+Maximum input
+of curve HI
+Set value
+
+F06.20
+
+F06.21
+
+F06.22
+
+F06.23
+
+F06.24
+
+F06.25
+
+F06.26
+
+F06.27
+
+F06.28
+
+F06.29
+
+F06.30
+
+F06.31
+
+F06.32
+
+F06.33
+
+F06.34
+
+F06.35
+
+Input of inflection point 1 of curve
+AI3～Maximum input of curve AI3
+
+75.0%
+
+0614
+
+-100.0～100.0%
+
+25.0%
+
+Input of inflection point A of curve
+AI3～100.0%
+
+100.0%
+
+-100.0～100.0%
+
+100.0%
+
+0.0～Maximum input of curve
+keypad potentiometer
+
+-100.0～100.0%
+
+0.5%
+
+0.0%
+
+Minimum input of curve keypad
+potentiometer～100.0
+
+99.9%
+
+-100.0～100.0%
+
+100.0%
+
+0.000～10.000s
+
+0.000～10.000s
+
+0.000～10.000s
+
+0.000～10.000s
+
+0.100s
+
+0.100s
+
+0.100s
+
+0.100s
+
+0.00 kHz～Maximum input of curve
+HI
+
+0.00kHz
+
+-100.0～100.0%
+
+0.0%
+
+Minimum input of curve HI～
+100.00kHz
+-100.0～100.0%
+
+- 36 -
+
+50.00kHz
+
+100.0%
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+0615
+
+0616
+
+0617
+
+0618
+
+0619
+
+061A
+
+061B
+
+061C
+
+061D
+
+061E
+
+061F
+
+0620
+
+0621
+
+0622
+
+0623
+
+FR500A&FR510A Series Vector Control Inverter
+
+corresponding
+to maximum
+input of curve
+HI
+HI terminal
+filtering time
+
+F06.36
+
+0.000～10.000s
+
+0.100s
+
+Group F07 Analog and Pulse Output
+
+F07.00
+
+F07.01
+
+AO1 output
+function
+AO2 output
+function
+
+F07.02
+
+Y2/HO output
+function
+(when used as
+HO)
+
+F07.03
+F07.04
+
+F07.05
+
+F07.06
+F07.07
+
+F07.08
+
+F07.09
+
+F07.10
+
+F07.11
+
+F07.12
+
+AO1 offset
+AO1 gain
+AO1 filtering
+time
+AO2 offset
+AO2 gain
+AO2 filtering
+time
+HO maximum
+output
+pulse frequency
+HO output
+filtering time
+Ho output
+encoder pulse
+proportion 1
+(FR510A only)
+Ho output
+encoder pulse
+proportion 2
+(FR510A only)
+
+00: No output
+01: Output frequency
+02: Command frequency
+03: Output current
+04: Output voltage
+05: Output power
+06: Bus voltage
+07: +10V
+08: keypad potentiometer
+09: AI1
+10: AI2
+11: AI3
+12: HI
+13: Output torque
+14: Ao communication given 1
+15: Ao communication given 2
+16: Encoder input (FR510A only)
+-100.0～100.0%
+-2.000～2.000
+
+0.000～10.000s
+
+-100.0～100.0%
+-2.000～2.000
+
+0.000～10.000s
+
+0.01～100.00kHz
+
+0.000～10.000s
+
+0.00～10.00
+
+0.00～10.00
+
+Group F08 Parameters of Motor 1
+
+F08.00
+
+Motor 1 type
+selection
+
+0: Three phase asynchronous
+motors
+1: PMSM (FR510A only)
+2: Single phase asynchronous
+motors (Remove capacity)
+3: Single phase asynchronous
+motors (No need to remove
+capacity)
+
+F08.01
+
+F08.02
+
+Power rating of
+motor 1
+Rated voltage
+
+0.1～1000.0kW
+
+60～660V
+
+- 37 -
+
+1
+
+2
+
+3
+
+0.0%
+1.000
+
+0.000s
+
+0.00%
+1.000
+
+0.000s
+
+50.00kHz
+
+0.010s
+
+1.00
+
+1.00
+
+0
+
+Model
+defined
+Model
+
+0624
+
+0700
+
+0701
+
+△
+×
+
+×
+
+×
+
+0702
+
+0703
+0704
+
+0705
+
+0706
+0707
+
+0708
+
+0709
+
+070A
+
+070B
+
+070C
+
+0800
+
+0801
+
+0802
+
+△
+△
+
+△
+
+△
+△
+
+△
+
+△
+
+△
+△
+
+△
+
+×
+
+×
+
+×
+
+FR500A&FR510A Series Vector Control Inverter
+
+F08.03
+
+F08.04
+
+F08.05
+
+F08.08
+
+F08.09
+
+F08.10
+
+F08.11
+
+F08.12
+
+F08.13
+
+F08.14
+
+F08.15
+
+F08.16
+
+F08.17
+
+F08.18
+
+F08.19
+
+F08.20
+
+of motor 1
+Rated current
+of motor 1
+Rated
+frequency of
+motor 1
+Rated speed of
+motor 1
+Stator
+resistance R1
+of
+async motor 1
+Rotor
+resistance R2
+of
+async motor 1
+Leakage
+inductance L1
+of async motor
+1
+Mutual
+inductance L2
+of
+asynchronous
+motor 1
+No-load current
+of
+async motor 1
+Field
+weakening
+coeff 1
+of async motor
+1
+Field
+weakening
+coeff 2
+of async motor
+1
+Field
+weakening
+coeff 3
+of async motor
+1
+PMSM stator
+resistance
+(FR510A only)
+PMSM d-axis
+inductance
+(FR510A only)
+PMSM d-axis
+inductance
+(FR510A only)
+PMSM back
+EMF
+(FR510A only)
+Installation
+angle of
+encoder
+
+0.1～1500.0A
+
+20.00～Fmax
+
+1～30000
+
+0.001～65.535Ω
+
+0.001～65.535Ω
+
+0.01～655.35mH
+
+0.1～6553.5mH
+
+0.1～1500.0A
+
+0.0～100.0
+
+0.0～100.0
+
+0.0～100.0
+
+0.001～65.535Ω
+
+0.01～655.35mH
+
+0.01～655.35mH
+
+0～65535V
+
+0.0～359.9°
+
+- 38 -
+
+defined
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+87%
+
+75%
+
+70%
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+0.0°
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+0803
+
+0804
+
+0805
+
+0808
+
+0809
+
+080A
+
+080B
+
+080B
+
+080C
+
+080E
+
+080F
+
+0810
+
+0811
+
+0812
+
+0813
+
+0814
+
+FR500A&FR510A Series Vector Control Inverter
+
+F08.21
+
+F08.22
+
+F08.23
+
+(FR510A only)
+Pole number of
+motor
+Find encoder
+origin at
+beginning
+(FR510A only)
+Encoder line
+number
+(FR510A only)
+
+F08.24
+
+Encoder type
+(FR510A only)
+
+AB Phase
+Sequence of
+ABZ
+Incremental
+Encoder
+(FR510A only)
+Speed
+feedback PG
+disconnection
+detection time
+(FR510A only)
+Speed Ratio of
+Motor to
+Encoder
+(FR510A only)
+Pole pairs of
+rotary encoder
+(FR510A only)
+
+Autotuning of
+motor 1
+
+F08.25
+
+F08.26
+
+F08.27
+
+F08.28
+
+F08.30
+
+0～1000
+
+0: Not find
+1: Find
+
+0～10000
+
+0: ABZ encoder
+1: UVW encoder
+2: Rotary encoder
+3: ECN1313
+4: Sine-cosine encoder
+
+0: Positive
+1: Negative
+
+0.0：Invalid
+0.1～10.0s
+
+0.001～60.000
+
+1～100
+
+0: No autotuning
+1: Static autotuning of motor
+2: Rotary autotuning of motor
+
+Group F09 V/f Control Parameters of Motor 1
+
+00: Linear V/F
+01: Multi-stage V/F
+02: 1.2nd power V/F
+03: 1.4nd power V/F
+04: 1.6nd power V/F
+05: 1.8nd power V/F
+06: 2.0nd power V/F
+07: V/F complete separation
+08: V/F half separation
+09: 1.2 power inverse curve V/F
+10: 1.4 power inverse curve V/F
+11: 1.6 power inverse curve V/F
+12: 1.8 power inverse curve V/F
+13: 2.0 power inverse curve V/F
+0.1%–30.0% 0.0% (fixed torque
+boost)
+
+0.00～Fmax
+
+0.00～F09.05
+
+- 39 -
+
+F09.00
+
+V/f curve
+setting
+
+F09.01
+
+Torque boost
+
+F09.02
+
+F09.03
+
+Cut-off
+frequency of
+torque boost
+Multi-point V/F
+
+4
+
+1
+
+1024
+
+0
+
+0
+
+0.0s
+
+1.000
+
+1
+
+0
+
+0
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+0815
+
+0816
+
+0817
+
+0818
+
+0819
+
+081A
+
+081B
+
+081C
+
+081E
+
+×
+
+0900
+
+0.0%
+
+50.00Hz
+
+0.00Hz
+
+△
+
+△
+
+△
+
+0901
+
+0902
+
+0903
+
+FR500A&FR510A Series Vector Control Inverter
+
+frequency 1(F1)
+Multi-point V/F
+voltage 1
+(V1)
+Multi-point V/F
+frequency 2(F2)
+Multi-point V/F
+voltage 2
+(V2)
+Multi-point V/F
+frequency 3(F3)
+Multi-point V/F
+voltage 3
+(V3)
+Multi-point V/F
+frequency 4(F4)
+Multi-point V/F
+voltage 4
+(V4)
+V/F slip
+compensation
+gain
+Stator
+voltagedrop
+compensation
+gain
+Excitation boost
+gain
+Oscillation
+Suppression
+
+F09.04
+
+F09.05
+
+F09.06
+
+F09.07
+
+F09.08
+
+F09.09
+
+F09.10
+
+F09.11
+
+F09.12
+
+F09.13
+
+F09.14
+
+F09.15
+
+Voltage source
+for V/F
+separation
+
+F09.16
+
+F09.17
+
+F09.18
+
+F09.19
+
+F09.20
+
+F09.21
+
+Voltage digital
+setting for V/F
+separation
+
+Voltage rise
+time of V/F
+separation
+
+Set the IQ filter
+time below
+0.5Hz in VVF
+mode
+Set the IQ filter
+time above 2Hz
+in VVF mode
+Torque revision
+when run
+forward
+Torque revision
+when run
+
+0.0～100.0
+
+F09.03～F09.05
+
+0.0～100.0
+
+F09.05～F09.09
+
+0.0～100.0
+
+5.0%
+
+5.00Hz
+
+14.0%
+
+25.00Hz
+
+50.0%
+
+F09.07～rated motor frequency
+
+50.00Hz
+
+0.0～100.0
+
+Ue=100.0%
+
+100.0%
+
+0.0～300.0%
+
+0.0～200.0%
+
+0.0～200.0%
+
+0.0～300.0%
+
+0: Digital setting (F09.16)
+1: keypad potentiometer
+2: AI1
+3: Multi-reference
+4: Pulse setting ( DI7/HI )
+5: PID
+6: AI2
+7: AI3
+
+80.0%
+
+100.0%
+
+100.0%
+
+100.0%
+
+0
+
+0 V to rated motor voltage
+
+0.0%
+
+0.0～6000.0s
+It indicates the time for the
+voltage rising from 0 V to rated
+Motor voltage.
+
+F09.19～3000ms
+
+1ms～F09.18
+
+0.0～5.0%
+
+0.0～5.0%
+
+- 40 -
+
+0.1s
+
+500ms
+
+100ms
+
+0.0%
+
+1.0%
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+△
+
+△
+
+×
+
+×
+
+△
+
+△
+
+0904
+
+0905
+
+0906
+
+0907
+
+0908
+
+0909
+
+090A
+
+090B
+
+090C
+
+090D
+
+090E
+
+090F
+
+0910
+
+0911
+
+0912
+
+0913
+
+0914
+
+0915
+
+FR500A&FR510A Series Vector Control Inverter
+
+0.0～200.0%
+
+0.0%
+
+△
+
+0916
+
+0.0～100.0s
+
+2.0s
+
+△
+
+0917
+
+0.0～200.0%
+
+0.0%
+
+△
+
+0918
+
+F09.22
+
+F09.23
+
+F09.24
+
+reverse
+
+PMSM
+acceleration
+current
+compensation
+setting
+(FR510A only)
+PMSM
+compensation
+time decreased
+after
+acceleration
+(FR510A only)
+PMSM ID
+current value
+will be
+maintained
+after
+accelerating.
+(FR510A only)
+
+Group F10 Vector Control Parameters of Motor 1
+
+F10.00
+
+F10.01
+
+F10.02
+
+F10.03
+
+F10.04
+
+F10.05
+
+F10.06
+
+F10.07
+
+F10.08
+
+F10.09
+
+F10.10
+
+F10.11
+
+F10.12
+
+Speed/torque
+control
+ASR low-speed
+proportional
+gain Kp1
+ASR low-speed
+integration time
+Ti1
+ASR switching
+frequency 1
+ASR
+high-speed
+proportional
+gain Kp2
+ASR
+high-speed
+integration time
+Ti2
+ASR switching
+frequency 2
+ASR input
+filtering time
+ASR output
+filtering time
+Vector control
+slip gain
+Digital setting
+of torque
+upper limit in
+speed control
+mode
+Excitation
+adjustment
+proportional
+gain Kp1
+Excitation
+
+0: speed control
+1: torque control
+
+0.0～100.0
+
+0.001～30.000s
+
+0.00～F10.06
+
+1～100.0
+
+0.001～30.000s
+
+F10.03～Fmax
+
+0.0～500.0ms
+
+0.0～500.0ms
+
+50～200%
+
+80.0～200.0%
+
+0.00～10.00
+
+0.0～3000.0ms
+
+- 41 -
+
+0
+
+15.0
+
+0.100s
+
+5.00Hz
+
+10.0
+
+0.500s
+
+10.00Hz
+
+3.0ms
+
+0.0ms
+
+100%
+
+165.0%
+
+0.50
+
+10.0ms
+
+×
+
+0A00
+
+0A01
+
+0A02
+
+0A03
+
+0A04
+
+0A05
+
+0A06
+
+0A07
+
+0A08
+
+0A09
+
+0A0A
+
+0A0B
+
+0A0C
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+adjustment
+integral gain
+Ti1
+Torque
+adjustment
+proportional
+gain Kp2
+Torque
+adjustment
+integral gain
+Ti2
+Excitation gain
+coefficient
+
+F10.13
+
+F10.14
+
+F10.15
+
+F10.16
+
+Torque setting
+source under
+torque control
+
+F10.17
+
+F10.18
+
+F10.19
+
+F10.20
+
+F10.21
+
+F10.22
+
+F10.23
+
+F10.24
+
+F10.25
+
+Digital setting
+of torque
+Forward speed
+limited value
+under torque
+control
+Reverse speed
+limited value
+under torque
+control
+Set torque
+accel time
+Set torque
+decel time
+Static friction
+torque
+compensation
+Static friction
+frequency
+range
+Static
+Frequency of
+Open-Loop
+Torque
+SVC
+optimization
+method
+
+F10.26
+
+Max Frequency
+source under
+torque control
+
+F10.27
+
+PMSM Start
+Excitation
+Current
+(FR510A only)
+
+0.00～10.00
+
+0.50
+
+0A0D
+
+0.0～3000.0ms
+
+50.0~200%
+
+0: Set by F10.17
+1: Keypad potentiometer
+2: AI1
+3: AI2
+4: AI3
+5: Pulse setting ( DI7/HI )
+6: Communication setting
+
+-200.0～200.0%
+
+0.00～Fmax
+
+0.00～ Fmax
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+0.0～100.0%
+
+0.00～20.00Hz
+
+1.00～10.00Hz
+
+0: Optimization method 1
+1: Optimization method 2
+2: Optimization method 3
+0: Set by F10.18 & F10.19
+1: Keypad potentiometer
+2: AI1
+3: AI2
+4: AI3
+5: Pulse setting ( DI7/HI )
+
+10.0ms
+
+100%
+
+0
+
+50.0%
+
+50.00Hz
+
+50.00Hz
+
+0.0s
+
+0.0s
+
+5.00%
+
+1.00Hz
+
+1.00Hz
+
+1
+
+0
+
+0.0～150.0%
+
+50.0%
+
+- 42 -
+
+△
+
+△
+
+△
+
+×
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+×
+
+×
+
+0A0E
+
+0A0F
+
+0A10
+
+0A11
+
+0A12
+
+0A13
+
+0A14
+
+0A15
+
+0A16
+
+0A17
+
+0A18
+
+0A19
+
+0A1A
+
+0A1B
+
+FR500A&FR510A Series Vector Control Inverter
+
+0: Invalid
+1: Valid
+
+1
+
+×
+
+0A1C
+
+70.0～100.0%
+
+95.0%
+
+0A1D
+
+0.0～500.0%
+
+0.00～60.00s
+
+0.0～200.0%
+
+30.0%
+
+0.5s
+
+100.0%
+
+△
+
+△
+
+△
+
+△
+
+0A1E
+
+0A1F
+
+0A20
+
+F10.34～600.00Hz
+
+15.00Hz △
+
+0A21
+
+0.0～F10.33
+
+10.00Hz △
+
+0A22
+
+F10.28
+
+F10.29
+
+F10.30
+
+F10.31
+
+F10.32
+
+F10.33
+
+F10.34
+
+F10.35
+
+F10.36
+
+F10.37
+
+PMSM Flux
+weakening
+control
+(FR510A only)
+PMSM Flux
+weakening
+Voltage
+(FR510A only)
+PMSM Flux
+weakening
+gain(Kp)
+(FR510A only)
+PMSM Flux
+weakening
+integral(Ti)
+(FR510A only)
+PMSM Flux
+weakening limit
+(FR510A only)
+PMSM
+excitation
+current
+frequency high
+point
+(FR510A only)
+PMSM
+excitation
+current
+frequency low
+point
+(FR510A only)
+PMSM
+excitation
+current
+conversion
+delay
+(FR510A only)
+PMSM speed
+estimation Kp
+(FR510A only)
+PMSM speed
+estimation Ti
+(FR510A only)
+
+0.0～10.0s
+
+0.00～10.00
+
+1.0s
+
+2.00
+
+0.1～1000.0ms
+
+20.0ms
+
+Group F11 Protection Parameters
+
+F11.00
+
+F11.01
+
+F11.02
+
+F11.03
+
+F11.04
+
+Current limit
+control
+
+Current limit
+Frequency
+decreasing
+time(limit
+current in
+constant speed
+operation)
+Current limit
+mode 2
+proportion gain
+Current limit
+
+0: Current limit disabled
+1: Current limit mode 1
+2: Current limit mode 2
+100.0～200.0%
+
+0.0～6000.0s
+
+0.1～100.0%
+
+0.00～10.00s
+
+- 43 -
+
+2
+
+150.0%
+
+5.0s
+
+3.0%
+
+10.00s
+
+0A23
+
+0A24
+
+0A25
+
+0B00
+
+0B01
+
+0B02
+
+0B03
+
+0B04
+
+△
+
+△
+
+△
+
+×
+
+×
+
+△
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+mode 2 integral
+time
+
+Overvoltage
+Stall Control
+
+Overvoltage
+stall voltage
+Overvoltage
+Stall
+Mode 2
+Proportion Gain
+Overvoltage
+stall mode 2
+frequency limit
+
+F11.05
+
+F11.06
+
+F11.07
+
+F11.08
+
+F11.10
+
+Protection
+action 1
+
+F11.11
+
+Protection
+action 2
+
+2
+
+730V
+
+50.0%
+
+5.00Hz
+
+×
+
+×
+
+△
+
+×
+
+0B05
+
+0B06
+
+0B07
+
+0B08
+
+03330
+
+×
+
+0B0A
+
+0: Overvoltage stall disabled
+1: Overvoltage stall mode 1
+2: Overvoltage stall mode 2
+
+600～800V
+
+0.0～100.0%
+
+0.00～50.00Hz
+
+Unit's place: Bus undervoltage
+
+0: Fault reported and coast to
+
+stop
+
+1: Stop according to the stop
+
+mode
+
+2: Fault reported but continue to
+
+run
+
+3: Fault protection disabled
+Ten's place: Power input phase
+Loss (Err09)
+(Same as unit's place )
+Hundred's place: Power output
+phase loss(Err10)
+(Same as unit's place )
+Thousand's place: Motor overload
+(Err11)(Same as unit's place )
+Ten thousand's place: Inverter
+overload(Err12)
+(Same as unit's place )
+External equipment fault（Err13)
+0: Fault reported and coast to
+
+stop
+
+1: Stop according to the stop
+
+mode
+
+2: Fault reported but continue to
+
+run
+Ten's place: EEPROM read/write
+fault (Err15)
+
+(Same as unit's place)
+
+00000
+
+×
+
+0B0B
+
+Hundred's place: Communication
+overtime error (Err18)
+
+(Same as unit's place)
+
+Thousand's place: PID feedback
+loss (Err19)
+(Same as unit's place)
+Ten thousand's place: Continuous
+running time reached (Err20)
+(Same as unit's place)
+
+- 44 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+F11.12
+
+Protection
+action 3
+
+F11.14
+
+F11.15
+
+F11.17
+
+Frequency
+selection for
+continuing to
+run upon fault
+
+Backup
+frequency upon
+abnormality
+Motor overload
+protection time
+
+F11.18
+
+Overload alarm
+
+F11.19
+
+F11.20
+
+F11.21
+
+F11.22
+
+F11.23
+
+Overload alarm
+threshold
+Overload alarm
+activated time
+that
+exceeding
+threshold
+Inverter
+overheat
+warning
+threshold
+Detection level
+of load loss
+Detection time
+
+Unit's place: Module temperature
+detection disconnection（Err24)
+0: Fault reported and coast to
+
+stop
+
+1: Stop according to the stop
+
+mode
+
+2: Fault reported but continue to
+
+run
+
+3: Fault protection disabled
+Ten's place: Load becoming 0
+(Err25) (Same as unit's place)
+0: Current running frequency
+1: Set frequency
+2: Frequency upper limit
+3: Frequency lower limit
+4: Backup frequency upon
+abnormality
+
+0.00～Fmax
+
+30.0～300.0s
+
+Unit's place: detection option:
+
+0: Always detect
+1: Detect at constant speed only
+
+Ten's place: compared object
+0: Rated current of motor
+1: Rated current of drive
+Hundred’s place: Fault reported
+
+0:No fault reported
+1:Fault reported
+
+Thousand’s place: whether to
+decelerate or not when overload
+alarm
+
+0: No deceleration
+1: Deceleration
+
+Ten thousand's place: given mode
+for overload threshold
+
+0: F11.19 set
+1: F11.19*VP
+2: F11.19*AI1
+3: F11.19*AI2
+4: F11.19*AI3
+
+20.0～200.0%
+
+0.1～60.0s
+
+50～overheat Temperature
+
+5.0～100.0%
+
+0.1～60.0s
+
+- 45 -
+
+00030
+
+×
+
+0B0C
+
+1
+
+0.00Hz
+
+60.0s
+
+×
+
+×
+
+×
+
+0B0D
+
+0B0E
+
+0B11
+
+00010
+
+×
+
+0B12
+
+130.0%
+
+5.0s
+
+Model
+defined
+
+20.0%
+
+5.0s
+
+×
+
+×
+
+×
+
+×
+
+×
+
+0B13
+
+0B14
+
+0B15
+
+0B16
+
+0B17
+
+FR500A&FR510A Series Vector Control Inverter
+
+of load loss
+Action selection
+at
+instantaneous
+power failure
+Decel time at
+instantaneous
+power failure
+
+F11.24
+
+F11.25
+
+0: Disabled
+1: Deceleration
+
+2: Bus voltage constant control
+
+0.0～6000.0s
+
+F11.26
+
+Rapid current
+limit
+
+0: Disabled
+1: Rapid current limiting mode 1
+2: Rapid current limiting mode 2
+
+0
+
+×
+
+0B18
+
+F11.27
+
+F11.28
+
+F11.29
+
+F11.30
+
+F11.31
+
+F11.32
+
+F11.33
+
+F11.34
+
+F11.35
+
+F11.36
+
+F11.37
+
+F11.38
+
+F11.39
+
+Times of
+automatic
+trip(fault) reset
+Interval of
+automatic
+trip(fault) reset
+DO action
+during fault
+auto reset
+Instantaneous
+power off bus
+voltage
+Instantaneous
+power off
+recovery
+voltage
+Instantaneous
+power off
+voltage
+detection time
+Instantaneous
+power off Kp
+Instantaneous
+power off
+integration time
+Ti
+
+Motor
+temperature
+sensor type
+
+Zero drift value
+of motor
+temperature
+sensor
+Reserved
+Motor
+temperature
+warning action
+threshold
+Motor
+temperature
+protection
+action threshold
+
+5.0s
+
+2
+
+0
+
+1.0s
+
+0
+
+0～20
+
+0.1～100.0s
+
+0: Not act
+
+1: Act
+
+60.0%～Recovery voltage
+
+80.0%
+
+Power off voltage～100.0%
+
+85.0%
+
+0.01～10.00s
+
+0.1～100.0%
+
+0.10s
+
+40.0%
+
+0.00～10.00s （0.00: Integration
+invalid）
+
+0.10s
+
+0
+
+0
+
+90℃
+
+110℃
+
+0:None
+1:PT100
+2:PT1000
+3:KTY84
+
+-100～100℃
+
+0～200℃
+
+0～200℃
+
+- 46 -
+
+0B19
+
+0B1A
+
+0B1B
+
+0B1C
+
+0B1D
+
+0B1E
+
+0B1F
+
+0B20
+
+0B21
+
+0B22
+
+0B23
+
+△
+×
+
+×
+
+×
+
+×
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+△
+
+0B24
+
+0B25
+
+0B26
+
+0B27
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+Unit’s place: Overspeed Action
+
+Selection
+0:Report error and coast to stop
+1:Warning and ramp to stop
+2: Alarm and continue run with
+
+failure frequency
+3:No protection
+
+Ten’s place: Selection of Excessive
+
+Speed Deviation
+0:Report error and coast to stop
+1:Warning and ramp to stop
+2: Alarm and continue run with
+
+failure frequency
+3:No protection
+
+0.0～150.0%
+
+0.0～60.0s
+
+0.0～50.0%
+
+0.0～60.0s
+
+F11.40
+
+F11.41
+
+F11.42
+
+F11.43
+
+F11.44
+
+Action selection
+of Excessive
+Speed and
+Excessive
+Speed
+Deviation
+(FR510A only)
+
+Overspeed
+detection value
+(FR510A only)
+Overspeed
+detection time
+(FR510A only)
+Detection value
+of excessive
+velocity
+deviation
+(FR510A only)
+Detection time
+of excessive
+velocity
+deviation
+(FR510A only)
+
+Group F12: Multi-Reference and Simple PLC Function
+F12.00
+F12.01
+F12.02
+F12.03
+F12.04
+F12.05
+F12.06
+F12.07
+F12.08
+F12.09
+F12.10
+F12.11
+F12.12
+F12.13
+F12.14
+F12.15
+
+Reference 0
+Reference 1
+Reference 2
+Reference 3
+Reference 4
+Reference 5
+Reference 6
+Reference 7
+Reference 8
+Reference 9
+Reference 10
+Reference 11
+Reference 12
+Reference 13
+Reference 14
+Reference 15
+
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+-100.0～100.0%
+0: Digital setting（F12.00)
+1: keypad potentiometer
+2: AI1
+3: Process PID output
+4: X7/HI pulse input
+5: AI2
+6: AI3
+
+F12.16
+
+Reference 0
+source
+
+- 47 -
+
+00
+
+×
+
+0B28
+
+120.0%
+
+1.0s
+
+20.0%
+
+5.0s
+
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+0.0%
+
+0
+
+×
+
+×
+
+×
+
+×
+
+△
+△
+△
+△
+△
+△
+△
+△
+△
+△
+△
+△
+△
+△
+△
+△
+
+×
+
+0B29
+
+0B2A
+
+0B2B
+
+0B2C
+
+0C00
+0C01
+0C02
+0C03
+0C04
+0C05
+0C06
+0C07
+0C08
+0C09
+0C0A
+0C0B
+0C0C
+0C0D
+0C0E
+0C0F
+
+0C10
+
+FR500A&FR510A Series Vector Control Inverter
+
+F12.17
+
+Running mode
+of simple
+PLC
+
+Unit's place: PLC running mode
+0: Stop after a single cycle
+1: Continue to run with the last
+
+frequency after a single cycle
+
+2: Repeat cycles
+
+Ten’s place: started mode
+
+0: Continue to run from the step
+
+of stop (or fault)
+
+1: Run from the first step
+
+“multi-step frequency 0”
+
+2: Run from the eighth step
+
+“multi-step frequency 8”
+
+3: Run from the fifteenth step
+
+“multi-step frequency 15”
+Hundreds place: power loss
+memory
+
+0: Memory disabled on power
+
+loss
+
+1: Memory enabled on power
+
+loss
+Thousands place: unit of simple
+PLC running time
+0: Second (s)
+1: Minute (min)
+
+F12.18
+
+F12.19
+
+F12.20
+
+F12.21
+
+F12.22
+
+F12.23
+
+F12.24
+
+F12.25
+
+F12.26
+
+F12.27
+
+F12.28
+
+F12.29
+
+F12.30
+
+F12.31
+
+F12.32
+
+F12.33
+
+F12.34
+
+Running time of
+step 0
+Running time of
+step 1
+Running time of
+step 2
+Running time of
+step 3
+Running time of
+step 4
+Running time of
+step 5
+Running time of
+step 6
+Running time of
+step 7
+Running time of
+step 8
+Running time of
+step 9
+Running time of
+step 10
+Running time of
+step 11
+Running time of
+step 12
+Running time of
+step 13
+Running time of
+step 14
+Running time of
+step 15
+Acceleration/de
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0.0～6000.0s(h)
+
+0～3
+
+- 48 -
+
+00000
+
+×
+
+0C11
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0.0s(h)
+
+0
+
+0C12
+
+0C13
+
+0C14
+
+0C15
+
+0C16
+
+0C17
+
+0C18
+
+0C19
+
+0C1A
+
+0C1B
+
+0C1C
+
+0C1D
+
+0C1E
+
+0C1F
+
+0C20
+
+0C21
+
+0C22
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+celeration time
+of simple PLC
+reference 0
+Acceleration/de
+celeration time
+of simple PLC
+reference 1
+Acceleration/de
+celeration time
+of simple PLC
+reference 2
+Acceleration/de
+celeration time
+of simple PLC
+reference 3
+Acceleration/de
+celeration time
+of simple PLC
+reference 4
+Acceleration/de
+celeration time
+of simple PLC
+reference 5
+Acceleration/de
+celeration time
+of simple PLC
+reference 6
+Acceleration/de
+celeration time
+of simple PLC
+reference 7
+Acceleration/de
+celeration time
+of simple PLC
+reference 8
+Acceleration/de
+celeration time
+of simple PLC
+reference 9
+Acceleration/de
+celeration time
+of simple PLC
+reference 10
+Acceleration/de
+celeration
+timeof simple
+PLC reference
+11
+Acceleration/de
+celeration time
+of simple PLC
+reference 12
+Acceleration/de
+celeration time
+of simple PLC
+reference 13
+Acceleration/de
+celeration time
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+0～3
+
+F12.35
+
+F12.36
+
+F12.37
+
+F12.38
+
+F12.39
+
+F12.40
+
+F12.41
+
+F12.42
+
+F12.43
+
+F12.44
+
+F12.45
+
+F12.46
+
+F12.47
+
+F12.48
+
+- 49 -
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0C23
+
+0C24
+
+0C25
+
+0C26
+
+0C27
+
+0C28
+
+0C29
+
+0C2A
+
+0C2B
+
+0C2C
+
+0C2D
+
+0C2E
+
+0C2F
+
+0C30
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+of simple PLC
+reference 14
+Acceleration/de
+celeration time
+of simple PLC
+reference 15
+
+UP/DOWN
+function
+selection of
+Multi- reference
+
+F12.49
+
+F12.50
+
+F12.51
+
+UP/DOWN
+speed of
+Multi-reference
+
+Group F13 Process PID
+
+F13.00
+
+PID setting
+
+F13.01
+
+PID digital
+setting
+
+F13.02
+
+PID feedback
+
+F13.03
+
+F13.04
+
+F13.05
+
+F13.06
+
+F13.07
+
+F13.08
+
+F13.09
+
+F13.10
+
+F13.11
+
+PID setting
+feedback range
+PID action
+direction
+Filtering time of
+PID
+setting
+Filtering time of
+PID
+feedback
+Filtering time of
+PID
+output
+Proportional
+gain Kp1
+Integration time
+Ti1
+Differential time
+Td1
+Proportional
+
+0～3
+
+0
+
+0C31
+
+Unit’s place: Action selection when
+power off
+
+0:Zero clearing when power off
+1:Hold when power off
+
+Ten’s place: select if it can be
+reduced to negative
+
+0:Disable
+1:Enable
+
+△
+
+00
+
+×
+
+0C32
+
+0.0～100.0% (0.0%Invalid)
+
+0.0%
+
+0C33
+
+△
+
+0: F13.01 digital setting
+1:keypad potentiometer
+2: AI1
+3: Communication
+4: Multi-Reference
+5: DI7/HI pulse input
+6: AI2
+7: AI3
+
+0.0～100.0%
+
+0: AI1
+1: AI2
+2: Communication
+3: AI1+AI2
+4: AI1-AI2
+5: Max{AI1，AI2}
+6: Min{AI1，AI2}
+7: DI7/HI pulse input
+8: AI3
+
+0.0～6000.0
+
+0: Forward action
+1: Reverse action
+
+0.000～10.000s
+
+0.000～10.000s
+
+0.000～10.000s
+
+0.0～100.0
+
+0.01～10.00s
+
+0.000～10.000s
+
+0.0～100.0
+
+- 50 -
+
+0
+
+×
+
+0D00
+
+50.0%
+
+0D01
+
+△
+
+×
+
+△
+×
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+0D02
+
+0D03
+
+0D04
+
+0D05
+
+0D06
+
+0D07
+
+0D08
+
+0D09
+
+0D0A
+
+0D0B
+
+0
+
+100.0
+
+0
+
+0.000s
+
+0.000s
+
+0.000s
+
+1.0
+
+0.10s
+
+0.000s
+
+1.0
+
+FR500A&FR510A Series Vector Control Inverter
+
+F13.12
+
+F13.13
+
+gain Kp2
+Integration time
+Ti2
+Differential time
+Td2
+
+0.01～10.00s
+
+0.000～10.000s
+
+0.10s
+
+0.000s
+
+0: No switch, determined by
+parameters Kp1, Ti1 and Td1
+1: Auto switch on the basis of input
+offset
+2: Switched by terminal
+
+0
+
+0D0C
+
+0D0D
+
+0D0E
+
+0D0F
+
+0D10
+
+0D011
+
+0D12
+
+0D13
+
+0D14
+
+0D15
+
+0D16
+
+0D17
+
+0D18
+
+0D19
+
+△
+
+△
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+00000
+
+×
+
+0D1A
+
+F13.14
+
+PID parameter
+switch
+
+F13.15
+
+F13.16
+
+F13.17
+
+PID parameter
+switchover
+deviation 1
+PID parameter
+switchover
+deviation 2
+PID offset limit
+
+F13.18
+
+PID integral
+property
+
+F13.19
+
+F13.20
+
+F13.21
+
+F13.22
+
+F13.23
+
+F13.24
+
+F13.25
+
+PID differential
+limit
+PID initial value
+Holding time of
+PID
+initial value
+PID output
+frequency
+upper limit
+PID output
+frequency lower
+limit
+Low value of
+PID feedback
+loss
+Detection time
+for low value of
+PID feedback
+loss
+
+F13.26
+
+PID operation
+selection
+
+20.0%
+
+80.0%
+
+0.0%
+
+00
+
+0.5%
+
+0.0%
+
+0.0s
+
+100.0%
+
+0.0%
+
+0.0%
+
+1.0s
+
+0.0～100.0%
+
+0.0～100.0%
+
+0.0～100.0%
+Unit's place (Whether to stop
+integral operation when the output
+reaches the limit)
+
+0: Continue integral operation
+1: Stop integral operation
+Ten's place (Integral separated)
+
+0: Invalid
+1: Valid
+
+0.0～100.0%
+
+0.0～100.0%
+
+0.0～6000.0s
+
+PID output frequency lower limit～
+100.0%（100.0% corresponds to
+maximum frequency ）
+
+–100.0%～PID output frequency
+lower limit
+
+0.1～100.0%
+0.0%: Not judging feedback loss
+
+0.0～30.0s
+
+Unit’s place: PID operation
+selection when stop
+
+0:Do not operate when stop
+1:Operate when stop
+
+Ten’s place: output is limited by
+output frequency
+0:No limited
+1:limited
+
+Hundred’s place: UP/DOWN digital
+given of PID
+
+0:Zero clearing when power off
+1:Hold when power off
+
+Thousand’s place: PID feedback
+
+- 51 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+loss detection when stop
+0:Not detect when stop
+1:detect when stop
+
+Then thousand’s place: action for
+PID feedback loss
+0:Report fault
+1:Ramp to stop
+
+0.0～100.0% (0.0% Invalid)
+
+0.0%
+
+0.1～100.0%
+0.0%: Not judging feedback loss
+
+100.0%
+
+F13.27
+
+F13.28
+
+F13.29
+
+UP/DWON
+speed of PID
+digital given
+High value of
+PID feedback
+loss
+Detection time
+for high value of
+PID feedback
+loss
+
+F13.30
+
+PID upper limit
+source
+
+F13.31
+
+PID lower limit
+source
+
+0.0～30.0s
+
+0:F13.22
+1:F13.22*VP
+2:F13.22*AI1
+3:F13.22*AI2
+4:F13.22*HI
+5:F13.22*AI3
+0:F13.23
+1:F13.23*VP
+2:F13.23*AI1
+3:F13.23*AI2
+4:F13.23*HI
+5:F13.23*AI3
+
+Group F14: Swing Frequency, Fixed Length , Wakeup and Count
+
+F14.00
+
+F14.01
+
+F14.02
+
+F14.03
+
+F14.04
+
+F14.05
+
+F14.06
+
+Swing
+frequency
+setting
+mode
+Swing
+frequency
+amplitude
+Jump
+frequency
+amplitude
+Rising Time of
+Swing
+frequency
+Dropping Time
+of Swing
+frequency
+Set length
+Number of
+pulses per
+meter
+
+F14.07
+
+Command
+when the length
+attained
+
+0: Relative to the setting
+frequency
+1: Relative to the maximum
+frequency
+
+0.0～100.0%
+
+0.0～50.0%
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+0m～65535m
+
+0.1～6553.5
+
+Unit’s place: stop when the length
+reaches
+0: Not stop
+1: Stop
+Ten’s place: length calculation
+method
+0: pulse by pulse
+1: Reference maximum frequency
+
+- 52 -
+
+△
+×
+
+×
+
+×
+
+0D1B
+
+0D1C
+
+0D1D
+
+×
+
+0D1E
+
+×
+
+0E00
+
+0E01
+
+0E02
+
+0E03
+
+0E04
+
+0E05
+
+0E06
+
+△
+
+△
+
+△
+
+△
+×
+
+×
+
+1.0s
+
+0
+
+0
+
+0
+
+0.0%
+
+0.0%
+
+5.0s
+
+5.0s
+
+1000m
+
+100.0
+
+00
+
+×
+
+0E07
+
+FR500A&FR510A Series Vector Control Inverter
+
+F14.08
+
+F14.09
+
+F14.10
+
+F14.11
+
+F14.12
+
+F14.13
+
+F14.14
+
+F14.15
+
+Set count value
+Designated
+count value
+Wakeup
+frequency
+Wakeup delay
+time
+Dormant
+frequency
+Dormant delay
+time
+Wake up mode
+selection
+Dormancy
+mode selection
+
+F14.16
+
+Voltage
+feedback
+source
+
+F14.17
+
+F14.18
+
+Wake up
+pressure
+Dormancy
+pressure
+
+2: Refer to Ai1 channel
+3: Refer to AI2 channel
+4: Refer to AI3 channel
+1～65535
+
+1～65535
+
+Dormant frequency (F14.12)～
+Fmax
+
+0.0～6000.0s
+
+0.00～Wakeup frequency
+
+0.0～6000.0s
+
+0: Frequency
+1: Pressure
+0: Frequency
+1: Pressure
+Unit’s place: pressure feedback
+
+0: AI1
+1: AI2
+2: DI7/HI pulse input
+3: AI3
+
+Ten’s place: pressure dormancy
+mode
+
+0:Positive direction, dormancy
+on big pressure and wakeup on
+small pressure
+
+1:Negative direction, dormancy
+on small pressure and wakeup on
+big pressure
+
+0.0%～Dormancy pressure
+
+Wake up pressure～100.0%
+
+F15.00
+
+Baud rate
+
+Group F15: Communication Parameters
+0: 4800bps
+1: 9600bps
+2: 19200bps
+3: 38400bps
+4: 57600bps
+5: 115200bps
+No check, data format (1-8-N-2) for
+RTU
+1: Even parity check, data format
+(1-8-E-1) for RTU
+2: Odd Parity check, data format
+(1-8-O-1) for RTU
+3: No check, data format(1-8-N-1)
+for RTU
+1～247
+
+0: Broadcast address
+
+Data format
+
+F15.01
+
+F15.02
+
+F15.03
+
+F15.04
+
+F15.05
+
+Local address
+Communication
+timeout
+Response time
+delay
+Master-slave
+Communication
+
+0.0～60.0s
+
+0～200ms
+
+0:The inverter is the slave
+1:The inverter is the master
+
+- 53 -
+
+1000
+
+1000
+
+0.00Hz
+
+0.0s
+
+0.00Hz
+
+0.0s
+
+0
+
+0
+
+0
+
+10.0%
+
+50.0%
+
+1
+
+0
+
+1
+
+0.0s
+
+1ms
+
+0
+
+×
+
+×
+
+△
+
+△
+
+△
+
+△
+×
+
+×
+
+0E08
+
+0E09
+
+0E0A
+
+0E0B
+
+0E0C
+
+0E0D
+
+0E0E
+
+0E0F
+
+×
+
+0E10
+
+0E11
+
+0E12
+
+0F00
+
+0F01
+
+0F02
+
+0F03
+
+0F04
+
+0F05
+
+△
+
+△
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+FR500A&FR510A Series Vector Control Inverter
+
+Mode
+The Master
+Communication
+Sending Data
+Message return
+when
+communication
+error
+
+U group return
+value
+
+F15.06
+
+F15.07
+
+F15.08
+
+0: Set frequency
+
+1: Current running frequency
+
+0: No return
+
+1: Return
+
+0: Positive and negative
+
+1: Absolute value
+
+Group F16 Keys and Display of Keypad Parameters
+
+F16.00
+
+MF.K key
+setting
+
+F16.01
+
+Keyboard
+operation
+display
+
+F16.02
+
+Keys locked
+option
+
+F16.03
+
+F16.04
+
+F16.05
+
+F16.06
+
+F16.07
+
+LED displayed
+parameters
+setting 1 on
+running status
+LED displayed
+parameters
+setting 2 on
+running status
+LED displayed
+parameters
+setting 3 on
+running status
+LED displayed
+parameters
+setting 4 on
+running status
+LED displayed
+parameters
+
+0: No function
+1: Jog
+2: Forward/reverse switchover
+3: Run command sources shifted
+4: Jog reverse
+Unit’s digit: Function selection of
+STOP/RESET key
+
+0: stop function of STOP/RESET
+
+key is valid only in keyboard
+operation mode
+
+1: Stop function of STOP/RES
+key is valid in any operation mode
+Ten’s digit: Speed display（U00.05）
+0: According to the actual speed
+1: Multiply frequency by speed
+
+coefficient(F16.11)
+Hundred’s digit: Decimal places
+
+0: No decimal places
+1: One decimal places
+2: Two decimal places
+3: Three decimal places
+
+0: Not locked
+1: Full locked
+2: Keys locked other than RUN,
+STOP/RST
+3: Keys locked other than
+STOP/RST
+4: Keys locked other than >>
+
+0～99(correspond U00.00～
+U00.99)
+
+0～99(correspond U00.00～
+U00.99)
+
+0～99(correspond U00.00～
+U00.99)
+
+0～99(correspond U00.00～
+U00.99)
+
+0～99(correspond U00.00～
+
+- 54 -
+
+0
+
+1
+
+0
+
+1
+
+×
+
+0F06
+
+0F07
+
+0F08
+
+1000
+
+△
+
+×
+
+001
+
+×
+
+1001
+
+0
+
+0
+
+6
+
+3
+
+2
+
+1
+
+×
+
+1002
+
+1003
+
+1004
+
+1005
+
+1006
+
+1007
+
+△
+
+△
+
+△
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+setting 1 on
+stop status
+LED displayed
+parameters
+setting 2 on
+stop status
+LED displayed
+parameters
+setting 3 on
+stop status
+LED displayed
+parameters
+setting 4 on
+stop status
+Speed display
+coefficient
+Power display
+coefficient
+The enable
+difference
+range of
+U00.00 and
+U00.01
+
+F16.08
+
+F16.09
+
+F16.10
+
+F16.11
+
+F16.12
+
+F16.13
+
+U00.99)
+
+0～99(correspond U00.00～
+U00.99)
+
+0～99(correspond U00.00～
+U00.99)
+
+0～99(correspond U00.00～
+U00.99)
+
+0.00~100.00
+
+0.0~300.0%
+
+6
+
+15
+
+16
+
+1.00
+
+100.0%
+
+0.00Hz~5.00Hz
+
+0.10Hz
+
+Group F17 User-defined Display Parameters
+
+F17.00
+
+F17.01
+
+F17.02
+
+F17.03
+
+F17.04
+
+F17.05
+
+F17.06
+
+F17.07
+
+F17.08
+
+F17.09
+
+F17.10
+
+User-defined
+Display
+Parameter 0
+User-defined
+Display
+Parameter 1
+User-defined
+Display
+Parameter 2
+User-defined
+Display
+Parameter 3
+User-defined
+Display
+Parameter 4
+User-defined
+Display
+Parameter 5
+User-defined
+Display
+Parameter 6
+User-defined
+Display
+Parameter 7
+User-defined
+Display
+Parameter 8
+User-defined
+Display
+Parameter 9
+User-defined
+Display
+Parameter 10
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+- 55 -
+
+00.03
+
+01.01
+
+01.02
+
+01.08
+
+01.09
+
+02.00
+
+02.01
+
+02.12
+
+03.00
+
+03.01
+
+04.00
+
+1008
+
+1009
+
+100A
+
+100B
+
+100C
+
+100D
+
+1100
+
+1101
+
+1102
+
+1103
+
+1104
+
+1105
+
+1106
+
+1107
+
+1108
+
+1109
+
+110A
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+F17.11
+
+F17.12
+
+F17.13
+
+F17.14
+
+F17.15
+
+F17.16
+
+F17.17
+
+F17.18
+
+F17.19
+
+F17.20
+
+F17.21
+
+F17.22
+
+F17.23
+
+F17.24
+
+F17.25
+
+F17.26
+
+F17.27
+
+F17.28
+
+F17.29
+
+User-defined
+Display
+Parameter 11
+User-defined
+Display
+Parameter 12
+User-defined
+Display
+Parameter 13
+User-defined
+Display
+Parameter 14
+User-defined
+Display
+Parameter 15
+User-defined
+Display
+Parameter 16
+User-defined
+Display
+Parameter 17
+User-defined
+Display
+Parameter 18
+User-defined
+Display
+Parameter 19
+User-defined
+Display
+Parameter 20
+User-defined
+Display
+Parameter 21
+User-defined
+Display
+Parameter 22
+User-defined
+Display
+Parameter 23
+User-defined
+Display
+Parameter 24
+User-defined
+Display
+Parameter 25
+User-defined
+Display
+Parameter 26
+User-defined
+Display
+Parameter 27
+User-defined
+Display
+Parameter 28
+User-defined
+Display
+Parameter 29
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+00.00～49.99
+
+Group F18 Parameters of Motor 2
+
+- 56 -
+
+04.01
+
+04.02
+
+04.03
+
+05.02
+
+08.01
+
+08.02
+
+08.03
+
+08.04
+
+08.05
+
+08.30
+
+11.10
+
+13.00
+
+13.01
+
+13.02
+
+13.08
+
+13.09
+
+00.00
+
+00.00
+
+00.00
+
+110B
+
+110C
+
+110D
+
+110E
+
+110F
+
+1110
+
+1111
+
+1112
+
+1113
+
+1114
+
+1115
+
+1116
+
+1117
+
+1118
+
+1119
+
+111A
+
+111B
+
+111C
+
+111D
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+FR500A&FR510A Series Vector Control Inverter
+
+F18.00
+
+Motor 2 type
+selection
+
+0: Three phase asynchronous
+motors
+1: Sync motor(PMSM)
+2: Single phase asynchronous
+motors (Remove capacity)
+3: Single phase asynchronous
+motors (No need to remove
+capacity)
+
+F18.01
+
+F18.02
+
+F18.03
+
+F18.04
+
+F18.05
+
+F18.08
+
+F18.09
+
+F18.10
+
+F18.11
+
+F18.12
+
+F18.13
+
+F18.14
+
+F18.15
+
+F18.16
+
+F18.17
+
+Power rating of
+motor 2
+Rated voltage
+of motor 2
+Rated current
+of motor 2
+Rated
+frequency of
+motor 2
+Rated speed of
+motor 2
+Stator
+resistance R1
+of
+async motor 2
+Rotor
+resistance R2
+of
+async motor 2
+Leakage
+inductance L1
+of async motor
+2
+Mutual
+inductance L2
+of
+asynchronous
+motor 2
+No-load current
+of
+async motor 2
+Field
+weakening
+coeff 1
+of async motor
+2
+Field
+weakening
+coeff 2
+of async motor
+2
+Field
+weakening
+coeff 3
+of async motor
+2
+PMSM Stator
+resistance
+(FR510A only)
+PMSM D-axis
+
+0.1～1000.0kW
+
+60～660V
+
+0.1～1500.0A
+
+20.00～Fmax
+
+1～30000
+
+0.001～65.535Ω
+
+0.001～65.535Ω
+
+0.01～655.35mH
+
+0.1～6553.5mH
+
+0.1～1500.0A
+
+0.0～100.0
+
+0.0～100.0
+
+0.0～100.0
+
+0.001～65.535Ω
+
+0.01～655.35mH
+
+- 57 -
+
+0
+
+Model
+defined
+Model
+defined
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+Model
+defined
+
+87%
+
+75%
+
+70%
+
+Model
+defined
+
+Model
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+1200
+
+1201
+
+1202
+
+1203
+
+1204
+
+1205
+
+1208
+
+1209
+
+120A
+
+120B
+
+120C
+
+120D
+
+120E
+
+120F
+
+1210
+
+1211
+
+FR500A&FR510A Series Vector Control Inverter
+
+inductance
+(FR510A only)
+PMSM Q-axis
+inductance
+(FR510A only)
+PMSM back
+EMF
+(FR510A only)
+Installation
+angle of
+encoder
+(FR510A only)
+Pole number of
+motor
+Find encoder
+origin at
+beginning
+(FR510A only)
+Encoder line
+number
+(FR510A only)
+
+F18.18
+
+F18.19
+
+F18.20
+
+F18.21
+
+F18.22
+
+F18.23
+
+0.01～655.35mH
+
+0～65535V
+
+0.0～359.9°
+
+0～1000
+
+0: Not find
+1: Find
+
+0～10000
+
+F18.24
+
+Encoder type
+(FR510A only)
+
+0: ABZ encoder
+1: UVW encoder
+2: Rotary encoder
+3: ECN1313
+4: Sine-cosine encoder
+
+AB Phase
+Sequence of
+ABZ
+Incremental
+Encoder
+(FR510A only)
+Speed
+feedback PG
+disconnection
+detection time
+(FR510A only)
+Speed Ratio of
+Motor to
+Encoder
+(FR510A only)
+Pole pairs of
+rotary encoder
+(FR510A only)
+
+Autotuning of
+motor 2
+
+F18.25
+
+F18.26
+
+F18.27
+
+F18.28
+
+F18.30
+
+0: Positive
+1: Negative
+
+0.0：Invalid
+0.1～10.0s
+
+0.001～60.000
+
+1～100
+
+0: No autotuning
+1: Static autotuning of motor
+2: Rotary autotuning of motor
+
+Group F19 V/f Control Parameters of Motor 2
+
+F19.00
+
+V/f curve
+setting
+
+00: Linear V/F
+01: Multi-stage V/F
+02: 1.2nd power V/F
+03: 1.4nd power V/F
+04: 1.6nd power V/F
+05: 1.8nd power V/F
+06: 2.0nd power V/F
+07: V/F complete separation
+08: V/F half separation
+
+- 58 -
+
+defined
+
+Model
+defined
+
+Model
+defined
+
+0.0°
+
+4
+
+1
+
+1024
+
+0
+
+0
+
+0.0s
+
+1.000
+
+1
+
+0
+
+0
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+1212
+
+1213
+
+1214
+
+1215
+
+1216
+
+1217
+
+1218
+
+1219
+
+121A
+
+121B
+
+121C
+
+121E
+
+×
+
+1300
+
+FR500A&FR510A Series Vector Control Inverter
+
+09: 1.2 power inverse curve V/F
+10: 1.4 power inverse curve V/F
+11: 1.6 power inverse curve V/F
+12: 1.8 power inverse curve V/F
+13: 2.0 power inverse curve V/F
+0.1%–30.0% 0.0% (fixed torque
+boost)
+
+0.00～Fmax
+
+0.00～F19.05
+
+0.0～100.0
+
+F19.03～F19.05
+
+0.0～100.0
+
+F19.05～F19.09
+
+0.0～100.0
+
+0.0%
+
+50.00Hz
+
+0.00Hz
+
+5.0%
+
+5.00Hz
+
+14.0%
+
+25.00Hz
+
+50.0%
+
+F19.07～rated motor frequency
+
+50.00Hz
+
+0.0～100.0
+
+Ue=100.0%
+
+100.0%
+
+0.0～300.0%
+
+0.0～200.0%
+
+0.0～200.0%
+
+0.0～300.0%
+
+0: Digital setting (F19.16)
+1: keypad potentiometer
+2: AI1
+3: Multi-reference
+4: Pulse setting ( DI7/HI )
+5: PID
+6: AI2
+7: AI3
+
+80.0%
+
+100.0%
+
+100.0%
+
+100.0%
+
+0
+
+0 V to rated motor voltage
+
+0.0%
+
+0.0～6000.0s
+It indicates the time for the
+voltage rising from 0 V to rated
+Motor voltage.
+F19.19～3000ms
+
+- 59 -
+
+0.1s
+
+500ms
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+△
+
+△
+×
+
+F19.01
+
+Torque boost
+
+F19.02
+
+F19.03
+
+F19.04
+
+F19.05
+
+F19.06
+
+F19.07
+
+F19.08
+
+F19.09
+
+F19.10
+
+F19.11
+
+F19.12
+
+F19.13
+
+F19.14
+
+Cut-off
+frequency of
+torque boost
+Multi-point V/F
+frequency 1(F1)
+Multi-point V/F
+voltage 1
+(V1)
+Multi-point V/F
+frequency 2(F2)
+Multi-point V/F
+voltage 2
+(V2)
+Multi-point V/F
+frequency 3(F3)
+Multi-point V/F
+voltage 3
+(V3)
+Multi-point V/F
+frequency 4(F4)
+Multi-point V/F
+voltage 4
+(V4)
+V/F slip
+compensation
+gain
+Stator
+voltagedrop
+compensation
+gain
+Excitation boost
+gain
+Oscillation
+Suppression
+
+F19.15
+
+Voltage source
+for V/F
+separation
+
+F19.16
+
+F19.17
+
+Voltage digital
+setting for V/F
+separation
+
+Voltage rise
+time of V/F
+separation
+
+F19.18
+
+Set the IQ filter
+
+1301
+
+1302
+
+1303
+
+1304
+
+1305
+
+1306
+
+1307
+
+1308
+
+1309
+
+130A
+
+130B
+
+130C
+
+130D
+
+130E
+
+130F
+
+1310
+
+1311
+
+1312
+
+FR500A&FR510A Series Vector Control Inverter
+
+F19.19
+
+F19.20
+
+F19.21
+
+F19.22
+
+F19.23
+
+F19.24
+
+time below
+0.5Hz in VVF
+mode
+Set the IQ filter
+time above 2Hz
+in VVF mode
+Torque revision
+when run
+forward
+Torque revision
+when run
+reverse
+PMSM
+acceleration
+current
+compensation
+setting
+(FR510A only)
+PMSM
+compensation
+time decreased
+after
+acceleration
+(FR510A only)
+PMSM ID
+current value
+will be
+maintained
+after
+accelerating.
+(FR510A only)
+
+1ms～F19.18
+
+100ms
+
+×
+
+1313
+
+0.0～5.0%
+
+0.0～5.0%
+
+0.0%
+
+1.0%
+
+1314
+
+1315
+
+△
+
+△
+
+0.0～200.0%
+
+0.0%
+
+△
+
+1316
+
+0.0～100.0s
+
+2.0s
+
+△
+
+1317
+
+0.0～200.0%
+
+0.0%
+
+△
+
+1318
+
+Group F20 Vector Control Parameters of Motor 2
+
+F20.00
+
+F20.01
+
+F20.02
+
+F20.03
+
+F20.04
+
+F20.05
+
+F20.06
+
+F20.07
+
+F20.08
+
+F20.09
+
+Speed/torque
+control
+ASR low-speed
+proportional
+gain Kp1
+ASR low-speed
+integration time
+Ti1
+ASR switching
+frequency 1
+ASR
+high-speed
+proportional
+gain Kp2
+ASR
+high-speed
+integration time
+Ti2
+ASR switching
+frequency 2
+ASR input
+filtering time
+ASR output
+filtering time
+Vector control
+slip gain
+
+0: speed control
+1: torque control
+
+0.0～100.0
+
+0.001～30.000s
+
+0.00～F20.06
+
+1～100.0
+
+0.001～30.000s
+
+F20.03～Fmax
+
+0.0～500.0ms
+
+0.0～500.0ms
+
+50～200%
+
+- 60 -
+
+0
+
+15.0
+
+0.100s
+
+5.00Hz
+
+10.0
+
+0.500s
+
+10.00Hz
+
+3.0ms
+
+0.0ms
+
+100%
+
+×
+
+1400
+
+1401
+
+1402
+
+1403
+
+1404
+
+1405
+
+1406
+
+1407
+
+1408
+
+1409
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+Digital setting
+of torque
+upper limit in
+speed control
+mode
+Excitation
+adjustment
+proportional
+gain Kp1
+Excitation
+adjustment
+integral gain
+Ti1
+Torque
+adjustment
+proportional
+gain Kp2
+Torque
+adjustment
+integral gain
+Ti2
+Excitation gain
+coefficient
+
+F20.10
+
+F20.11
+
+F20.12
+
+F20.13
+
+F20.14
+
+F20.15
+
+F20.16
+
+Torque setting
+source under
+torque control
+
+F20.17
+
+F20.18
+
+F20.19
+
+F20.20
+
+F20.21
+
+F20.22
+
+F20.23
+
+F20.24
+
+F20.25
+
+F20.26
+
+Digital setting
+of torque
+Forward speed
+limited value
+under torque
+control
+Reverse speed
+limited value
+under torque
+control
+Set torque
+accel time
+Set torque
+decel time
+Static friction
+torque
+compensation
+Static friction
+frequency
+range
+Static
+Frequency of
+Open-Loop
+Torque
+SVC
+optimization
+method
+Max Frequency
+
+FR500A&FR510A Series Vector Control Inverter
+
+80.0～200.0%
+
+165.0%
+
+×
+
+140A
+
+0.00～10.00
+
+0.50
+
+140B
+
+0.0～3000.0ms
+
+10.0ms
+
+0.00～10.00
+
+0.0～3000.0ms
+
+50.0~200%
+
+0: Set by F20.17
+1: Keypad potentiometer
+2: AI1
+3: AI2
+4: AI3
+5: Pulse setting ( DI7/HI )
+6: Communication setting
+
+-200.0～200.0%
+
+0.00～Fmax
+
+0.00～ Fmax
+
+0.0～6000.0s
+
+0.0～6000.0s
+
+0.0～100.0%
+
+0.00～20.00Hz
+
+1.00～10.00Hz
+
+0: Optimization method 1
+1: Optimization method 2
+2: Optimization method 3
+0: Set by F20.18 & F20.19
+
+- 61 -
+
+0.50
+
+10.0ms
+
+100%
+
+0
+
+50.0%
+
+50.00Hz
+
+50.00Hz
+
+0.0s
+
+0.0s
+
+5.00%
+
+1.00Hz
+
+1.00Hz
+
+1
+
+0
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+×
+
+140C
+
+140D
+
+140E
+
+140F
+
+1410
+
+1411
+
+1412
+
+1413
+
+1414
+
+1415
+
+1416
+
+1417
+
+1418
+
+1419
+
+141A
+
+FR500A&FR510A Series Vector Control Inverter
+
+source under
+torque control
+
+PMSM Start
+Excitation
+Current
+(FR510A only)
+PMSM Flux
+weakening
+control
+(FR510A only)
+PMSM Flux
+weakening
+Voltage
+(FR510A only)
+PMSM Flux
+weakening
+gain(Kp)
+(FR510A only)
+PMSM Flux
+weakening
+integral(Ti)
+(FR510A only)
+PMSM Flux
+weakening limit
+(FR510A only)
+PMSM
+excitation
+current
+frequency high
+point (FR510A
+only)
+PMSM
+excitation
+current
+frequency low
+point
+(FR510A only)
+PMSM
+excitation
+current
+conversion
+delay
+(FR510A only)
+PMSM speed
+estimation Kp
+(FR510A only)
+PMSM speed
+estimation Ti
+(FR510A only)
+
+F20.27
+
+F20.28
+
+F20.29
+
+F20.30
+
+F20.31
+
+F20.32
+
+F20.33
+
+F20.34
+
+F20.35
+
+F20.36
+
+F20.37
+
+1: Keypad potentiometer
+2: AI1
+3: AI2
+4: AI3
+5: Pulse setting ( DI7/HI )
+
+0.0～150.0%
+
+0: Invalid
+1: Valid
+
+70.0～100.0%
+
+0.0～500.0%
+
+0.00～60.00s
+
+50.0%
+
+1
+
+95.0%
+
+30.0%
+
+0.5s
+
+0.0～200.0%
+
+100.0%
+
+141B
+
+141C
+
+141D
+
+141E
+
+141F
+
+1420
+
+×
+
+×
+
+△
+
+△
+
+△
+
+△
+
+F10.34～600.00Hz
+
+15.00Hz △
+
+1421
+
+0.0～F10.33
+
+10.00Hz △
+
+1422
+
+0.0～10.0s
+
+0.00～10.00
+
+1.0s
+
+2.00
+
+0.1～1000.0ms
+
+20.0ms
+
+△
+
+△
+
+△
+
+1423
+
+1424
+
+1425
+
+Group F21 Position Control (FR510A only)
+
+F21.00
+
+Selection of
+Position Control
+Mode
+
+0: Non-position control
+1: Zero Servo (Frequency
+Achievement Effective)
+2: Zero Servo (Terminal Effective)
+
+- 62 -
+
+0
+
+×
+
+1500
+
+F21.01
+
+F21.02
+
+F21.03
+
+F21.04
+
+F21.05
+
+F21.06
+
+F21.07
+
+F21.08
+
+Position loop
+gain
+Zero Servo
+Initiation
+Frequency
+Location
+completion
+width
+Location
+completion time
+Spindle
+orientation
+position 1
+Spindle
+orientation
+position 2
+Spindle
+orientation
+position 3
+Spindle
+orientation
+position 4
+
+F21.09
+
+Spindle
+orientation
+
+F21.10
+
+F21.11
+
+F21.12
+
+Spindle
+orientation
+speed
+Spindle
+orientation
+deceleration
+time
+Orientation
+position
+confirmation
+time
+
+F21.13
+
+Regression
+Origin Selection
+
+F21.14
+
+Regression
+Origin Direction
+
+F21.15
+
+Regression
+
+FR500A&FR510A Series Vector Control Inverter
+
+3: Spindle orientation
+4: Simple carry
+5: Pulse train
+
+0.000～40.000
+
+0.00Hz～Fmax
+
+0～3000
+
+0.000～40.000s
+
+0～40000
+
+0～40000
+
+0～40000
+
+0～40000
+
+Unit’s place: spindle orientation
+direction
+0: Orient from current direction of
+rotation
+1: Direction from positive direction
+2: Orient from reverse direction
+Ten’s place: positioning when
+parking
+0: Do not locate when parking
+1: Positioning when parking
+
+1.000
+
+1.00Hz
+
+10
+
+0.200s
+
+0
+
+0
+
+0
+
+0
+
+△
+×
+
+×
+
+×
+
+△
+
+△
+
+△
+
+△
+
+1501
+
+1502
+
+1503
+
+1504
+
+1505
+
+1506
+
+1507
+
+1508
+
+00
+
+×
+
+1509
+
+0.00Hz～Fmax
+
+10.00Hz
+
+0.0～60.0s
+
+0.000～6.000s
+
+Unit’s place: back to origin
+selection
+0: Invalid
+1: Valid
+Ten’s place: whether carry requires
+terminal enable signal
+0: no need
+1: Need
+0:Forward
+1:Reverse
+0.00Hz～600.00Hz
+
+- 63 -
+
+2.0s
+
+0.010s
+
+00
+
+0
+
+10.00Hz
+
+×
+
+×
+
+×
+
+×
+
+×
+
+×
+
+150A
+
+150B
+
+150C
+
+150D
+
+150E
+
+150F
+
+FR500A&FR510A Series Vector Control Inverter
+
+0.00Hz～60.00Hz
+
+1.00Hz
+
+×
+
+1510
+
+Origin
+Frequency 1
+Regression
+Origin
+Frequency 2
+Carry amount 0
+high
+Carry amount 0
+low
+Carry amount 1
+high
+Carry amount 1
+low
+Carry amount 2
+high
+Carry amount 2
+low
+Carry amount 3
+high
+Carry amount 3
+low
+Carry amount 4
+high
+Carry amount 4
+low
+Carry amount 5
+high
+Carry amount 5
+low
+Carry amount 6
+high
+Carry amount 6
+low
+Carry amount 7
+high
+Carry amount 7
+low
+
+Selection of
+Position-Given
+Mode
+
+Electronic Gear
+Ratio Molecule
+Electronic gear
+denominator
+feed forward
+gain
+Feedforward
+filtering time
+Position offset
+change rate
+
+F21.16
+
+F21.17
+
+F21.18
+
+F21.19
+
+F21.20
+
+F21.21
+
+F21.22
+
+F21.23
+
+F21.24
+
+F21.25
+
+F21.26
+
+F21.27
+
+F21.28
+
+F21.29
+
+F21.30
+
+F21.31
+
+F21.32
+
+F21.33
+
+F21.34
+
+F21.35
+
+F21.36
+
+F21.37
+
+F21.38
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0～9999
+
+0:X7 pulse input
+1: Encoder gives A/B phase pulse,
+A phase ahead B phase 90 reads
+forward
+2: Encoder gives A/B phase pulse,
+B phase ahead A phase 90 reads
+forward
+
+1～9999
+
+1～9999
+
+0.000～7.000
+
+0.000～7.000s
+
+0～9999
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+1000
+
+1000
+
+1.000
+
+0.001s
+
+800
+
+F22Group:Virtual IO
+Function
+selection of
+
+F22.00
+
+The same as function code F04.00
+
+0
+
+- 64 -
+
+1511
+
+1512
+
+1513
+
+1514
+
+1515
+
+1516
+
+1517
+
+1518
+
+1519
+
+151A
+
+151B
+
+151C
+
+151D
+
+151E
+
+151F
+
+1520
+
+1521
+
+1522
+
+1523
+
+1524
+
+1525
+
+1526
+
+1600
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+×
+
+×
+
+×
+
+△
+
+△
+×
+
+×
+
+virtual VDI1
+terminal
+Function
+selection of
+virtual VDI2
+terminal
+Function
+selection of
+virtual VDI3
+terminal
+Function
+selection of
+virtual VDI4
+terminal
+Function
+selection of
+virtual VDI5
+terminal
+
+Valid status
+setting mode of
+virtual VDI
+terminals
+
+Settings of
+virtual VDI
+terminal status
+Function
+selection of
+virtual VDO1
+terminals
+output
+Function
+selection of
+virtual VDO2
+terminals
+output
+Function
+selection of
+virtual VDO3
+terminals
+output
+Function
+selection of
+virtual VDO4
+terminals
+output
+Function
+selection of
+virtual VDO5
+terminals
+output
+Virtual VDO1
+output delay
+time
+Virtual VDO2
+output delay
+
+F22.01
+
+F22.02
+
+F22.03
+
+F22.04
+
+F22.05
+
+F22.06
+
+F22.07
+
+F22.08
+
+F22.09
+
+F22.10
+
+F22.11
+
+F22.12
+
+F22.13
+
+FR500A&FR510A Series Vector Control Inverter
+
+The same as function code F04.00
+
+0
+
+The same as function code F04.00
+
+0
+
+The same as function code F04.00
+
+0
+
+The same as function code F04.00
+
+0
+
+VDI5, VDI4, VDI3, VDI2, VDI1
+
+0:Validity of VDI depends on virual
+VDOx’s status
+
+00000
+
+×
+
+×
+
+×
+
+×
+
+×
+
+1601
+
+1602
+
+1603
+
+1604
+
+1605
+
+1:Validity of VDI set by function
+code F22.06
+VDI5, VDI4, VDI3, VDI2, VDI1
+0: Invalid
+1: Valid
+
+: Internal short circuited to
+
+0
+physics DIx
+Other: The same as function code
+F05.00
+
+: Internal short circuited to
+
+0
+physics DIx
+Other: The same as function code
+F05.00
+
+: Internal short circuited to
+
+0
+physics DIx
+Other: The same as function code
+F05.00
+
+: Internal short circuited to
+
+0
+physics DIx
+Other: The same as function code
+F05.00
+
+: Internal short circuited to
+
+0
+physics DIx
+Other: The same as function code
+F05.00
+
+0.0s~6000.0s
+
+0.0s~6000.0s
+
+- 65 -
+
+00000
+
+1606
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0.0s
+
+0.0s
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+△
+
+1607
+
+1608
+
+1609
+
+160A
+
+160B
+
+160C
+
+160D
+
+FR500A&FR510A Series Vector Control Inverter
+
+F22.14
+
+F22.15
+
+F22.16
+
+F22.17
+
+time
+Virtual VDO3
+output delay
+time
+Virtual VDO4
+output delay
+time
+Virtual VDO5
+output delay
+time
+VDO output
+terminal
+positive and
+negative logic
+
+0.0s~6000.0s
+
+0.0s~6000.0s
+
+0.0s~6000.0s
+
+VDO5, VDO4, VDO3, VDO2,
+VDO1
+0: Positive logic
+1: Negative logic
+
+U00.09
+
+U00.08
+
+U00.07
+
+U00.06
+
+U00.05
+
+U00.00
+
+U00.12
+
+U00.10
+U00.11
+
+U00.01
+U00.02
+U00.03
+U00.04
+
+Group U00 Status Monitoring
+Running
+frequency
+Set frequency
+Output voltage
+Output current
+Output power
+Estimated
+Motor
+Speed
+Bus voltage
+Synchronous
+Frequency
+PLC step
+Program
+Operation Time
+PID set
+PID feedback
+Status of DI1～
+DI5 digital input
+terminal
+Status of DI6～
+DI7 digital input
+terminal
+Status of digital
+output
+terminal
+AI1 input
+AI2 input
+AI3 input
+Keypad
+potentiometer
+input
+HI input
+AO1 output
+AO2 output
+HO output
+Temperature of
+inverter
+Accumulative
+power-on time
+
+U00.19
+U00.20
+U00.21
+U00.22
+
+U00.15
+U00.16
+U00.17
+
+U00.13
+
+U00.14
+
+U00.18
+
+U00.24
+
+U00.23
+
+0.00～Fup
+
+0.00～Fmax
+0～660V
+0.0～3000.0A
+-3000.0～3000.0kW
+
+0～60000rpm
+
+0～1200V
+
+0.00～Fup
+
+1～15
+
+0.0～6000.0s(h)
+
+0～60000
+0～60000
+
+DI5 DI4 DI3 DI2 DI1
+
+DI7 DI6
+
+R2 R1 Y2 Y1
+
+0.0～100.0%
+0.0～100.0%
+-100.0～100.0%
+
+0.0～100.0%
+
+0.00～100.00kHz
+0.0～100.0%
+0.0～100.0%
+0.00～100.00kHz
+
+-40.0℃～120.0℃
+
+0～65535min
+
+- 66 -
+
+0.0s
+
+0.0s
+
+0.0s
+
+00000
+
+0.00Hz
+
+0.00Hz
+0.0V
+0.0A
+0.0kW
+
+0rpm
+
+0V
+
+0.00Hz
+
+1
+
+0.0s(h)
+
+0
+0
+
+00000
+
+00
+
+0000
+
+0.0%
+0.0%
+0.0%
+
+0.0%
+
+0.00kHz
+0.0%
+0.0%
+0.00kHz
+
+0.0℃
+
+0min
+
+△
+
+△
+
+△
+
+△
+
+⊙
+
+⊙
+⊙
+⊙
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+⊙
+⊙
+
+⊙
+
+⊙
+⊙
+⊙
+⊙
+
+⊙
+
+⊙
+
+160E
+
+160F
+
+1610
+
+1611
+
+3000
+
+3001
+3002
+3003
+3004
+
+3005
+
+3006
+
+3007
+
+3008
+
+3009
+
+300A
+300B
+
+300C
+
+300D
+
+300E
+
+300F
+3010
+3011
+
+3012
+
+3013
+3014
+3015
+3016
+
+3017
+
+3018
+
+U00.35
+
+U00.34
+
+U00.33
+
+U00.32
+
+U00.27
+
+U00.26
+
+U00.25
+
+U00.28
+U00.29
+U00.30
+U00.31
+
+Accumulative
+running time
+Cumulative
+power-on
+time
+Cumulative
+running time
+Count value
+Length value
+Linear speed
+Output torque
+PTC motor
+temperature
+detection
+Speed that
+detected by
+encoder
+Monitoring of
+encoder line
+number
+Power
+consumption
+VDI1～VDI5
+input status
+VDO1～
+VDO5output
+status
+High speed
+pulse X7 or the
+line number of
+extension card
+monitoring
+Sine cosine
+encoder C
+signal (FR510A
+only)
+Sine cosine
+encoder D
+signal (FR510A
+only)
+UVW encoder
+UVW signal
+(FR510A only)
+Group U01 Fault Record
+
+U00.39
+
+U00.40
+
+U00.41
+
+U00.36
+
+U00.37
+
+U00.38
+
+U01.00
+
+U01.01
+
+U01.02
+
+U01.03
+
+Code of the
+latest fault
+Running
+frequency
+when the latest
+fault
+occurred
+Output current
+when the
+latest fault
+occurred
+Bus voltage
+when the
+
+FR500A&FR510A Series Vector Control Inverter
+
+0～6553.5min
+
+0～65535h
+
+0～65535h
+
+0～65535
+0～65535m
+0～65535m/min
+0.0～300.0%
+
+-40℃～200℃
+
+0～60000rpm
+
+0～65535
+
+0～65535kWh
+
+VDI5 VDI4 VDI3 VDI2 VDI1
+
+0.0min
+
+0h
+
+0h
+
+0
+0m
+0m/Min
+0.0%
+
+0℃
+
+0rpm
+
+0
+
+0kWh
+
+00000
+
+VDO5 VDO4 VDO3 VDO2 VDO1
+
+00000
+
+0～65535
+
+0～4096
+
+0～4096
+
+U V W
+
+Err00~Err44
+
+0
+
+0
+
+0
+
+000
+
+0
+
+0.00～Fup
+
+0.00Hz
+
+0.0～3000.0A
+
+0～1200V
+
+- 67 -
+
+0.0A
+
+0V
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+3019
+
+301A
+
+301B
+
+301C
+301D
+301E
+301F
+
+3020
+
+3021
+
+3022
+
+3023
+
+3024
+
+3025
+
+3026
+
+3027
+
+3028
+
+3029
+
+3100
+
+3101
+
+3102
+
+3103
+
+FR500A&FR510A Series Vector Control Inverter
+
+latest fault
+occurred
+Cumulative
+running time
+when the latest
+fault
+occurred
+Code of
+previous fault
+Running
+frequency
+when previous
+fault
+occurred
+Output current
+when
+previous fault
+occurred
+Bus voltage
+when
+previous fault
+occurred
+Cumulative
+running time
+when previous
+fault
+occurred
+Before-previou
+s fault
+code
+Running
+frequency
+when
+before-previous
+fault occurred
+Output current
+when
+before-previous
+fault
+occurred
+Bus voltage
+when
+before-previous
+fault
+occurred
+Cumulative
+running time
+when
+before-previous
+fault occurred
+Previous 3
+categories of
+faults
+Previous 4
+categories of
+faults
+Previous 5
+categories of
+
+U01.04
+
+U01.05
+
+U01.06
+
+U01.07
+
+U01.08
+
+U01.09
+
+U01.10
+
+U01.11
+
+U01.12
+
+U01.13
+
+U01.14
+
+U01.15
+
+U01.16
+
+U01.17
+
+0～65535h
+
+Same as U01.00
+
+0h
+
+0
+
+0.00～Fup
+
+0.00Hz
+
+0.0～3000.0A
+
+0.0A
+
+0～1200V
+
+0～65535h
+
+Same as U01.00
+
+0V
+
+0h
+
+0
+
+0.00～Fup
+
+0.00Hz
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+3104
+
+3105
+
+3106
+
+3107
+
+3108
+
+3109
+
+310A
+
+310B
+
+0.0～3000.0A
+
+0.0A
+
+⊙
+
+310C
+
+0～1200V
+
+0～65535h
+
+The same with U01.00
+
+The same with U01.00
+
+The same with U01.00
+
+- 68 -
+
+0V
+
+0h
+
+Err00
+
+Err00
+
+Err00
+
+⊙
+
+310D
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+310E
+
+310F
+
+3110
+
+3111
+
+FR500A&FR510A Series Vector Control Inverter
+
+U01.18
+
+U01.19
+
+U01.20
+
+U01.21
+
+U01.22
+
+U01.23
+
+U01.24
+
+U01.25
+
+faults
+Previous 6
+categories of
+faults
+Previous 7
+categories of
+faults
+Previous 8
+categories of
+faults
+Previous 9
+categories of
+faults
+Previous 10
+categories of
+faults
+Previous 11
+categories of
+faults
+Previous 12
+categories of
+faults
+Previous 13
+categories of
+faults
+
+The same with U01.00
+
+The same with U01.00
+
+The same with U01.00
+
+The same with U01.00
+
+The same with U01.00
+
+The same with U01.00
+
+The same with U01.00
+
+The same with U01.00
+
+Err00
+
+Err00
+
+Err00
+
+Err00
+
+Err00
+
+Err00
+
+Err00
+
+Err00
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+⊙
+
+3112
+
+3113
+
+3114
+
+3115
+
+3116
+
+3117
+
+3118
+
+3119
+
+- 69 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Chapter 5 Maintenance and Troubleshooting
+
+FR500A&FR510A inverter provides a number of warning information and protection, when a fault
+occurs, the protective function is activated, the inverter will stop output, inverter fault relay contact, and
+in the inverter displays the fault code on the display panel. Before seeking service user can press the
+self-examination tips in this section, analyze problems, and identify solutions. If the problem still
+cannot be excluded, seek services, or contact the dealer you purchase the drive with my company.
+
+Display
+
+Fault Name
+
+Possible Causes
+
+Solutions
+
+Err01
+
+Accel overcurrent
+
+Err02
+
+Decel overcurrent
+
+Err03
+
+Constant-speed
+overcurrent
+
+Err04
+
+Accel overvoltage
+
+1: The output circuit is
+grounded or short circuited.
+2: The acceleration time is too
+short.
+3: Manual torque boost or V/F
+curve is not appropriate.
+4: The voltage is too low.
+5: The startup operation is
+performed on the rotating
+motor.
+6: A sudden load is added
+during acceleration.
+7: The AC drive model is of too
+small power class.
+1: The output circuit is
+grounded or short circuited.
+2: The deceleration time is too
+short.
+3: The voltage is too low.
+4: A sudden load is added
+during deceleration.
+5: The braking unit and
+braking resistor are not
+installed.
+1: The output circuit is
+grounded or short circuited.
+2: The voltage is too low.
+3: A sudden load is added
+during operation.
+4: The AC drive model is of too
+small power class.
+1: The input voltage is too
+high.
+2: An external force drives the
+motor during acceleration.
+3: The acceleration time is too
+short.
+4: The braking unit and
+braking resistor are not
+installed.
+
+1: Eliminate external faults.
+2: Increase the acceleration
+time.
+3: Adjust the manual torque
+boost or V/F curve.
+4: Adjust the voltage to
+normal range.
+5: Select rotational speed
+tracking restart or start the
+motor after it stops.
+6: Remove the added load.
+7: Select an AC drive of
+higher power class
+
+1: Eliminate external faults.
+2: Increase the deceleration
+time.
+3: Adjust the voltage to
+normal range.
+4: Remove the added load.
+5: Install the braking unit and
+braking resistor.
+
+1: Eliminate external faults
+2: Adjust the voltage to
+normal range.
+3: Remove the added load
+4: Select an AC drive of
+higher power class.
+
+1: Adjust the voltage to
+normal range.
+2: Cancel the external force
+or install a braking resistor.
+3: Increase the acceleration
+time.
+4: Install the braking unit and
+braking resistor.
+
+- 70 -
+
+Err05
+
+Decel
+overvoltage
+
+Err06
+
+Constant-speed
+overvoltage
+
+Err07
+
+Bus undervoltage
+
+Err08
+
+Short circuit
+
+Err09
+
+Power input
+phase loss
+
+Err10
+
+Power output
+phase loss
+
+Err11
+
+Motor overload
+
+FR500A&FR510A Series Vector Control Inverter
+
+1: The input voltage is too
+high.
+2: An external force drives the
+motor during deceleration.
+3: The deceleration time is too
+short.
+4: The braking unit and
+braking resistor are not
+installed.
+
+1: The input voltage is too high
+2: An external force drives the
+motor during deceleration.
+
+1: Instantaneous power failure
+occurs on the input power
+supply.
+2: The AC drive's input voltage
+is not within the allowable
+range.
+3: The bus voltage is
+abnormal.
+4: The rectifier bridge and
+buffer resistor are faulty.
+5: The drive board is faulty.
+6: The main control board is
+faulty.
+1: The output circuit is
+grounded or short circuited.
+2: The connecting cable of the
+motor is too long.
+3: The module overheats.
+4: The internal connections
+become loose.
+5:The main control board is
+faulty
+6: The drive board is faulty.
+7: The inverter module is
+faulty.
+1: The three-phase power
+input is abnormal.
+2: The drive board is faulty.
+3: The lightening board is
+faulty.
+4: The main control board is
+faulty.
+1: The cable connecting the
+AC drive and the motor is
+faulty.
+2: The AC drive's three-phase
+outputs are unbalanced when
+the motor is running.
+3: The drive board is faulty.
+4: The module is faulty.
+1: F11-17 is set improperly.
+2: The load is too heavy or
+locked-rotor occurs on the
+motor.
+3: The AC drive model is of too
+
+- 71 -
+
+1: Adjust the voltage to
+normal range.
+2: Cancel the external force
+or install the braking resistor.
+3: Increase the deceleration
+time.
+4: Install the braking unit and
+braking resistor.
+
+1: Adjust the voltage to
+normal range.
+2: Cancel the external force
+or install the braking resistor.
+
+1: Reset the fault.
+2: Adjust the voltage to
+normal range.
+3: Contact the agent or
+Frecon.
+
+1: Eliminate external faults.
+2: Install a reactor or an
+output filter.
+3: Check the air filter and the
+cooling fan.
+4: Connect all cables
+properly.
+5: Contact the agent or
+Frecon.
+
+1: Eliminate external faults.
+2: Contact the agent or
+FRECON.
+
+1: Eliminate external faults.
+2: Check whether the motor
+Three-phase winding is
+normal.
+3: Contact the agent or
+Frecon.
+
+1: Set F11-17 correctly.
+2: Reduce the load and
+check the motor and the
+mechanical condition.
+3: Select an AC drive of
+
+FR500A&FR510A Series Vector Control Inverter
+
+small power class.
+1: The load is too heavy or
+locked-rotor occurs on the
+motor.
+2: The AC drive model is of too
+small power class.
+1: External fault signal is input
+via DI.
+1: The ambient temperature is
+too high.
+2: The air filter is blocked.
+3: The fan is damaged.
+4: The thermally sensitive
+resistor of the module is
+damaged.
+5: The inverter module is
+damaged.
+The EEPROM chip is
+damaged.
+Since the identification
+process, press STOP / RST
+key
+1: the motor and the inverter
+output terminals are not
+connected
+2: The motor does not
+disengage the load
+3: The electrical fault
+1: The PC is not working
+properly
+2: The communication line is
+not normal
+3: F15 set communication
+parameters set incorrectly
+
+higher power class.
+1: Reduce the load and
+check the motor and
+mechanical condition.
+2: Select an AC drive of
+higher power class.
+
+Reset the operation.
+
+1: Lower the ambient
+temperature.
+2: Clean the air filter.
+3: Replace the damaged
+fan.
+4: Replace the damaged
+thermally sensitive resistor.
+5: Replace the inverter
+module.
+Replace the main control
+board.
+
+Press STOP / RST key to
+reset
+
+1: check the connection
+between the inverter and
+motor
+2: The motor is disengaged
+load
+3: Check the motor
+
+1: Check the PC Connection
+2: Check the communication
+cable
+3: The communication
+parameters are set correctly
+
+Check the PID feedback
+signal or set to an
+appropriate value F13.24
+
+Err12
+
+Inverter overload
+
+Err13
+
+External
+equipment fault
+
+Err14
+
+Module overheat
+
+Err15
+
+Err16
+
+EEPROM
+read/write fault
+
+Motor auto-tuning
+cancelled
+
+Err17
+
+Motor auto-tuning
+fault
+
+Communication
+overtime
+error
+
+Err18
+
+Err19
+
+Err20
+
+PID feedback
+loss
+
+PID feedback set value is less
+than F13.24
+
+Continuous
+running time
+reached
+
+Set the running time to reach
+this function
+
+reference F05.14
+Description
+
+Err21
+
+Parameter
+upload fault
+
+Err22
+
+Parameter
+download fault
+
+Err23
+
+Braking unit fault
+
+1: Is not installed or is not
+plugged parameter copy card
+2: Parameter copy card
+anomalies
+3: The control board
+abnormalities
+1: Is not installed or is not
+plugged parameter copy card
+2: Parameter copy card
+anomalies
+3: The control board
+abnormalities
+1: The brake line failure or
+damage the brake pipe
+2: An external braking resistor
+is too small
+
+1: a copy of the card is
+properly installed
+parameters
+2: for technical support
+3: for technical support
+
+1: A copy of the card is
+properly installed
+parameters
+2: For technical support
+3: For technical support
+
+1: Check the brake unit,
+replace the brake pipe
+2: Increasing the braking
+resistor
+
+- 72 -
+
+Err24
+
+Module
+temperature
+detection
+disconnection
+
+FR500A&FR510A Series Vector Control Inverter
+
+The temperature sensor
+failure or cable break
+
+For technical support
+
+Err25
+
+Load becoming 0
+
+The AC drive running current
+is lower than F11.22
+
+Err26
+
+With-wave
+current limit fault
+
+1: The load is too heavy or
+locked rotor occurs on the
+motor.
+2: The AC drive model is of too
+small power class.
+
+Err27
+
+Inverter soft-start
+relay is off
+
+1: The grid voltage is too low
+2: Rectifier module failure
+
+Err28
+
+Software version
+compatibility fault
+
+Err29
+
+Instantaneous
+overcurrent
+
+Err30
+
+Instantaneous
+overvoltage
+
+1: The upper and lower
+transmission module
+parameters in the parameter
+version of the control panel
+version mismatch.
+
+1. Inverter output circuit being
+grounded or short-circuit;
+2. The acceleration and
+deceleration time is too short;
+3. Manually torque boost or
+V/F curve not appropriate;
+4. Voltage too low;
+5. Start the running motor;
+6. Sudden-load in the
+acceleration process;
+7. Model selection of inverter
+power is too small.
+
+1: Input voltage is too high;
+2. There is external force drag
+the motor to run in
+deceleration process;
+3. The deceleration time is too
+short;
+4. No installation of braking
+resistor.
+
+Err36
+
+PG card is
+disconnection
+(close loop)
+
+PG card detects that the
+encoder signal is
+disconnected
+
+Err37
+
+Over Speed
+(close loop)
+
+Err38
+
+Excessive speed
+deviation (close
+loop)
+
+1. Encoder parameters not
+right
+2. F11.41 and F11.42 not
+unreasonable.
+3. No parameter tuning
+1. Motor Locked Rotor
+2. Encoder parameters not
+right
+3. F11.43 and F11.44 not
+unreasonable.
+4. Output circuit is abnormal
+- 73 -
+
+Check that the load is
+disconnected or the setting
+F11-22 and F11-23 is
+correct.
+1: Reduce the load and
+check the motor and
+mechanical condition.
+2: Select an AC drive of
+higher power class.
+1: Check the grid voltage
+2: Demand for technical
+support
+
+re-upload module
+parameters to pass down
+
+1. Troubleshooting
+peripheral problems;
+2. To increase the
+acceleration time;
+3. Adjust the manually
+torque boost or V/F curve;
+4. Adjust the voltage to
+normal range;
+5. Select RPM track start or
+start after motor stopped;
+6. Cancel sudden-load;
+7. Select the inverter with
+larger power.
+
+1: Adjust the voltage to
+normal range;
+2. Cancel external force or
+install brake resistor;
+3. To increase the
+deceleration time;
+4. Install braking resistor
+
+Check the cable of encoder
+
+1. check encoder
+parameters
+2. check the value of F11.41
+and F11.42
+3. Perform parameter tuning
+
+1. check encoder
+parameters
+2. check the value of F11.43
+and F11.44
+3. check drive output circuit
+
+FR500A&FR510A Series Vector Control Inverter
+
+Err39
+
+Motor
+temperature too
+high
+
+1, PTC sensor configuration
+not right
+2, Motor temperature
+protection value too small
+3, Motor temperature too high
+
+Err40
+
+The setting
+running time ends
+
+1, Running time more than
+F00.25
+
+Err41
+
+Overload warning
+
+Err44
+
+Short circuit to
+ground
+
+1, when F11.18 = 00100 and
+the current output amp is more
+than F11.19
+When the ten’s place of
+F02.04 is set and the drive
+output is circuited to the
+ground.
+
+1, Reset PTC sensor
+parameter
+2, Increase motor
+temperature protection value
+3, Waiting until motor is
+cooled
+
+1. Contact the dealer
+
+1, Check the current load
+
+1. Check the value of F02.04
+and the output circuit of
+drive
+
+- 74 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Appendix A: Modbus Communication Protocol
+
+1. Application Scope
+
+1. Applicable series: FRECON FR series inverter.
+2. Applicable network: Support Modbus protocol, RTU format, withsingle-master/multi-slave
+
+Communication network of RS485 bus.
+
+The typical RTU message frame format:
+
+Start Bit
+
+T1-T2-T3-T4
+
+Device
+Address
+8Bit
+
+Function
+Code
+8Bit
+
+Data
+
+n*8Bit
+
+CRC
+
+16Bit
+
+Stop Bit
+
+T1-T2-T3-T4
+
+2. Physical Interface
+
+RS485 is asynchronous half-duplex Communication mode. LSB has transmission priority.
+Default data format of RS485 terminal: 1-8-N-1，bits rate: 9600bps.
+Data format 1-8-N-1, 1-8-O-1, 1-8-E-1, optional bits rates 4800bps, 9600bps, 19200bps,
+
+38400bps, 57600bps and 115200bps can be selected.
+
+Shielded twisted-pair cable is recommended Communication cable to lower external
+
+interference.
+3. Protocol Format
+
+The parity in ADU (Application Data Unit) is obtained via the CRC16 parity of the 1st three
+Parts of ADU and switch the low bytes and high bytes. Low bytes of CRC parity go first, and high
+bytes of it follow in the protocol format.
+４. Description of Protocol Format
+4.1 Address Code
+
+Address of slave inverter. The setting range: 1～247, 0 is broadcast address.
+
+4.2 Command Code
+
+Command Code
+
+Function
+
+03H
+
+06H
+
+08H
+
+Read parameters and status byte of inverter
+
+Write single function code or control parameter of inverter
+
+Circuit diagnosis and setting
+
+- 75 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+4.3 Allocation of Register Addresses
+
+name
+
+Description
+
+Function Code
+(F00.00～U01.99)
+
+High byte function code group number, F00～F31, U00, U01,
+respectively, corresponding to the high byte address is 00H～1FH, 30H,
+31H.
+Low byte of the group function code number, from 0 to 99 corresponding
+to the low byte address is 00H～63H.
+For example: Modify F01.02 function code value, no power-down when
+storing the corresponding register address (referred to as RAM address)
+to 0102H.
+EEPROM is frequently modified, will reduce the life of the EEPROM. If
+you modify the value of the function code-down storage needs, you can
+make this function code is the highest position a high address. Note that
+this address is only to write, not read.
+For example: Modify F01.02 function code value, and the corresponding
+need to power down when storing the register address (referred to as
+EEPROM address) to 8102H.
+
+Function code group
+F00
+F01
+F02
+F03
+F04
+F05
+F06
+F07
+F08
+F09
+F10
+F11
+F12
+F13
+F14
+F15
+F16
+F17
+F18
+F19
+F20
+F21
+F22
+U00 (Read Only)
+U01 (Read Only)
+
+RAM address high byte
+0x00
+0x01
+0x02
+0x03
+0x04
+0x05
+0x06
+0x07
+0x08
+0x09
+0x0A
+0x0B
+0x0C
+0x0D
+0x0E
+0x0F
+0x10
+0x11
+0x12
+0x13
+0x14
+0x15
+0x16
+0x30
+0x31
+
+EEPROM address high byte
+0x80
+0x81
+0x82
+0x83
+0x84
+0x85
+0x86
+0x87
+0x88
+0x89
+0x8A
+0x8B
+0x8C
+0x8D
+0x8E
+0x8F
+0x90
+0x91
+0x92
+0x93
+0x94
+0x95
+0x96
+--
+--
+
+4.4 Address and control command functions: (write only)
+
+Command word address
+
+Command Function
+
+2000H
+
+2001H
+2002H
+2003H
+
+0001: Forward run
+0002: Reverse Run
+0003: Inching Forward
+0004: Reverse Jog
+0005: Slowdown stop
+0006: Freewheel
+0007: Fault reset
+Communication setting frequency (0～Fmax (Unit: 0.01Hz))
+PID given range (0 to 1000, 1000 corresponds to 100.0%)
+PID feedback range (0～1000, 1000 corresponds to 100.0%)
+
+- 76 -
+
+2004H
+
+2005～20FF
+
+FR500A&FR510A Series Vector Control Inverter
+
+Torque set point (-3000～3000, 1000 corresponds to 100.0%
+motor rated current)
+Retention
+
+4.5 The status and function of the read address Description: (read only)
+
+Status word address
+
+functional status word
+
+2100H
+
+2101H
+
+0000H: parameter setting
+0001H: slave run
+0002H: JOG operation
+0003H: learning run
+0004H: Slave parking
+0005H: JOG parking
+0006H: Fault Status
+
+Bit0: 0 are given effective
+
+1 Given negative effective
+
+Bit1:0 frequency output Forward
+1 frequency output inversion
+
+Bit2～3:
+
+00 Keyboard start-stop
+01 terminal start-stop
+10 start-stop communication
+11 Reserved
+
+Bit4:
+
+0 Factory password is invalid
+1 factory password is valid
+
+Bit5:
+
+0 user password is invalid
+1 valid user password
+
+Bit6～7:
+
+00 basic function code group
+01 user-defined function code group
+10 different functions with the factory default code group
+11 Others
+
+5．Explanation of Command
+Command code 0x03: Read parameter and status of inverter.
+
+ADU Item
+
+Byte No.
+
+Range
+
+Master requests:
+Address of slave
+Command Code
+Register start address
+The number of register
+
+CRC parity(Low bytes go first)
+Slave responds :
+Address of slave
+Command Code
+Register start address
+
+The number of register
+
+CRC parity
+
+0～127
+0x03
+0x0000～0xFFFF
+0x0000～0x0008
+
+The local address
+0x03
+2 number of registers
+
+1
+1
+2
+2
+2
+
+1
+1
+1
+
+2 number of
+registers
+
+2
+
+Remarks: Read maximum 8 function codes consecutively.
+
+Command code 0x06: Write single function code or control parameter of inverter.
+
+Master requests:
+Address of slave
+Command Code
+
+ADU Item
+
+Byte No.
+
+1
+1
+
+- 77 -
+
+Range
+
+0～127
+0x06
+
+FR500A&FR510A Series Vector Control Inverter
+
+Register start address
+The number of register
+
+CRC parity
+Slave responds :
+Address of slave
+Command Code
+Register start address
+The number of register
+
+CRC parity
+
+2
+2
+2
+
+1
+1
+2
+2
+2
+
+0x0000～0xFFFF
+0x0000～0xFFFF
+
+The local address
+0x06
+0x0000～0xFFFF
+0x0000～0xFFFF
+
+Command code 0x08: Circuit Diagnosis and Setting
+
+ADU Item
+
+Byte No.
+
+Range
+
+Master requests:
+Address of slave
+Command Code
+Register start address
+The number of register
+CRC parity
+Slave responds :
+Address of slave
+Command Code
+Register start address
+The number of register
+CRC parity
+
+0～127
+0x08
+0x0000～0xFFFF
+
+The local address
+0x08
+0x0000～0xFFFF
+
+1
+1
+2
+2
+2
+
+1
+1
+2
+2
+2
+
+Remarks: Command code 0x08 is only for circuit check.
+
+6．CRC Parity
+
+Sending equipment calculates CRC parity value first, and then attaches it to the sending
+message. Upon receipt of the message, receiving equipment will calculate CRC parity value again,
+and compare the operation result with received CRC parity value. If the two values are different, it
+indicates that there is error during transmission.
+Calculation process of CRC parity:
+
+1. Define a CRC parity register, and initialize it as FFFFH.
+2. Conduct XOR calculation between the first byte of sending message and the value of CRC parity
+
+register, and then upload the result to CRC parity register. Start from address code, the start bit and
+stop bit will not be calculated.
+
+3. Collect and check LSB (the least significant bit of CRC parity register).
+4. If LSB is 1, shift each bit of CRC parity register rightwards by 1 bit, the highest bit filled with 0.
+Conduct XOR calculation between the value of CRC register and A001H, and then upload the result to
+CRC parity register.
+
+5. If LSB is 0, shift each bit of CRC parity register rightwards by 1 bit, the highest bit filled with 0.
+6. Repeat steps 3, 4 and 5 until completing 8 rounds of shifting.
+7. Repeat steps 2, 3, 4, 5 and 6, and process the next byte of sending message. Repeat above
+
+process continuously until each byte of sending message is processed.
+
+8. CRC parity date will be saved in CRC parity register after calculation.
+9. LUT (Look-up table) method is to obtain CRC parity in the system with limited time resources.
+Simple CRC functions as shown in following (C language Programming):
+
+- 78 -
+
+unsigned int CRC_Cal_Value (unsigned char Data, unsigned char Length)
+{
+
+FR500A&FR510A Series Vector Control Inverter
+
+unsigned int crc_value = 0xFFFF;
+int i = 0;
+while (Length--)
+{
+
+crc_value ^= Data++;
+for (i=0; i<8; i++)
+{
+
+if (crc_value & 0x0001)
+{
+
+crc_value = (crc_value>>1) ^ 0xa001;
+
+}
+else
+{
+
+}
+
+}
+
+crc_value = crc_value>>1;
+
+}
+return (crc_value);
+
+}
+
+7．Error Message Response
+
+Inverter will send an error message report when the master sends error data or inverter receives
+
+the error data due to the external interference.
+
+When Communication error occurs, slave combines the highest bit 1 of command code and error
+
+code as the response to the master.
+
+Responding data frame format when errors happened in Communication:
+
+ADU Item
+
+Byte No.
+
+Range
+
+Error
+
+response:
+
+Address of slave
+Error command code
+Error code
+CRC parity(Low bytes go first)
+Responding command code at normal Communication and error Communication
+
+0～127
+The highest bit 1 of command code
+0x01～0x13
+
+1
+1
+1
+2
+
+Responding Command Code at Normal
+Communication
+03H
+06H
+08H
+Description of Error Code:
+
+Responding Command Code at Error
+Communication
+83H
+86H
+88H
+
+error
+
+01H
+
+02H
+
+Description
+Exceptional command
+code
+Exceptional data address
+
+error
+
+03H
+
+04H
+
+Description
+
+Illegal Data
+
+Operation failed
+
+For example, for U00.00 write data 50.00HZ frequency. The host sends the data frame (hex):
+
+01H
+
+06H
+
+30H
+
+00H
+
+13H
+
+88H
+
+8BH
+
+9CH
+
+Because F00.00 is read only, inverter responds error message. Inverter responds data frame in
+
+hexadecimal format:
+01H
+
+02H
+Command code is 86H in error message, the highest bit 1 of 06H. If error code detail is 11H, it
+
+C3H
+
+A1H
+
+86H
+
+means the parameter is read only.
+
+After responding to the error data receipt, master can revise the responding program via
+
+resending data frame or based on the error message responded by the inverter.
+
+- 79 -
+
+FR500A&FR510A Series Vector Control Inverter
+8. Illustration
+
+1, No. 01 reads the output frequency value (U00.00), returned 5000, that 50.00Hz.
+To send data:
+01 03 30 00 00 01 8B 0A
+The received data is:
+01 03 02 13 88 B5 12
+2, No. 01 Drive communication given frequency 30.00Hz, send the data content of 3000.
+To send data:
+01 06 20 01 0B B8 D4 88
+The received data is:
+01 06 20 01 0B B8 D4 88
+3, communications sent on the 1st drive forward run command, write to the address 2000H 01
+To send data:
+01 06 20 00 00 01 43 CA
+The received data is:
+01 06 20 00 00 01 43 CA
+4, No. 01 communications sent inverter deceleration stop command, the address to write to
+
+2000H 05
+
+To send data:
+01 06 20 00 00 05 42 09
+The received data is:
+01 06 20 00 00 05 42 09
+
+- 80 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Appendix B: Braking Resistor
+
+When the inverter with high inertia loads or need to slow down rapid deceleration，Motor will in the
+
+state of power generation, the energy is transferred to the inverter DC link via the inverter bridge,
+causing the bus voltage of the inverter rises, when more than a certain value, the inverter will report
+overvoltage fault, and even lead to inverter power module damage of overvoltage, to prevent this
+happening, you must configure the brake components.
+
+FR500A&FR510A versatile compact inverter series are all built-in brake unit, customers simply
+external braking resistor can be used. The following is recommended braking resistor power rating and
+resistance. Depending on the load, the user can change the values
+within the recommended range.
+
+appropriately, but must be
+
+Inverter Model No.
+
+Brake unit
+
+Resistance(Ω)
+
+Quantity
+
+Minimum
+enabled brake
+resistance
+
+Standard built-in
+
+FR500A-4T-0.7G/1.5PB
+FR500A-4T-1.5G/2.2PB
+FR500A-4T-2.2G/4.0PB
+FR500A-4T-4.0G/5.5PB
+FR500A-4T-5.5G/7.5PB
+FR500A-4T-7.5G/011PB
+FR500A-4T-011G/015PB
+FR500A-4T-015G/018PB
+FR500A-4T-018G/022PB
+FR500A-4T-022G/030PB
+FR500A-4T-030G/037PB
+FR500A-4T-037G/045P(B)
+FR500A-4T-045G/055P(B)
+FR500A-4T-055G/075P(B)
+FR500A-4T-075G/090P(B)
+FR500A-4T-090G/110P(B)
+FR500A-4T-110G/132P
+FR500A-4T-132G/160P
+FR500A-4T-160G/185P
+FR500A-4T-185G/200P
+FR500A-4T-200G/220P
+FR500A-4T-220G/250P
+FR500A-4T-250G/280P
+FR500A-4T-280G/315P
+FR500A-4T-315G/355P
+*Note：The model of FR510A series inverter only needs to replace FR500A in the above
+
+200W 600Ω
+300W 360Ω
+300W 180Ω
+400W 150Ω
+600W 100Ω
+800W 75Ω
+1.1kW 50Ω
+1.6kW 40Ω
+4.0kW 32Ω
+4.5kW 27Ω
+6.0kW 20Ω
+7.0kW 20Ω
+9.0kW 13Ω
+11.0kW 10.2Ω
+15.0kW 7.5Ω
+18.0kW 6.5Ω
+26.0kW 6Ω
+26.0kW 4Ω
+26.0kW 4Ω
+38.0kW 3.4Ω
+38.0kW 3.4Ω
+42.0kW 3Ω
+42.0kW 3Ω
+54.0kW 2Ω
+54.0kW 2Ω
+
+100Ω
+100Ω
+100Ω
+100Ω
+80Ω
+60Ω
+43Ω
+31Ω
+24Ω
+24Ω
+19.2Ω
+19.2Ω
+12.8Ω
+9.6Ω
+6.8Ω
+6.3Ω
+6Ω
+4Ω
+4Ω
+3.4Ω
+3.4Ω
+3Ω
+3Ω
+2Ω
+2Ω
+
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+
+Built-in optional
+
+FRBU-4T-315
+
+table with FR510A
+
+Remark:
+
+Multiple braking resistors are connected in parallel mode. For example FR500A-4T-022G/030PB
+
+inverter braking resistor selection: Recommend selecting two 2KW, 30Ω resistor in parallel connection,
+Equivalent braking resistor is 4KW, 15Ω.
+
+If the power rating over 90kw, please refer to《FRBU User's Manual Of Braking Unit》to select the
+
+braking resistor.
+
+Cables listed in above table refer to the lead cable of single resistor. The DC bus should be
+updated if the resistors are in parallel connection. Cable should withstand voltage above AC450V,and
+temperature resistance of cable: 105℃.
+
+- 81 -
+
+​
+​
+FR500A&FR510A Series Vector Control Inverter
+
+Appendix C: PG Card
+
+FR510A series is equipped with PG cards showed as below, as optional parts, is the necessary
+
+part for inverter with closed loop vector control mode. PG card feedback the real-time speed of motor
+through the signal acquisition from encoder to achieve the precise control of motor speed and steering
+
+Model
+EXC-PG01
+EXC-PG02
+EXC-PG03
+EXC-PG04
+EXC-PG05
+EXC-PG06
+
+Description
+The differential input PG card
+Open collector,push input PG card
+Rotary transformer PGcard
+UVW encoder PG card
+ECN1313 PG card
+Sin-Cos encoder PG card
+
+Connection mode
+Terminal connection
+Terminal connection
+DB9 interface
+Terminal connection
+Terminal connection
+DB15 interface
+
+Relative Parameters
+
+Function
+code
+
+Code Name
+
+Setting Range
+
+Default
+
+Attr
+
+F00.08
+
+Motor control
+method
+
+Unit’s place: Motor1 control method
+0: V/F control
+1: Sensor-less vector control mode1
+2: Sensor-less vector control mode2
+3: Close-loop control(with PG card)
+Ten’s place: Motor2 control method
+0: V/F control
+1: Sensor-less vector control mode1
+2: Sensor-less vector control mode2
+3: Close-loop control(with PG card)
+
+Encoder line
+count
+
+0-65535
+
+F08.23
+
+F08.24
+
+Encoder
+selection
+
+F08.25
+
+AB phase
+sequence
+
+F08.30
+
+Auto-tuning
+
+0: ABZ incremental encoder
+1: UVW incremental encoder
+2: Rotary transformer
+3: ECN1313
+4: Sin-Cos encoder
+0: Positive
+1: Negative
+0: No autotuning
+1: Static autotuning of motor
+2: Rotary autotuning of motor
+
+11
+
+1024
+
+0
+
+0
+
+0
+
+×
+
+×
+
+×
+
+×
+
+×
+
+Set these parameter according to different encoder
+
+Function code expaination:
+
+1)F00.08 = 33(Close-loop control,with PG card)
+2)When choosing ABZ incremental encoder, F08.24 should be rightly set.
+3)When choosing ABZ incremental encoder, need to check that AB phase sequence is the same
+
+with frequency.
+
+- 82 -
+
+Installation diagram shown as below C-1:
+
+1) All kinds of PG cards are installed in the same place
+2) Cut off the power when to install PG card or uninstall it.
+3) Connecting the 20 PIN interface of PG card to J3 interface of control board.
+
+FR500A&FR510A Series Vector Control Inverter
+
+C.1 ABZ encoder PG card
+
+External view:
+
+Fig.C-1 PG card installation
+
+Fig.C-2(a)EXC-PG01
+
+Fig.C-2(b)EXC-PG02
+
+Table C-1 Technical parameter
+
+Model
+
+Power
+
+EXC-PG01
+EXC-PG02
+
+5V
+12V
+
+Characteristics of the input signal
+Response
+frequency range
+0-300KHz
+0-80KHz
+
+Input
+impedance
+
+Characteristics of the ouput signal
+Output frequency
+range
+0-300KHz
+0-80KHz
+
+Output
+current
+200mA
+100mA
+
+- 83 -
+
+FR500A&FR510A Series Vector Control Inverter
+Terminals outline drawing:
+
+Fig.C-3(a)EXC-PG01 terminals
+
+Fig.C-3(b)EXC-PG02 terminals
+
+Table C-2 Terminal function description
+
+Model
+
+Connection object
+
+Interface name
+
+EXC-PG
+01
+
+The differential
+input incremental
+encoder interface
+
+EXC-PG
+02
+
+Open collector,
+Push input
+incremental
+encoder interface
+
+A+、A-
+
+B+、B-
+
+Z+、Z-
++5V
+COM
++12V
+COM
+
+A
+
+B
+
+Z
+PE
+
+Description
+Encoder output singal A, maximum
+frequency 300kHz
+Encoder output signal B, maximum
+frequency 300kHz
+Encoder output singal Z, zero signal
+Supply +5V/200mA power
+Power earthing
+Supply +12V/100mA power
+Power earthing
+Encoder output singal A, maximum
+frequency 80kHz
+Encoder output singal B, maximum
+frequency 80kHz
+Encoder output singal Z, zero signal
+Shielding line
+
+Schematic diagram of the application connection
+
+Fig. C-4 Connection schematic diagram of EXC-PG01
+
+and the differential output encoder
+
+- 84 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+Fig. C-5 Connection schematic diagram of EXC-PG01
+
+andthe open collector output encoder
+
+Fig. C-6 Connection schematic diagram of EXC-PG01
+
+and the push output encoder
+
+Usage method
+
+1) Follow Figure C-1 to loading PG card
+2) Follow Figure C-4、C-5、C-6 to connect PG card and encoder
+3) Shielded cable earthing line PE is connected directly to the fixed screw of PG card
+4) According to the actual situation to set the inverter parameters as follow:
+
+Parameter setting
+F00.08 = 3
+F08.23 = 1024
+
+F08.24 = 0
+F08.25 = 0
+
+Description
+Close-loop control(with PG card)
+Encoder line number, setting as the specification of
+encoder
+ABZ incremental encoder
+AB phase sequence.
+
+- 85 -
+
+FR500A&FR510A Series Vector Control Inverter
+C.2 Rotary transformer PG card
+Outline and its interface：
+
+Fig.C-7 EXC-PG03 Schematic diagram and its DB9 pin interface
+
+DB9 PIN
+PIN
+Name
+
+1
+REF-
+
+2
+REF+
+
+3
+COS+
+
+4
+COS-
+
+5
+SIN+
+
+6
+Null
+
+7
+Null
+
+8
+Null
+
+9
+SIN-
+
+PIN function
+
+Model
+
+Connecting object
+
+Pin name
+
+Description
+
+EXC-PG03
+
+Rotary transformer
+
+SIN+、SIN-
+
+Sine signal
+
+COS+、
+
+COS-
+
+Cosine signal
+
+REF+、REF-
+
+Voltage reference signal
+
+Null
+
+Null
+
+Usage method
+
+1) Follow Figure C-1 to loading PG card
+2) Shielded cable earthing line PE is connected directly to the fixed screw of PG card
+3) According to the actual situation to set the inverter parameters as follow:
+
+Parameter setting
+F00.08 = 3
+F08.24 = 2
+
+Description
+Close-loop control(with PG card)
+Select the rotary transformer
+
+- 86 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+C.3 UVW Encoder PG card
+
+There are two types of PG card of UVW encoder: one can only accept signals from encoder
+(exc-pg04b); the other can accept AB signals from upper computer (exc-pg04) in addition to encoder
+signals.
+
+Fig c-8a EXC-PG04
+
+J1 terminal description：
+
+Fig c-8b EXC-PG04B
+
+J1 is mainly used to receive a and B signals from the upper computer, which is generally not used.
+
+No.
+1
+2
+3
+4
+5
+6
+7
+8
+
+Terminal Name
+VCC
+COM
+QA+
+QA-
+QB+
+QB-
+VCC
+COM
+
+Description
+Power input
+common end
+signal A+
+signal A-
+signal B+
+signal B-
+Power input
+common end
+
+- 87 -
+
+FR500A&FR510A Series Vector Control Inverter
+J3 terminal description：
+
+J3 terminal is used to receive signals from UVW encoder.。
+
+No.
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15,16
+
+Terminal Name
+5V
+GND
+A+
+A-
+B+
+B-
+Z+
+Z-
+U+
+U-
+V+
+V-
+W+
+W-
+PE
+
+Description
++5V power
+GND
+Encoder differential signal A+
+Encoder differential signal A-
+Encoder differential signal B+
+Encoder differential signal B-
+Encoder differential signal Z+
+Encoder differential signal Z-
+Encoder differential signal U+
+Encoder differential signal U-
+Encoder differential signal V+
+Encoder differential signal V-
+Encoder differential signal W+
+Encoder differential signal W-
+Shielding ground
+
+◆Usage method
+
+1) Install the PG card according to figure C-1
+2）Shielding cable ground PE can be directly punched on PG card fixing screw
+3）Set the converter parameters according to the actual situation, as follows：
+
+Function code set
+
+Description
+
+F00.08 = 3
+
+F08.24 = 1
+
+With PG vector control mode
+
+UVW Encoder
+
+- 88 -
+
+C.4 ECN1313 PG Card
+Outline and its interface：
+
+FR500A&FR510A Series Vector Control Inverter
+
+Fig.C-9 EXC-PG05 ECN1313 PG terminals
+
+Terminals：
+Model
+EXC-PG05
+
+Connecting Object
+ECN1313 Encoder
+
+Pin Name
+
+Description
+GND
+
+24_COM、COM 24V output and its common
+terminal
+5V output and its ground
+A differential signal
+B differential signal
+
+5V_GND、GND
+A+、A-
+B+、B-
+
+Y1
+
+B signal OC output (24V)
+
+Y2
+CLK+, CLK-
+DATA+, DATA-
+
+A signal OC output (24V)
+ECN1313 differential clock input
+ECN1313 differential data input
+
+Usage method
+
+1) Follow Figure C-1 to loading PG card
+2) Shielded cable earthing line PE is connected directly to the fixed screw of PG card
+3) According to the actual situation to set the inverter parameters as follow:
+
+Parameter setting
+F00.08 = 3
+F08.24 = 3
+
+Description
+Close-loop control(with PG card)
+Select the ECN1313 encoder
+
+- 89 -
+
+FR500A&FR510A Series Vector Control Inverter
+
+C.5 Sin-Cos encoder PG card
+Outline and its interface：
+
+Fig.C-10 EXC-PG06 Sin-Cos encoder PG card
+
+DB15 PIN：
+Num.
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14、15
+
+Pin Name
+B-
+NC
+R+
+R-
+A+
+A-
+GND
+B+
+PG VCC
+C+
+C-
+D+
+D-
+NC
+
+Description
+Differential signal B-
+Null
+Differential signal R+
+Differential signal R-
+Differential signal A+
+Differential signal A-
+Power ground
+Differential signal B+
++5V Power
+Differential signal C+
+Differential signal C-
+Differential signal D+
+Differential signal D-
+Null
+
+- 90 -
+
+

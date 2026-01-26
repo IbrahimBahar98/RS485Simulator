@@ -518,6 +518,98 @@ button.run-btn:hover {
 }
 
 /* ========================================
+   Inverter Status Bar
+   ======================================== */
+.inverter-status-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85em;
+}
+
+.status-label {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.75em;
+    letter-spacing: 0.5px;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-badge.running {
+    background: rgba(0, 230, 118, 0.2);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.status-badge.stopped {
+    background: rgba(255, 82, 82, 0.2);
+    color: var(--error);
+    border: 1px solid var(--error);
+}
+
+.status-badge.reverse {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ffb74d;
+    border: 1px solid #ff9800;
+}
+
+.status-badge.jog {
+    background: rgba(156, 39, 176, 0.2);
+    color: #ce93d8;
+    border: 1px solid #9c27b0;
+}
+
+.status-badge.locked {
+    background: rgba(255, 171, 0, 0.2);
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+.status-badge.unlocked {
+    background: rgba(0, 168, 255, 0.2);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.status-badge.mode-keypad {
+    background: rgba(156, 39, 176, 0.2);
+    color: #ce93d8;
+    border: 1px solid #9c27b0;
+}
+
+.status-badge.mode-terminal {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ffb74d;
+    border: 1px solid #ff9800;
+}
+
+.status-badge.mode-comm {
+    background: rgba(76, 175, 80, 0.2);
+    color: #81c784;
+    border: 1px solid #4caf50;
+}
+
+/* ========================================
    Scrollbar Styling
    ======================================== */
 ::-webkit-scrollbar {

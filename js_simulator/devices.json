@@ -10,19 +10,19 @@
     },
     "3": {
       "type": "inverter",
-      "enabled": true
+      "enabled": false
     },
     "4": {
       "type": "inverter",
-      "enabled": true
+      "enabled": false
     },
     "5": {
       "type": "inverter",
-      "enabled": true
+      "enabled": false
     },
     "100": {
       "type": "energymeter",
-      "enabled": true
+      "enabled": false
     },
     "101": {
       "type": "energymeter",
@@ -30,19 +30,19 @@
     },
     "102": {
       "type": "energymeter",
-      "enabled": true
+      "enabled": false
     },
     "103": {
       "type": "energymeter",
-      "enabled": true
+      "enabled": false
     },
     "104": {
       "type": "energymeter",
-      "enabled": true
+      "enabled": false
     },
     "110": {
       "type": "flowmeter",
-      "enabled": true
+      "enabled": false
     },
     "111": {
       "type": "flowmeter",
