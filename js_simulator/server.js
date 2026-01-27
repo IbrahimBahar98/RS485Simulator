@@ -476,8 +476,18 @@ let writeCount = 0;
 let errorBeforeClose = null;
 
 // --- Custom RTU Server Logic ---
+// --- Custom RTU Server Logic ---
 function processBuffer() {
     let start = 0;
+    const MAX_BUFFER_SIZE = 4096; // Increased from 1KB
+
+    // Safety check for massive buffer
+    if (buffer.length > MAX_BUFFER_SIZE) {
+        io.emit('log', { type: 'ERR', msg: `Buffer overflow (${buffer.length}b) - flushing to recover` });
+        buffer = Buffer.alloc(0);
+        return;
+    }
+
     while (start + 4 <= buffer.length) { // 4 is min Modbus frame size
         // 1. Peek at potential header
         const unitID = buffer[start];
@@ -486,11 +496,7 @@ function processBuffer() {
         // Quick validation of UnitID and FC
         // We only support specific FCs for this sim
         if (![3, 4, 6, 16].includes(fc)) {
-            // Only warn if this looks like a valid device ID
-            if (devices.has(unitID)) {
-                // Throttle? No, just emit.
-                io.emit('log', { type: 'WARN', msg: `ID:${unitID} Unsupported FC:${fc}` });
-            }
+            // Invalid FC, just skip byte
             start++;
             continue;
         }
@@ -522,20 +528,24 @@ function processBuffer() {
         const calcCRC = calculateCRC(frame.subarray(0, len - 2));
 
         if (receivedCRC === calcCRC) {
-            // VALID FRAME FRAME
+            // VALID FRAME
+            // Process it immediately
             handleFrame(frame);
-            // Consume this frame
+
+            // Consume this frame fully
             start += len;
-            // Update main buffer status immediately to avoid reprocessing
-            buffer = buffer.subarray(start);
-            start = 0; // Restart from new beginning
-            continue; // Continue processing remaining buffer
-        } else {
-            // CRC failed, this is not a valid frame start
-            if (devices.has(unitID) && [3, 4, 6, 16].includes(fc)) {
-                io.emit('log', { type: 'WARN', msg: `ID:${unitID} Bad CRC (Recv:${receivedCRC.toString(16)} Calc:${calcCRC.toString(16)})` });
+
+            // Optimization: If we processed a valid frame, discard consumed buffer immediately
+            // to keep buffer small for next iteration
+            if (start > 0) {
+                buffer = buffer.subarray(start);
+                start = 0;
             }
-            // Shift by 1 byte and try again
+            continue;
+        } else {
+            // CRC failed. This is likely noise or a misalignment.
+            // Do NOT log here - it kills performance on noisy lines.
+            // Just shift by 1 byte and try again.
             start++;
         }
     }
@@ -543,15 +553,6 @@ function processBuffer() {
     // Trim consumed garbage
     if (start > 0) {
         buffer = buffer.subarray(start);
-    }
-
-    // Safety Cap to prevent infinite memory growth if no valid frames ever arrive
-    if (buffer.length > 512) {
-        io.emit('log', { type: 'WARN', msg: `Buffer growing: ${buffer.length} bytes (potential overflow)` });
-    }
-    if (buffer.length > 1024) {
-        io.emit('log', { type: 'ERR', msg: 'Buffer overflow (1KB) - flushing to prevent crash' });
-        buffer = Buffer.alloc(0);
     }
 }
 
@@ -957,7 +958,7 @@ io.on('connection', (socket) => {
 
     socket.on('set-register', ({ id, addr, val }) => {
         // ID is required now
-        const targetID = id || 1;
+        const targetID = parseInt(id) || 1;
         const mem = getMem(targetID);
         mem[addr] = val;
         saveMemoryConfig(); // Save memory changes
@@ -966,20 +967,24 @@ io.on('connection', (socket) => {
     });
 
     socket.on('toggle-inverter', ({ id, enabled }) => {
-        const device = devices.get(id);
+        const targetID = parseInt(id);
+        const device = devices.get(targetID);
         if (device) {
             device.enabled = enabled;
-            devices.set(id, device);
+            devices.set(targetID, device);
             saveDevicesConfig(); // Save to file
-            io.emit('log', { type: 'INFO', msg: `Device ${id} ${enabled ? 'ENABLED' : 'DISABLED'}` });
-            io.emit('device-updated', { id, ...device });
+            io.emit('log', { type: 'INFO', msg: `Device ${targetID} ${enabled ? 'ENABLED' : 'DISABLED'}` });
+            io.emit('device-updated', { id: targetID, ...device });
+        } else {
+            console.warn(`Attempted to toggle unknown device ID: ${id} (parsed: ${targetID})`);
         }
     });
 
     socket.on('get-register', ({ id, addr }) => {
-        const mem = getMem(id || 1);
+        const targetID = parseInt(id) || 1;
+        const mem = getMem(targetID);
         const val = mem[addr] || 0;
-        socket.emit('register-value', { id, addr, val });
+        socket.emit('register-value', { id: targetID, addr, val });
     });
 
 

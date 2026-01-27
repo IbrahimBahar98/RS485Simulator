@@ -42,7 +42,7 @@
     },
     "110": {
       "type": "flowmeter",
-      "enabled": false
+      "enabled": true
     },
     "111": {
       "type": "flowmeter",
