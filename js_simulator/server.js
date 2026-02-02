@@ -41,6 +41,12 @@ function loadDevicesConfig() {
                 devices.set(parseInt(idStr), deviceData);
             }
             console.log(`Loaded ${devices.size} devices from ${DEVICES_CONFIG_FILE}`);
+            // Ensure all devices have a simulationMode property (default 'random')
+            for (const [id, dev] of devices) {
+                if (!dev.simulationMode) {
+                    dev.simulationMode = 'random';
+                }
+            }
         } else {
             console.log(`No devices config file found. Using defaults.`);
         }
@@ -168,25 +174,27 @@ const inverterDefaults = {
 };
 
 // ===== FLOW METER (CR009) Register Defaults =====
+// EdgeBox expects CDAB word order: LSW at lower address, MSW at higher address
 const flowMeterDefaults = {
-    // Input Registers (FC 04) - Flow Meter Readings
-    772: 0,                     // Forward Total (Word 0 - MSW)
-    773: 0,                     // Forward Total (Word 1 - LSW)
+    // Input Registers (FC 04) - Flow Meter Readings (CDAB order)
+    772: 0,                     // Forward Total - LSW
+    773: 0,                     // Forward Total - MSW
     774: 0x0403,                // Unit Info (Total=L, Flow=L/s)
     777: 0,                     // Alarm Flags (bitfield)
-    778: 0,                     // Flow Rate (Word 0 - MSW) - Float
-    779: 0,                     // Flow Rate (Word 1 - LSW)
+    778: 0,                     // Flow Rate - LSW
+    779: 0,                     // Flow Rate - MSW
     786: 0,                     // Forward Overflow Count
-    812: 0,                     // Conductivity (Word 0 - MSW) - Float
-    813: 0,                     // Conductivity (Word 1 - LSW)
+    812: 0,                     // Conductivity - LSW
+    813: 0,                     // Conductivity - MSW
 
-    // Holding Registers (FC 03) - Configuration
-    261: 0x43D4,                // Flow Range MSW (424.0 float)
-    262: 0x0000,                // Flow Range LSW
-    281: 0x42C8,                // Alarm High MSW (100.0 float)
-    282: 0x0000,                // Alarm High LSW
-    284: 0x4120,                // Alarm Low MSW (10.0 float)
-    285: 0x0000                 // Alarm Low LSW
+    // Holding Registers (FC 03) - Configuration (CDAB order)
+    261: 0x0000,                // Flow Range - LSW
+    262: 0x43D4,                // Flow Range - MSW (424.0 float)
+    281: 0x0000,                // Alarm High - LSW
+    282: 0x42C8,                // Alarm High - MSW (100.0 float)
+    283: 0x0000,                // Reserved/Padding
+    284: 0x0000,                // Alarm Low - LSW
+    285: 0x4120                 // Alarm Low - MSW (10.0 float)
 };
 
 // ===== ENERGY METER (ADL400) Register Defaults =====
@@ -382,7 +390,7 @@ function addDevice(slaveId, type = 'inverter') {
     if (devices.has(slaveId)) {
         return { success: false, error: 'Device with this Slave ID already exists' };
     }
-    devices.set(slaveId, { type, enabled: true });
+    devices.set(slaveId, { type, enabled: true, simulationMode: 'random' });
     // Initialize memory for this device
     memory[slaveId] = new Uint16Array(65536);
     let defs = inverterDefaults;
@@ -580,7 +588,10 @@ function handleFrame(frame) {
         const addr = frame.readUInt16BE(2);
         const count = frame.readUInt16BE(4);
 
-        io.emit('log', { type: 'RX', msg: `Read ID:${unitID} FC:${fc} Addr:0x${addr.toString(16)} Len:${count}` });
+        // Log asynchronously to avoid blocking response
+        setImmediate(() => {
+            io.emit('log', { type: 'RX', msg: `Read ID:${unitID} FC:${fc} Addr:0x${addr.toString(16)} Len:${count}` });
+        });
 
         // Build Response: ID(1) FC(1) Bytes(1) Data(N*2) CRC(2)
         const bytes = count * 2;
@@ -610,8 +621,10 @@ function handleFrame(frame) {
         } else {
             // Valid write - proceed
             mem[addr] = val;
-            io.emit('reg-update', { id: unitID, addr, val });
-            io.emit('log', { type: 'RX', msg: `Write ID:${unitID} Addr:0x${addr.toString(16)} Val:${val}` });
+            setImmediate(() => {
+                io.emit('reg-update', { id: unitID, addr, val });
+                io.emit('log', { type: 'RX', msg: `Write ID:${unitID} Addr:0x${addr.toString(16)} Val:${val}` });
+            });
 
             // Handle password unlock
             handlePasswordWrite(addr, val, unitID, io);
@@ -633,7 +646,9 @@ function handleFrame(frame) {
         const byteCount = frame.readUInt8(6);
         const data = frame.subarray(7, 7 + byteCount);
 
-        io.emit('log', { type: 'RX', msg: `WriteMulti ID:${unitID} Addr:0x${addr.toString(16)} Count:${count}` });
+        setImmediate(() => {
+            io.emit('log', { type: 'RX', msg: `WriteMulti ID:${unitID} Addr:0x${addr.toString(16)} Count:${count}` });
+        });
 
         // Validate ALL registers first before writing any
         let validationError = null;
@@ -655,7 +670,9 @@ function handleFrame(frame) {
                 const regAddr = addr + i;
                 const val = data.readUInt16BE(i * 2);
                 mem[regAddr] = val;
-                io.emit('reg-update', { id: unitID, addr: regAddr, val });
+                setImmediate(() => {
+                    io.emit('reg-update', { id: unitID, addr: regAddr, val });
+                });
 
                 // Handle password unlock
                 handlePasswordWrite(regAddr, val, unitID, io);
@@ -678,23 +695,31 @@ function handleFrame(frame) {
     if (response) {
         // Safety check: ensure port is still open before writing
         if (!serialPort || !serialPort.isOpen) {
-            io.emit('log', { type: 'WARN', msg: `Write skipped - port not open (ID:${unitID})` });
             return;
         }
-
-        // Log TX to help user verify response
-        const hex = response.toString('hex').toUpperCase();
-        io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
 
         writeCount++;
         lastWriteTime = Date.now();
 
+        // Write and drain to ensure response is fully sent before processing next request
         serialPort.write(response, (err) => {
             if (err) {
                 errorBeforeClose = err.message;
-                io.emit('log', { type: 'ERR', msg: `Write error: ${err.message}` });
                 console.error('Serial write error:', err);
+                return;
             }
+            // Drain to ensure bytes are sent before next request
+            serialPort.drain((drainErr) => {
+                if (drainErr) {
+                    console.error('Serial drain error:', drainErr);
+                }
+            });
+        });
+
+        // Log asynchronously to avoid blocking the response
+        const hex = response.toString('hex').toUpperCase();
+        setImmediate(() => {
+            io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
         });
     }
 }
@@ -809,6 +834,9 @@ function startSimulation() {
 
         for (const [id, device] of devices) {
             if (!device.enabled) continue;
+
+            // Skip random generation if in 'manual' mode
+            if (device.simulationMode === 'manual') continue;
 
             if (device.type === 'energymeter') {
                 const mem = getMem(id);
@@ -1003,7 +1031,10 @@ io.on('connection', (socket) => {
             const oldType = device.type;
             setDeviceType(id, type);
             saveDevicesConfig(); // Save to file
+            saveDevicesConfig(); // Save to file
             io.emit('log', { type: 'INFO', msg: `Device ${id} changed from ${oldType} to ${type}` });
+            // Preserve simulationMode or reset? Let's keep it if set, or default
+            device.simulationMode = device.simulationMode || 'random';
             io.emit('device-updated', { id, ...devices.get(id) });
 
             // Send the new register state for this device
@@ -1052,13 +1083,25 @@ io.on('connection', (socket) => {
     socket.on('get-devices', () => {
         socket.emit('devices-list', getDevicesList());
     });
+
+    socket.on('set-simulation-mode', ({ id, mode }) => {
+        const targetID = parseInt(id);
+        const device = devices.get(targetID);
+        if (device) {
+            device.simulationMode = mode;
+            devices.set(targetID, device);
+            saveDevicesConfig();
+            io.emit('log', { type: 'INFO', msg: `Device ${id} Simulation Mode: ${mode}` });
+            io.emit('device-updated', { id: targetID, ...device });
+        }
+    });
 });
 
 // Helper to get devices as array for client
 function getDevicesList() {
     const list = [];
     for (const [slaveId, device] of devices) {
-        list.push({ slaveId, type: device.type, enabled: device.enabled });
+        list.push({ slaveId, type: device.type, enabled: device.enabled, simulationMode: device.simulationMode || 'random' });
     }
     return list;
 }

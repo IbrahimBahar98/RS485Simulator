@@ -163,6 +163,7 @@
         const state = {};
         const inverterEnabled = {};
         const deviceTypes = {};
+        const simulationModes = {}; // { slaveId: 'random' | 'manual' }
 
         // ===== INVERTER Dashboard Cards =====
         const inverterMap = [
@@ -180,9 +181,9 @@
         // ===== FLOW METER Dashboard Cards =====
         // CR009 uses Big Endian word order (MSW at lower address)
         const flowMeterMap = [
-            { a: 778, n: "Flow Rate", s: 1, u: "L/s", isFloat: true, lsw: 779 },
-            { a: 772, n: "Fwd Total", s: 1, u: "L", uint32: true, lsw: 773 },
-            { a: 812, n: "Conductivity", s: 1, u: "μS/cm", isFloat: true, lsw: 813 },
+            { a: 778, n: "Flow Rate", s: 1, u: "L/s", isFloat: true, lsw: 779, leWords: true },
+            { a: 772, n: "Fwd Total", s: 1, u: "L", uint32: true, lsw: 773, leWords: true },
+            { a: 812, n: "Conductivity", s: 1, u: "μS/cm", isFloat: true, lsw: 813, leWords: true },
             { a: 777, n: "Alarms", s: 1, u: "flags" }
         ];
 
@@ -249,16 +250,16 @@
         // CR009 uses Big Endian word order (MSW at lower address)
         const flowMeterRegs = [
             // Input Registers (FC 04) - Readings
-            { a: 772, n: "Forward Total", uint32: true, lsw: 773 },
+            { a: 772, n: "Forward Total", uint32: true, lsw: 773, leWords: true },
             { a: 774, n: "Unit Info" },
             { a: 777, n: "Alarm Flags" },
-            { a: 778, n: "Flow Rate", isFloat: true, lsw: 779 },
+            { a: 778, n: "Flow Rate", isFloat: true, lsw: 779, leWords: true },
             { a: 786, n: "Fwd Overflow Count" },
-            { a: 812, n: "Conductivity", isFloat: true, lsw: 813 },
+            { a: 812, n: "Conductivity", isFloat: true, lsw: 813, leWords: true },
             // Holding Registers (FC 03) - Config
-            { a: 261, n: "Flow Range", isFloat: true, lsw: 262 },
-            { a: 281, n: "Alarm High", isFloat: true, lsw: 282 },
-            { a: 284, n: "Alarm Low", isFloat: true, lsw: 285 }
+            { a: 261, n: "Flow Range", isFloat: true, lsw: 262, leWords: true },
+            { a: 281, n: "Alarm High", isFloat: true, lsw: 282, leWords: true },
+            { a: 284, n: "Alarm Low", isFloat: true, lsw: 285, leWords: true }
         ];
 
         // ===== ENERGY METER (ADL400) Registers (Merged 32-bit values) =====
@@ -334,17 +335,40 @@
             else map = inverterMap;
 
             const dashboard = document.getElementById('dashboard');
-            dashboard.innerHTML = map.map(r => `
+
+            let html = '';
+
+            // Add Simulation Mode Toggle for Energy Meter
+            if (type === 'energymeter') {
+                const mode = simulationModes[currentID] || 'random';
+                html += `
+                    <div style="grid-column: 1 / -1; margin-bottom: 10px; padding: 10px; background: #333; border-radius: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: bold; color: #fff;">Simulation Mode:</span>
+                        <div style="display: flex; gap: 10px;">
+                            <label style="color: ${mode === 'random' ? '#4caf50' : '#888'}; cursor: pointer;">
+                                <input type="radio" name="sim-mode" value="random" ${mode === 'random' ? 'checked' : ''} onchange="setSimulationMode('random')"> Auto (Random)
+                            </label>
+                            <label style="color: ${mode === 'manual' ? '#2196f3' : '#888'}; cursor: pointer;">
+                                <input type="radio" name="sim-mode" value="manual" ${mode === 'manual' ? 'checked' : ''} onchange="setSimulationMode('manual')"> Manual (Fixed)
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += map.map(r => `
                 <div class="card">
                     <div class="card-label">${r.n}</div>
                     <div class="card-value" id="val-${r.a}">-</div>
                     <div class="card-unit">${r.u}</div>
                     <div class="control-group">
                         <input type="number" id="set-${r.a}" value="0" step="${r.isFloat ? '0.1' : '1'}">
-                        <button onclick="setReg(${r.a}, 'set-${r.a}', ${r.s}, ${!!r.isFloat}, ${!!r.uint32}, ${r.lsw || 0})">${r.isFloat ? 'Set Float' : (r.uint32 ? 'Set U32' : 'Set')}</button>
+                        <button onclick="setReg(${r.a}, 'set-${r.a}', ${r.s}, ${!!r.isFloat}, ${!!r.uint32}, ${r.lsw || 0}, ${!!r.leWords})">${r.isFloat ? 'Set Float' : (r.uint32 ? 'Set U32' : 'Set')}</button>
                     </div>
                 </div>
             `).join('');
+
+            dashboard.innerHTML = html;
         }
 
         // Update inverter status bar (only for inverter type)
@@ -457,9 +481,9 @@
                     tval.value = floatVal.toFixed(3);
                     thex.innerText = `0x${msw.toString(16).toUpperCase().padStart(4, '0')} ${lsw.toString(16).toUpperCase().padStart(4, '0')}`;
                 } else if (r.uint32 && r.lsw) {
-                    const msw = state[currentID][r.a] || 0;
-                    const lsw = state[currentID][r.lsw] || 0;
-                    const uint32Val = (msw << 16) | lsw;
+                    const val1 = state[currentID][r.a] || 0;
+                    const val2 = state[currentID][r.lsw] || 0;
+                    const uint32Val = r.leWords ? ((val2 << 16) | val1) : ((val1 << 16) | val2);
                     tval.value = uint32Val;
                     thex.innerText = `0x${uint32Val.toString(16).toUpperCase().padStart(8, '0')}`;
                 } else {
@@ -582,9 +606,9 @@
                     const floatVal = registersToFloat(msw, lsw, r.leWords);
                     valEl.innerText = floatVal.toFixed(2);
                 } else if (r.uint32 && r.lsw) {
-                    const msw = state[currentID][r.a] || 0;
-                    const lsw = state[currentID][r.lsw] || 0;
-                    const uint32Val = (msw << 16) | lsw;
+                    const val1 = state[currentID][r.a] || 0;
+                    const val2 = state[currentID][r.lsw] || 0;
+                    const uint32Val = r.leWords ? ((val2 << 16) | val1) : ((val1 << 16) | val2);
                     valEl.innerText = uint32Val;
                 } else {
                     const val = state[currentID][r.a] || 0;
@@ -602,6 +626,13 @@
             updateTabs();
             regenerateDashboard();
             regenerateRegTable();
+        }
+
+        function setSimulationMode(mode) {
+            if (!currentID) return;
+            simulationModes[currentID] = mode;
+            socket.emit('set-simulation-mode', { id: currentID, mode });
+            regenerateDashboard(); // Update styles
         }
 
         // --- Device Management ---
@@ -641,12 +672,12 @@
             socket.emit('toggle-inverter', { id: currentID, enabled });
         }
 
-        function setReg(addr, inputId, scale, isFloat = false, isUint32 = false, lswAddr = 0) {
+        function setReg(addr, inputId, scale, isFloat = false, isUint32 = false, lswAddr = 0, leWords = false) {
             const val = parseFloat(document.getElementById(inputId).value);
 
             if (isFloat && lswAddr > 0) {
                 // Pack float as IEEE 754 Big Endian (MSW, LSW)
-                const floatRegs = floatToRegisters(val);
+                const floatRegs = floatToRegisters(val, leWords);
                 socket.emit('set-register', { id: currentID, addr, val: floatRegs.msw });
                 socket.emit('set-register', { id: currentID, addr: lswAddr, val: floatRegs.lsw });
             } else if (isUint32 && lswAddr > 0) {
@@ -654,8 +685,10 @@
                 const uint32Val = Math.round(val);
                 const msw = (uint32Val >>> 16) & 0xFFFF;
                 const lsw = uint32Val & 0xFFFF;
-                socket.emit('set-register', { id: currentID, addr, val: msw });
-                socket.emit('set-register', { id: currentID, addr: lswAddr, val: lsw });
+                const valLowAddr = leWords ? lsw : msw;
+                const valHighAddr = leWords ? msw : lsw;
+                socket.emit('set-register', { id: currentID, addr, val: valLowAddr });
+                socket.emit('set-register', { id: currentID, addr: lswAddr, val: valHighAddr });
             } else {
                 const intVal = Math.round(val * scale);
                 socket.emit('set-register', { id: currentID, addr, val: intVal });
@@ -775,6 +808,7 @@
                 state[d.slaveId] = state[d.slaveId] || {};
                 inverterEnabled[d.slaveId] = d.enabled;
                 deviceTypes[d.slaveId] = d.type;
+                simulationModes[d.slaveId] = d.simulationMode || 'random';
             });
 
             updateTabs();
