@@ -25,20 +25,15 @@
       "enabled": true,
       "simulationMode": "random"
     },
-    "100": {
-      "type": "energymeter",
-      "enabled": true,
-      "simulationMode": "random"
-    },
     "101": {
       "type": "energymeter",
       "enabled": true,
-      "simulationMode": "manual"
+      "simulationMode": "random"
     },
     "102": {
       "type": "energymeter",
       "enabled": true,
-      "simulationMode": "random"
+      "simulationMode": "manual"
     },
     "103": {
       "type": "energymeter",
@@ -46,6 +41,11 @@
       "simulationMode": "random"
     },
     "104": {
+      "type": "energymeter",
+      "enabled": true,
+      "simulationMode": "random"
+    },
+    "105": {
       "type": "energymeter",
       "enabled": true,
       "simulationMode": "random"
