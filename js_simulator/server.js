@@ -484,7 +484,62 @@ let writeCount = 0;
 let errorBeforeClose = null;
 
 // --- Custom RTU Server Logic ---
-// --- Custom RTU Server Logic ---
+
+// Response queue to prevent race conditions (re-implemented)
+let responseQueue = [];
+let isProcessingResponse = false;
+
+function queueResponse(response, unitID, delay = 0) {
+    responseQueue.push({ response, unitID, delay });
+    processResponseQueue();
+}
+
+function processResponseQueue() {
+    if (isProcessingResponse || responseQueue.length === 0) return;
+
+    if (!serialPort || !serialPort.isOpen) {
+        responseQueue = [];
+        return;
+    }
+
+    isProcessingResponse = true;
+    const { response, unitID, delay } = responseQueue.shift();
+
+    const executeWrite = () => {
+        if (!serialPort || !serialPort.isOpen) {
+            isProcessingResponse = false;
+            return;
+        }
+
+        writeCount++;
+        lastWriteTime = Date.now();
+
+        serialPort.write(response, (err) => {
+            if (err) {
+                errorBeforeClose = err.message;
+                console.error('Serial write error:', err);
+                isProcessingResponse = false;
+                setImmediate(processResponseQueue);
+                return;
+            }
+
+            serialPort.drain((drainErr) => {
+                if (drainErr) console.error('Serial drain error:', drainErr);
+                isProcessingResponse = false;
+                if (responseQueue.length > 0) setImmediate(processResponseQueue);
+            });
+        });
+
+        const hex = response.toString('hex').toUpperCase();
+        setImmediate(() => {
+            io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
+        });
+    };
+
+    if (delay > 0) setTimeout(executeWrite, delay);
+    else executeWrite();
+}
+
 function processBuffer() {
     let start = 0;
     const MAX_BUFFER_SIZE = 4096; // Increased from 1KB
@@ -693,34 +748,9 @@ function handleFrame(frame) {
     }
 
     if (response) {
-        // Safety check: ensure port is still open before writing
-        if (!serialPort || !serialPort.isOpen) {
-            return;
-        }
-
-        writeCount++;
-        lastWriteTime = Date.now();
-
-        // Write and drain to ensure response is fully sent before processing next request
-        serialPort.write(response, (err) => {
-            if (err) {
-                errorBeforeClose = err.message;
-                console.error('Serial write error:', err);
-                return;
-            }
-            // Drain to ensure bytes are sent before next request
-            serialPort.drain((drainErr) => {
-                if (drainErr) {
-                    console.error('Serial drain error:', drainErr);
-                }
-            });
-        });
-
-        // Log asynchronously to avoid blocking the response
-        const hex = response.toString('hex').toUpperCase();
-        setImmediate(() => {
-            io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
-        });
+        // Queue response for serialized sending
+        // Delay 0 for instant response (as requested)
+        queueResponse(response, unitID, 0);
     }
 }
 
@@ -890,6 +920,8 @@ function stopSimulation() {
 }
 
 // --- Socket Events ---
+let isPortStarting = false;
+
 io.on('connection', (socket) => {
     // Send current devices list to new client
     socket.emit('devices-list', getDevicesList());
@@ -909,7 +941,14 @@ io.on('connection', (socket) => {
 
     socket.on('start-server', ({ port, baud }) => {
         if (serialPort && serialPort.isOpen) return;
+        if (isPortStarting) {
+            console.log(`Ignoring start request for ${port} - port open already in progress.`);
+            return;
+        }
+
+        isPortStarting = true;
         intentionalStop = false;
+
         try {
             console.log(`Starting Custom Modbus Server on ${port} @ ${baud}`);
             serialPort = new SerialPort({ path: port, baudRate: parseInt(baud) });
@@ -924,9 +963,16 @@ io.on('connection', (socket) => {
                 console.error('Serial port error:', err);
                 io.emit('log', { type: 'ERR', msg: `Port error: ${err.message}` });
                 io.emit('server-status', false);
+                isPortStarting = false;
+
+                // If we failed to open, ensure serialPort is cleared so we can try another port
+                if (serialPort && !serialPort.isOpen) {
+                    serialPort = null;
+                }
             });
 
             serialPort.on('open', () => {
+                isPortStarting = false;
                 io.emit('server-status', true);
                 io.emit('log', { type: 'INFO', msg: `Server Started on ${port}` });
                 startSimulation();

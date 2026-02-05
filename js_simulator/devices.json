@@ -28,7 +28,7 @@
     "101": {
       "type": "energymeter",
       "enabled": true,
-      "simulationMode": "random"
+      "simulationMode": "manual"
     },
     "102": {
       "type": "energymeter",
@@ -38,17 +38,17 @@
     "103": {
       "type": "energymeter",
       "enabled": false,
-      "simulationMode": "random"
+      "simulationMode": "manual"
     },
     "104": {
       "type": "energymeter",
       "enabled": true,
-      "simulationMode": "random"
+      "simulationMode": "manual"
     },
     "105": {
       "type": "energymeter",
       "enabled": true,
-      "simulationMode": "random"
+      "simulationMode": "manual"
     },
     "110": {
       "type": "flowmeter",
