@@ -167,13 +167,13 @@
 
         // ===== INVERTER Dashboard Cards =====
         const inverterMap = [
-            { a: 0x3000, n: "Frequency", s: 100, u: "Hz" },
-            { a: 0x3002, n: "Voltage", s: 10, u: "V" },
-            { a: 0x3003, n: "Current", s: 10, u: "A" },
-            { a: 0x3004, n: "Power", s: 10, u: "kW" },
+            { a: 0x3000, n: "Frequency", s: 1, u: "Hz" },
+            { a: 0x3002, n: "Voltage", s: 1, u: "V" },
+            { a: 0x3003, n: "Current", s: 1, u: "A" },
+            { a: 0x3004, n: "Power", s: 1, u: "kW" },
             { a: 0x3005, n: "Speed", s: 1, u: "rpm" },
-            { a: 0x3006, n: "Bus V", s: 10, u: "V" },
-            { a: 0x3017, n: "Temp", s: 10, u: "°C" },
+            { a: 0x3006, n: "Bus V", s: 1, u: "V" },
+            { a: 0x3017, n: "Temp", s: 1, u: "°C" },
             { a: 0x3023, n: "Energy", s: 1, u: "kWh" }
         ];
 
@@ -181,9 +181,10 @@
         // ===== FLOW METER Dashboard Cards =====
         // CR009 uses Big Endian word order (MSW at lower address)
         const flowMeterMap = [
-            { a: 778, n: "Flow Rate", s: 1, u: "L/s", isFloat: true, lsw: 779, leWords: true },
-            { a: 772, n: "Fwd Total", s: 1, u: "L", uint32: true, lsw: 773, leWords: true },
-            { a: 812, n: "Conductivity", s: 1, u: "μS/cm", isFloat: true, lsw: 813, leWords: true },
+            { a: 778, n: "Flow Rate", s: 1, u: "L/s", isFloat: true, lsw: 779 },
+            { a: 772, n: "Fwd Total", s: 1, u: "L", uint32: true, lsw: 773 },
+            { a: 812, n: "Conductivity", s: 1, u: "μS/cm", isFloat: true, lsw: 813 },
+            { a: 786, n: "Fwd Overflow", s: 1, u: "count" },
             { a: 777, n: "Alarms", s: 1, u: "flags" }
         ];
 
@@ -250,16 +251,16 @@
         // CR009 uses Big Endian word order (MSW at lower address)
         const flowMeterRegs = [
             // Input Registers (FC 04) - Readings
-            { a: 772, n: "Forward Total", uint32: true, lsw: 773, leWords: true },
+            { a: 772, n: "Forward Total", uint32: true, lsw: 773 },
             { a: 774, n: "Unit Info" },
             { a: 777, n: "Alarm Flags" },
-            { a: 778, n: "Flow Rate", isFloat: true, lsw: 779, leWords: true },
+            { a: 778, n: "Flow Rate", isFloat: true, lsw: 779 },
             { a: 786, n: "Fwd Overflow Count" },
-            { a: 812, n: "Conductivity", isFloat: true, lsw: 813, leWords: true },
+            { a: 812, n: "Conductivity", isFloat: true, lsw: 813 },
             // Holding Registers (FC 03) - Config
-            { a: 261, n: "Flow Range", isFloat: true, lsw: 262, leWords: true },
-            { a: 281, n: "Alarm High", isFloat: true, lsw: 282, leWords: true },
-            { a: 284, n: "Alarm Low", isFloat: true, lsw: 285, leWords: true }
+            { a: 261, n: "Flow Range", isFloat: true, lsw: 262 },
+            { a: 281, n: "Alarm High", isFloat: true, lsw: 282 },
+            { a: 284, n: "Alarm Low", isFloat: true, lsw: 285 }
         ];
 
         // ===== ENERGY METER (ADL400) Registers (Merged 32-bit values) =====

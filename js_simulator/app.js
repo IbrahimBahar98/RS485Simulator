@@ -22,9 +22,9 @@ function createWindow() {
 
     // Wait for server to be ready
     const pollServer = () => {
-        http.get('http://localhost:3000', (res) => {
+        http.get('http://localhost:3001', (res) => {
             if (res.statusCode === 200) {
-                mainWindow.loadURL('http://localhost:3000');
+                mainWindow.loadURL('http://localhost:3001');
             } else {
                 setTimeout(pollServer, 500);
             }

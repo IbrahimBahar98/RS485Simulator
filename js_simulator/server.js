@@ -10,7 +10,7 @@ const crc = require('crc'); // We'll need a crc lib or impl one.
 // let's just add a simple CRC function.
 
 // --- Configuration ---
-const APP_PORT = 3000;
+const APP_PORT = 3001;
 const DEVICES_CONFIG_FILE = path.join(__dirname, 'devices.json');
 const MEMORY_CONFIG_FILE = path.join(__dirname, 'memory.json');
 
@@ -176,73 +176,89 @@ const inverterDefaults = {
 // ===== FLOW METER (CR009) Register Defaults =====
 // EdgeBox expects CDAB word order: LSW at lower address, MSW at higher address
 const flowMeterDefaults = {
-    // Input Registers (FC 04) - Flow Meter Readings (CDAB order)
-    772: 0,                     // Forward Total - LSW
-    773: 0,                     // Forward Total - MSW
+    // Input Registers (FC 04) - Flow Meter Readings (ABCD order)
+    772: 0,                     // Forward Total - MSW
+    773: 0,                     // Forward Total - LSW
     774: 0x0403,                // Unit Info (Total=L, Flow=L/s)
     777: 0,                     // Alarm Flags (bitfield)
-    778: 0,                     // Flow Rate - LSW
-    779: 0,                     // Flow Rate - MSW
+    778: 0x4120,                // Flow Rate - MSW (10.0)
+    779: 0x0000,                // Flow Rate - LSW
     786: 0,                     // Forward Overflow Count
-    812: 0,                     // Conductivity - LSW
-    813: 0,                     // Conductivity - MSW
+    812: 0x437A,                // Conductivity - MSW (250.0)
+    813: 0x0000,                // Conductivity - LSW
 
-    // Holding Registers (FC 03) - Configuration (CDAB order)
-    261: 0x0000,                // Flow Range - LSW
-    262: 0x43D4,                // Flow Range - MSW (424.0 float)
-    281: 0x0000,                // Alarm High - LSW
-    282: 0x42C8,                // Alarm High - MSW (100.0 float)
-    283: 0x0000,                // Reserved/Padding
-    284: 0x0000,                // Alarm Low - LSW
-    285: 0x4120                 // Alarm Low - MSW (10.0 float)
+    // Holding Registers (FC 03) - Configuration (CDAB order - Configs might still be CDAB? Keeping as is/defaults)
+    // Actually, let's assume we want defaults for readings mainly.
+    // 262/261 was "Flow Range"
+    261: 0,
+    262: 0x43D4,                // 17364? 424.0?
+    281: 0,
+    282: 0x42C8,
+    283: 0,
+    284: 0,
+    285: 0x4120
 };
 
 // ===== ENERGY METER (ADL400) Register Defaults =====
 const energyMeterDefaults = {
     // Voltage Registers (Input Registers - FC 04) - Default 0
-    0x0800: 0x0000,             // Phase A Voltage
-    0x0802: 0x0000,             // Phase B Voltage
-    0x0804: 0x0000,             // Phase C Voltage
+    0x0800: 0x0000,             // Phase A Voltage MSW
+    0x0801: 0x0000,             // Phase A Voltage LSW
+    0x0802: 0x0000,             // Phase B Voltage MSW
+    0x0803: 0x0000,             // Phase B Voltage LSW
+    0x0804: 0x0000,             // Phase C Voltage MSW
+    0x0805: 0x0000,             // Phase C Voltage LSW
 
     // Current Registers (Input Registers - FC 04) - Default 0
-    0x080C: 0x0000,             // Phase A Current
-    0x080E: 0x0000,             // Phase B Current
-    0x0810: 0x0000,             // Phase C Current
+    0x080C: 0x0000,             // Phase A Current MSW
+    0x080D: 0x0000,             // Phase A Current LSW
+    0x080E: 0x0000,             // Phase B Current MSW
+    0x080F: 0x0000,             // Phase B Current LSW
+    0x0810: 0x0000,             // Phase C Current MSW
+    0x0811: 0x0000,             // Phase C Current LSW
 
     // Active Power Registers (Input Registers - FC 04) - Default 0
-    0x0806: 0x0000,             // Phase A Active Power
-    0x0808: 0x0000,             // Phase B Active Power
-    0x080A: 0x0000,             // Phase C Active Power
-    0x060A: 0x0000,             // Total Active Power
+    0x0806: 0x0000,             // Phase A Active Power MSW
+    0x0807: 0x0000,             // Phase A Active Power LSW
+    0x0808: 0x0000,             // Phase B Active Power MSW
+    0x0809: 0x0000,             // Phase B Active Power LSW
+    0x080A: 0x0000,             // Phase C Active Power MSW
+    0x080B: 0x0000,             // Phase C Active Power LSW
+    0x060A: 0x0000,             // Total Active Power MSW
+    0x060B: 0x0000,             // Total Active Power LSW
 
     // Power Factor - Default 1.0 (0x3F80 in IEEE 754 = 1.0)
-    0x082E: 0x3F80,             // Phase A Power Factor = 1.0
-    0x0830: 0x3F80,             // Phase B Power Factor = 1.0
-    0x0832: 0x3F80,             // Phase C Power Factor = 1.0
+    0x082E: 0x3F80,             // Phase A Power Factor MSW
+    0x082F: 0x0000,             // Phase A Power Factor LSW
+    0x0830: 0x3F80,             // Phase B Power Factor MSW
+    0x0831: 0x0000,             // Phase B Power Factor LSW
+    0x0832: 0x3F80,             // Phase C Power Factor MSW
+    0x0833: 0x0000,             // Phase C Power Factor LSW
 
     // Frequency - Default 0
-    0x0834: 0x0032,             // Frequency
+    0x0834: 0x0000,             // Frequency MSW
+    0x0835: 0x0032,             // Frequency LSW (50Hz)
 
     // Energy Registers (Input Registers - FC 04) - Default 0
     0x0842: 0x0000,             // Total Active Energy MSW
-    0x0844: 0x0000,             // Total Active Energy LSW
+    0x0843: 0x0000,             // Total Active Energy LSW
 
-    0x0846: 0x0000,             // Total Reactive Energy MSW
-    0x0848: 0x0000,             // Total Reactive Energy LSW
+    0x0844: 0x0000,             // Total Reactive Energy MSW
+    0x0845: 0x0000,             // Total Reactive Energy LSW
 
     // Import/Export Energy - Default 0
     0x0864: 0x0000,             // Total Import Active Energy MSW
-    0x0866: 0x0000,             // Total Import Active Energy LSW
+    0x0865: 0x0000,             // Total Import Active Energy LSW
 
     0x0868: 0x0000,             // Total Export Active Energy MSW
-    0x086A: 0x0000,             // Total Export Active Energy LSW
+    0x0869: 0x0000,             // Total Export Active Energy LSW
 
     // Process Archives (Frozen Values) - Default 0
     0x6002: 0x0000,             // Daily Total Active Energy MSW
-    0x6004: 0x0000,             // Daily Total Active Energy LSW
+    0x6003: 0x0000,             // Daily Total Active Energy LSW
 
     0x7002: 0x0000,             // Monthly Total Active Energy MSW
-    0x7004: 0x0000,             // Monthly Total Active Energy LSW
+    0x7003: 0x0000,             // Monthly Total Active Energy LSW
 
     // Configuration Registers (Holding Registers - FC 03)
     0x008D: 0x0001,             // PT Ratio = 1
@@ -321,13 +337,7 @@ function validateWriteRequest(addr, val, unitID, io) {
         return { valid: false, errorCode: 0x02, reason: `Register 0x${addr.toString(16)} is read-only` };
     }
 
-    // Check parameter protection (F00.02) - if set to 1, only F00.02 can be modified
-    const paramProtection = mem[0x0002] || 0;
-    if (paramProtection === 1 && addr !== 0x0002) {
-        if (!unlockState.unlocked) {
-            return { valid: false, errorCode: 0x04, reason: `Parameters locked. Write password to 0x0000 first` };
-        }
-    }
+    // Parameter protection (F00.02 = 0x8002) disabled for simulator - allow all writes
 
     // Validate control command values
     if (CONTROL_REGISTERS[addr]) {
@@ -505,35 +515,56 @@ function processResponseQueue() {
     isProcessingResponse = true;
     const { response, unitID, delay } = responseQueue.shift();
 
-    const executeWrite = () => {
-        if (!serialPort || !serialPort.isOpen) {
+    // Safety timeout: if isProcessingResponse stays true for over 3s, force-reset it
+    const safetyTimer = setTimeout(() => {
+        if (isProcessingResponse) {
+            console.error('Response queue stuck! Force-resetting isProcessingResponse.');
+            io.emit('log', { type: 'ERR', msg: `Response queue was stuck for ID:${unitID} - force reset` });
             isProcessingResponse = false;
-            return;
+            if (responseQueue.length > 0) setImmediate(processResponseQueue);
         }
+    }, 3000);
 
-        writeCount++;
-        lastWriteTime = Date.now();
-
-        serialPort.write(response, (err) => {
-            if (err) {
-                errorBeforeClose = err.message;
-                console.error('Serial write error:', err);
+    const executeWrite = () => {
+        try {
+            if (!serialPort || !serialPort.isOpen) {
                 isProcessingResponse = false;
-                setImmediate(processResponseQueue);
+                clearTimeout(safetyTimer);
                 return;
             }
 
-            serialPort.drain((drainErr) => {
-                if (drainErr) console.error('Serial drain error:', drainErr);
-                isProcessingResponse = false;
-                if (responseQueue.length > 0) setImmediate(processResponseQueue);
-            });
-        });
+            writeCount++;
+            lastWriteTime = Date.now();
 
-        const hex = response.toString('hex').toUpperCase();
-        setImmediate(() => {
-            io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
-        });
+            serialPort.write(response, (err) => {
+                if (err) {
+                    errorBeforeClose = err.message;
+                    console.error('Serial write error:', err);
+                    isProcessingResponse = false;
+                    clearTimeout(safetyTimer);
+                    setImmediate(processResponseQueue);
+                    return;
+                }
+
+                serialPort.drain((drainErr) => {
+                    if (drainErr) console.error('Serial drain error:', drainErr);
+                    isProcessingResponse = false;
+                    clearTimeout(safetyTimer);
+                    if (responseQueue.length > 0) setImmediate(processResponseQueue);
+                });
+            });
+
+            const hex = response.toString('hex').toUpperCase();
+            setImmediate(() => {
+                io.emit('log', { type: 'TX', msg: `Resp ID:${unitID} Data:${hex}` });
+            });
+        } catch (err) {
+            console.error('executeWrite threw:', err);
+            io.emit('log', { type: 'ERR', msg: `Write failed for ID:${unitID}: ${err.message}` });
+            isProcessingResponse = false;
+            clearTimeout(safetyTimer);
+            setImmediate(processResponseQueue);
+        }
     };
 
     if (delay > 0) setTimeout(executeWrite, delay);
@@ -749,8 +780,11 @@ function handleFrame(frame) {
 
     if (response) {
         // Queue response for serialized sending
-        // Delay 0 for instant response (as requested)
-        queueResponse(response, unitID, 0);
+        const device = devices.get(unitID);
+        // Default to 0 (instant) if not specified. 
+        // User requested instant response for inverters.
+        const delay = device ? (device.responseDelay || 0) : 0;
+        queueResponse(response, unitID, delay);
     }
 }
 
@@ -909,6 +943,46 @@ function startSimulation() {
                 if (Object.keys(updates).length > 0) {
                     io.emit('regs-update-batch', { id, updates });
                 }
+            } else if (device.type === 'flowmeter') {
+                const mem = getMem(id);
+                const updates = {};
+
+                // Use Standard Big Endian Words (ABCD)
+                // mem[addr] = MSW, mem[addr+1] = LSW
+
+                const updateUInt32 = (addr, val) => {
+                    const lsw = val & 0xFFFF;
+                    const msw = (val >>> 16) & 0xFFFF;
+                    if (mem[addr] !== msw) { mem[addr] = msw; updates[addr] = msw; }
+                    if (mem[addr + 1] !== lsw) { mem[addr + 1] = lsw; updates[addr + 1] = lsw; }
+                };
+
+                // Read current Flow Rate from memory (ABCD)
+                const flowMsw = mem[778];
+                const flowLsw = mem[779];
+
+                // Convert to float
+                const buf = Buffer.alloc(4);
+                buf.writeUInt16BE(flowMsw, 0);
+                buf.writeUInt16BE(flowLsw, 2);
+                let currentFlow = buf.readFloatBE(0);
+
+                // If invalid or very small negative, treat as 0
+                if (isNaN(currentFlow) || currentFlow < 0) currentFlow = 0;
+
+                // Forward Total Flow (Accumulate)
+                // Total += Flow Rate (L/s) * 1 second
+                let totalMsw = mem[772];
+                let totalLsw = mem[773];
+                let total = (totalMsw << 16) | totalLsw;
+
+                total += Math.round(currentFlow);
+
+                updateUInt32(772, total);
+
+                if (Object.keys(updates).length > 0) {
+                    io.emit('regs-update-batch', { id, updates });
+                }
             }
         }
     }, 1000);
@@ -964,6 +1038,7 @@ io.on('connection', (socket) => {
                 io.emit('log', { type: 'ERR', msg: `Port error: ${err.message}` });
                 io.emit('server-status', false);
                 isPortStarting = false;
+                isProcessingResponse = false;
 
                 // If we failed to open, ensure serialPort is cleared so we can try another port
                 if (serialPort && !serialPort.isOpen) {
@@ -1000,7 +1075,11 @@ io.on('connection', (socket) => {
                     io.emit('log', { type: 'INFO', msg: 'Serial port closed' });
                 }
 
-                // Reset tracking variables
+                // Reset all tracking and state variables
+                serialPort = null;
+                isPortStarting = false;
+                isProcessingResponse = false;
+                responseQueue = [];
                 writeCount = 0;
                 lastWriteTime = 0;
                 errorBeforeClose = null;
@@ -1141,13 +1220,31 @@ io.on('connection', (socket) => {
             io.emit('device-updated', { id: targetID, ...device });
         }
     });
+
+    socket.on('set-response-delay', ({ id, delay }) => {
+        const targetID = parseInt(id);
+        const device = devices.get(targetID);
+        if (device) {
+            device.responseDelay = parseInt(delay) || 0;
+            devices.set(targetID, device);
+            saveDevicesConfig();
+            io.emit('log', { type: 'INFO', msg: `Device ${id} Response Delay: ${device.responseDelay}ms` });
+            io.emit('device-updated', { id: targetID, ...device });
+        }
+    });
 });
 
 // Helper to get devices as array for client
 function getDevicesList() {
     const list = [];
     for (const [slaveId, device] of devices) {
-        list.push({ slaveId, type: device.type, enabled: device.enabled, simulationMode: device.simulationMode || 'random' });
+        list.push({
+            slaveId,
+            type: device.type,
+            enabled: device.enabled,
+            simulationMode: device.simulationMode || 'random',
+            responseDelay: device.responseDelay || 0
+        });
     }
     return list;
 }

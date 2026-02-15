@@ -3,7 +3,7 @@
 A desktop application to simulate FR500A-compatible Modbus RTU inverters for testing EdgeBox-100 firmware.
 
 ## Features
-- **5 Independent Inverters**: Each with its own register memory and enable/disable toggle.
+- **5 Independent Inverters**: Each with is own register memory and enable/disable toggle.
 - **FR500A Register Map**: Supports status registers (0x03xx, 0x30xx) and control (0x2000).
 - **Desktop App**: Electron wrapper with a modern dark-mode UI.
 - **Start/Stop Server**: Toggle the Modbus server on/off without closing the app.

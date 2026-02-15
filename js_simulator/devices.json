@@ -2,7 +2,7 @@
   "devices": {
     "1": {
       "type": "inverter",
-      "enabled": false,
+      "enabled": true,
       "simulationMode": "random"
     },
     "2": {
@@ -12,17 +12,17 @@
     },
     "3": {
       "type": "inverter",
-      "enabled": true,
+      "enabled": false,
       "simulationMode": "random"
     },
     "4": {
       "type": "inverter",
-      "enabled": true,
+      "enabled": false,
       "simulationMode": "random"
     },
     "5": {
       "type": "inverter",
-      "enabled": true,
+      "enabled": false,
       "simulationMode": "random"
     },
     "101": {
@@ -32,7 +32,7 @@
     },
     "102": {
       "type": "energymeter",
-      "enabled": true,
+      "enabled": false,
       "simulationMode": "manual"
     },
     "103": {
@@ -42,12 +42,12 @@
     },
     "104": {
       "type": "energymeter",
-      "enabled": true,
+      "enabled": false,
       "simulationMode": "manual"
     },
     "105": {
       "type": "energymeter",
-      "enabled": true,
+      "enabled": false,
       "simulationMode": "manual"
     },
     "110": {
