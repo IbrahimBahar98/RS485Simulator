@@ -1,139 +1,141 @@
-# Modbus Flow Meter Simulators
+# RS-485/Modbus Simulator
 
-Collection of Modbus RTU simulators for Enelsan Electromagnetic Flow Meters, compatible with EdgeBox-ESP-100.
+A collection of Python-based RS-485/Modbus RTU simulators for industrial flow meters, energy meters, and inverters. Designed for testing and development with EdgeBox-ESP-100 and other Modbus masters.
 
-## 🎯 Recommended Version
+## 🎯 Purpose
 
-**`ModbusFlowMeterSimulator_Dual.py`** - Simple, tested, and fully functional.
+This project provides realistic simulation tools for RS-485/Modbus devices, enabling:
+- Hardware-in-the-loop (HIL) testing without physical devices
+- Protocol validation and debugging
+- Integration testing with SCADA systems and edge controllers
+- Educational demonstrations of Modbus RTU communication
 
-## 📦 Requirements
+## 📦 Prerequisites
 
-```bash
-pip install pymodbus==3.11.4 pyserial tkinter
-```
+- Python 3.8 or higher
+- Serial port access (COM port on Windows, /dev/tty* on Linux/macOS)
+- Required Python packages:
+  ```bash
+  pip install pymodbus>=3.6 pyserial tkinter
+  ```
 
-## 🚀 Quick Start
+## ⚙️ Installation & Setup
 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/IbrahimBahar98/RS485Simulator.git
+   cd RS485Simulator
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -e .
+   ```
+
+3. Verify installation:
+   ```bash
+   python -c "import pymodbus; print(pymodbus.__version__)"
+   ```
+
+## ▶️ Quick Start
+
+Run the recommended simulator:
 ```bash
 python ModbusFlowMeterSimulator_Dual.py
 ```
 
-1. Click **"Start Server"**
-2. Adjust values using sliders
-3. EdgeBox will read the simulated data
+1. Select your COM port from the dropdown
+2. Click **"Start Server"**
+3. Adjust values using sliders and input fields
+4. Your Modbus master can now read from slave IDs 110 and 111
 
 ## 📋 Available Simulators
 
-### 1. ModbusFlowMeterSimulator_Dual.py ⭐ (Recommended)
-- **Slave IDs**: 110, 111
-- **Registers**: Input Registers (FC 04)
-- **Controls**: Flow Rate, Conductivity, Total Flow
-- **Status**: ✅ Fully tested and working
+| Simulator | Slave IDs | Registers | Features | Status |
+|-----------|-----------|-----------|----------|--------|
+| `ModbusFlowMeterSimulator_Dual.py` | 110, 111 | Input Registers (FC 04) | Simple interface, dual slave support | ✅ Recommended |
+| `ModbusFlowMeterSimulator_Complete.py` | 110, 111 | Input + Holding Registers (FC 04 + FC 03) | Full register control, tabbed UI | ✅ Complete |
+| `ModbusFlowMeterSimulator_Working.py` | 110, 111 | Input Registers (FC 04) | Basic working version | ✅ Working |
+| `ModbusEnergyMeterSimulator_ADL400.py` | 1, 100 | Input Registers (FC 04) | Energy meter simulation | ✅ Energy Meter |
+| `ModbusInverterSimulator.py` | 1, 100 | Input Registers (FC 04) | Inverter simulation | ✅ Inverter |
 
-### 2. ModbusFlowMeterSimulator_Complete.py
-- **Slave IDs**: 110, 111
-- **Registers**: Input Registers (FC 04) + Holding Registers (FC 03)
-- **Controls**: All process variables and configuration parameters
-- **Features**: Tabbed interface with full register control
-- **Status**: ✅ Working with all registers
+## 📊 Register Maps
 
-### 3. ModbusFlowMeterSimulator_Working.py
-- **Slave IDs**: 110, 111
-- **Registers**: Input Registers (FC 04)
-- **Status**: ✅ Basic working version
+### Flow Meter (ADL400)
+- **Input Registers (FC 04)**: 772-773 (Forward Total Flow), 778-779 (Flow Rate), 812-813 (Conductivity)
+- **Holding Registers (FC 03)**: 261-262 (Flow Range), 281-282 (Alarm High), 284-285 (Alarm Low)
+- [View full register map](fr500a_extracted.txt)
 
-### 4. ModbusFlowMeterSimulator.py
-- **Original version** with GUI
-- **Status**: ⚠️ Legacy - use Dual or Complete instead
+### Energy Meter (ADL400)
+- **Input Registers (FC 04)**: 0-99 (Voltage, Current, Power, Energy)
+- [View energy meter register map](https://github.com/IbrahimBahar98/RS485Simulator/blob/main/ADL400_register_map.pdf)
 
 ## 🔧 Configuration
 
 Default settings:
-- **Port**: COM18
+- **Port**: COM18 (Windows) or /dev/ttyUSB0 (Linux)
 - **Baud Rate**: 9600
 - **Data Bits**: 8
 - **Parity**: None
 - **Stop Bits**: 1
+- **Byte Order**: Big-endian with swapped word order (CDAB format)
 
-## 📊 Supported Registers
+## 🧪 Testing
 
-### Input Registers (FC 04)
-| Register | Type | Description |
-|----------|------|-------------|
-| 772-773 | uint32 | Forward Total Flow |
-| 774 | uint16 | Unit Info (3 = m³/h) |
-| 777 | uint16 | Alarm Flags |
-| 778-779 | float32 | Flow Rate (m³/h) |
-| 786 | uint16 | Overflow Count |
-| 812-813 | float32 | Conductivity (µS/cm) |
-
-### Holding Registers (FC 03) - Complete version only
-| Register | Type | Description |
-|----------|------|-------------|
-| 261-262 | float32 | Flow Range |
-| 281-282 | float32 | Alarm High Value |
-| 284-285 | float32 | Alarm Low Value |
-
-## 🔍 Byte Order
-
-All simulators use **big-endian bytes with swapped word order** (CDAB format) to match the EdgeBox `getFloat()` and `getUint32()` functions:
-
-```python
-# EdgeBox expects:
-u.r[1] = data[0];  # Low word
-u.r[0] = data[1];  # High word
+Run the complete test suite:
+```bash
+pytest tests/ --tb=short
 ```
 
-## 🐛 Troubleshooting
-
-### "Port COM18 not found"
-- Check available COM ports in Device Manager
-- Update the port in the GUI before starting
-
-### "Read Static Params Failed"
-- Use `ModbusFlowMeterSimulator_Complete.py` which includes Holding Registers
-- Ensure server is started before EdgeBox attempts to read
-
-### Garbage values
-- Ensure you're using the latest version with correct byte order
-- All simulators now use swapped word order for compatibility
-
-## 📝 Notes
-
-- **Pymodbus 3.11.4** required (not compatible with 2.x)
-- Simulators support **dual slave IDs** (110 and 111) for multi-device testing
-- Values update every 500ms automatically
-- Server runs in background thread with async event loop
-
-## 🎓 Development Notes
-
-### Key Fixes Applied:
-1. ✅ Upgraded from Pymodbus 2.5.3 to 3.11.4
-2. ✅ Fixed API changes (`ModbusSlaveContext` → `ModbusDeviceContext`, `slaves` → `devices`)
-3. ✅ Removed deprecated `BinaryPayloadBuilder` (use `struct.pack` instead)
-4. ✅ Corrected byte order with manual word swapping
-5. ✅ Added Holding Register support for configuration parameters
-
-### Byte Order Details:
-The EdgeBox firmware expects **CDAB word order** (low word first, high word second) for multi-word values. The simulators pack values as:
-
-```python
-def pack_float32(value):
-    packed = struct.pack('>f', value)  # Big-endian bytes
-    word0 = struct.unpack('>H', packed[0:2])[0]  # High word
-    word1 = struct.unpack('>H', packed[2:4])[0]  # Low word
-    return [word1, word0]  # Swap: send low word first
+Generate coverage report:
+```bash
+pytest tests/ --cov=. --cov-report=html
 ```
 
-## 📄 License
+## 🛠️ Development
 
-Created for SEITech OEE Demo project.
+### Project Structure
+```
+RS485Simulator/
+├── ModbusFlowMeterSimulator_Complete.py  # Main simulator (monolithic)
+├── core/                                # Core logic (to be extracted)
+│   ├── registers.py                     # Register packing/unpacking
+│   └── modbus_server.py                 # Modbus server abstraction
+├── ui/                                  # GUI components (to be extracted)
+│   ├── theme.py                         # Theme engine
+│   └── widgets.py                       # Custom widgets
+├── tests/                               # Test suite
+├── data/                                # Register maps and configurations
+│   └── registers/
+│       ├── flow_meter_adl400.yaml
+│       └── inverter_fr500a.yaml
+├── pyproject.toml                       # Build and test configuration
+└── README.md                            # This documentation
+```
 
-## 🤝 Contributing
+### Contributing
 
-For issues or improvements, please contact the development team.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a pull request
+
+Please follow these guidelines:
+- Add type hints and docstrings per PEP 484 and PEP 257
+- Write unit tests for new functionality
+- Maintain 80%+ test coverage
+- Use black for code formatting
+
+## 📜 License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+## 📞 Support & Contact
+
+For issues or questions, please open a GitHub issue or contact the development team.
 
 ---
 
-**Last Updated**: December 2025  
-**Compatible with**: EdgeBox-ESP-100, Pymodbus 3.11.4
+**Last Updated**: March 2026  
+**Compatible with**: EdgeBox-ESP-100, Pymodbus 3.6+, Python 3.8+

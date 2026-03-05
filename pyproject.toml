@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rs485-simulator"
+version = "1.0.0"
+description = "RS-485/Modbus simulation tools for flow meters and energy meters"
+authors = [{name = "Ibrahim Bahar", email = "ibrahim.bahar@example.com"}]
+requires-python = ">=3.8"
+dependencies = [
+    "pymodbus>=3.6",
+    "pyserial>=3.5",
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-mock>=3.10",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "pytest-cov>=4.0", "pytest-mock>=3.10"]
+
+[project.urls]
+Homepage = "https://github.com/IbrahimBahar98/RS485Simulator"
+Repository = "https://github.com/IbrahimBahar98/RS485Simulator"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+cov_fail_under = 80
+cov_report = ["term-missing", "html"]
+cov_source = ["."]
+addopts = [
+    "--tb=short",
+    "-v",
+    "--strict-markers",
+]
+
+[tool.black]
+line-length = 88
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
