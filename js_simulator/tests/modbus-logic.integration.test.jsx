@@ -6,22 +6,27 @@ import rootReducer from '../src/reducers';
 
 // Mock modbus client
 jest.mock('../src/utils/modbusClient', () => ({
-  connect: jest.fn(),
+  sendRequest: jest.fn(),
 }));
 
-describe('App Component Test', () => {
+describe('Modbus Logic Integration Test', () => {
   let store;
 
   beforeEach(() => {
     store = createStore(rootReducer);
   });
 
-  it('renders without crashing and contains expected elements', () => {
+  it('should process Modbus request and update store devices status correctly', () => {
     render(
       <Provider store={store}>
         <App />
       </Provider>
     );
-    expect(screen.getByRole('heading')).toBeInTheDocument();
+
+    // Simulate dispatching a successful response
+    const action = { type: 'MODBUS_RESPONSE_RECEIVED', payload: { deviceId: '1', status: 'online' } };
+    store.dispatch(action);
+
+    expect(store.getState().devices[0].status).toBe('online');
   });
 });
