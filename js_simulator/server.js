@@ -1,13 +1,14 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const { SerialPort } = require('serialport');
-const path = require('path');
-const fs = require('fs');
-const crc = require('crc'); // We'll need a crc lib or impl one.
-// Actually, let's implement simple CRC16-Modbus to avoid extra deps if possible,
-// or use modbus-serial just for CRC if it exposes it?
-// let's just add a simple CRC function.
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import { SerialPort } from 'serialport';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { WebSocketServer } from 'ws';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // --- Configuration ---
 const APP_PORT = 3001;
@@ -475,7 +476,7 @@ process.on('unhandledRejection', (reason, promise) => {
     io.emit('log', { type: 'ERR', msg: `Promise Rejection: ${reason}` });
 });
 
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/ports', async (req, res) => {
     try {
@@ -1253,7 +1254,6 @@ server.listen(APP_PORT, () => {
 });
 
 // WebSocket server for React frontend
-const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 3002 });
 
 wss.on('connection', (ws, req) => {
