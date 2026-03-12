@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JS Simulator — Login</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="glassmorphic-app">
+  <div class="login-container">
+    <div class="login-card">
+      <h1>JS Simulator</h1>
+      <p class="subtitle">Sign in to continue</p>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+      <div class="login-footer">
+        <small>Default credentials: <strong>admin</strong> / <strong>admin</strong></small>
+      </div>
+    </div>
+  </div>
+  <script src="./script.js"></script>
+</body>
+</html>
