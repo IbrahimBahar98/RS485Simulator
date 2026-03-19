@@ -1,139 +1,66 @@
-# Modbus Flow Meter Simulators
+# IterativeQualityAssurancePipelineWithTestFixLoops Crew
 
-Collection of Modbus RTU simulators for Enelsan Electromagnetic Flow Meters, compatible with EdgeBox-ESP-100.
+Welcome to the IterativeQualityAssurancePipelineWithTestFixLoops Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
 
-## 🎯 Recommended Version
+## Installation
 
-**`ModbusFlowMeterSimulator_Dual.py`** - Simple, tested, and fully functional.
+Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
 
-## 📦 Requirements
-
-```bash
-pip install pymodbus==3.11.4 pyserial tkinter
-```
-
-## 🚀 Quick Start
+First, if you haven't already, install uv:
 
 ```bash
-python ModbusFlowMeterSimulator_Dual.py
+pip install uv
 ```
 
-1. Click **"Start Server"**
-2. Adjust values using sliders
-3. EdgeBox will read the simulated data
+Next, navigate to your project directory and install the dependencies:
 
-## 📋 Available Simulators
+(Optional) Lock the dependencies and install them by using the CLI command:
+```bash
+crewai install
+```
+### Customizing
 
-### 1. ModbusFlowMeterSimulator_Dual.py ⭐ (Recommended)
-- **Slave IDs**: 110, 111
-- **Registers**: Input Registers (FC 04)
-- **Controls**: Flow Rate, Conductivity, Total Flow
-- **Status**: ✅ Fully tested and working
+**Add your `OPENAI_API_KEY` into the `.env` file**
 
-### 2. ModbusFlowMeterSimulator_Complete.py
-- **Slave IDs**: 110, 111
-- **Registers**: Input Registers (FC 04) + Holding Registers (FC 03)
-- **Controls**: All process variables and configuration parameters
-- **Features**: Tabbed interface with full register control
-- **Status**: ✅ Working with all registers
+- Modify `src/iterative_quality_assurance_pipeline_with_test_fix_loops/config/agents.yaml` to define your agents
+- Modify `src/iterative_quality_assurance_pipeline_with_test_fix_loops/config/tasks.yaml` to define your tasks
+- Modify `src/iterative_quality_assurance_pipeline_with_test_fix_loops/crew.py` to add your own logic, tools and specific args
+- Modify `src/iterative_quality_assurance_pipeline_with_test_fix_loops/main.py` to add custom inputs for your agents and tasks
 
-### 3. ModbusFlowMeterSimulator_Working.py
-- **Slave IDs**: 110, 111
-- **Registers**: Input Registers (FC 04)
-- **Status**: ✅ Basic working version
+## Running the Project
 
-### 4. ModbusFlowMeterSimulator.py
-- **Original version** with GUI
-- **Status**: ⚠️ Legacy - use Dual or Complete instead
+To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
 
-## 🔧 Configuration
-
-Default settings:
-- **Port**: COM18
-- **Baud Rate**: 9600
-- **Data Bits**: 8
-- **Parity**: None
-- **Stop Bits**: 1
-
-## 📊 Supported Registers
-
-### Input Registers (FC 04)
-| Register | Type | Description |
-|----------|------|-------------|
-| 772-773 | uint32 | Forward Total Flow |
-| 774 | uint16 | Unit Info (3 = m³/h) |
-| 777 | uint16 | Alarm Flags |
-| 778-779 | float32 | Flow Rate (m³/h) |
-| 786 | uint16 | Overflow Count |
-| 812-813 | float32 | Conductivity (µS/cm) |
-
-### Holding Registers (FC 03) - Complete version only
-| Register | Type | Description |
-|----------|------|-------------|
-| 261-262 | float32 | Flow Range |
-| 281-282 | float32 | Alarm High Value |
-| 284-285 | float32 | Alarm Low Value |
-
-## 🔍 Byte Order
-
-All simulators use **big-endian bytes with swapped word order** (CDAB format) to match the EdgeBox `getFloat()` and `getUint32()` functions:
-
-```python
-# EdgeBox expects:
-u.r[1] = data[0];  # Low word
-u.r[0] = data[1];  # High word
+```bash
+$ crewai run
 ```
 
-## 🐛 Troubleshooting
+This command initializes the iterative_quality_assurance_pipeline_with_test_fix_loops Crew, assembling the agents and assigning them tasks as defined in your configuration.
 
-### "Port COM18 not found"
-- Check available COM ports in Device Manager
-- Update the port in the GUI before starting
+This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
 
-### "Read Static Params Failed"
-- Use `ModbusFlowMeterSimulator_Complete.py` which includes Holding Registers
-- Ensure server is started before EdgeBox attempts to read
+## Understanding Your Crew
 
-### Garbage values
-- Ensure you're using the latest version with correct byte order
-- All simulators now use swapped word order for compatibility
+The iterative_quality_assurance_pipeline_with_test_fix_loops Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
 
-## 📝 Notes
+## API Endpoints
 
-- **Pymodbus 3.11.4** required (not compatible with 2.x)
-- Simulators support **dual slave IDs** (110 and 111) for multi-device testing
-- Values update every 500ms automatically
-- Server runs in background thread with async event loop
+### Health Check
 
-## 🎓 Development Notes
+- **GET /health** - Returns the health status of the simulator
+  - Response: `{"status": "ok"}`
 
-### Key Fixes Applied:
-1. ✅ Upgraded from Pymodbus 2.5.3 to 3.11.4
-2. ✅ Fixed API changes (`ModbusSlaveContext` → `ModbusDeviceContext`, `slaves` → `devices`)
-3. ✅ Removed deprecated `BinaryPayloadBuilder` (use `struct.pack` instead)
-4. ✅ Corrected byte order with manual word swapping
-5. ✅ Added Holding Register support for configuration parameters
+### Status
 
-### Byte Order Details:
-The EdgeBox firmware expects **CDAB word order** (low word first, high word second) for multi-word values. The simulators pack values as:
+- **GET /api/status** - Returns the API status
+  - Response: `{"status": "ok"}`
 
-```python
-def pack_float32(value):
-    packed = struct.pack('>f', value)  # Big-endian bytes
-    word0 = struct.unpack('>H', packed[0:2])[0]  # High word
-    word1 = struct.unpack('>H', packed[2:4])[0]  # Low word
-    return [word1, word0]  # Swap: send low word first
-```
+## Support
 
-## 📄 License
+For support, questions, or feedback regarding the IterativeQualityAssurancePipelineWithTestFixLoops Crew or crewAI.
+- Visit our [documentation](https://docs.crewai.com)
+- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
+- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
+- [Chat with our docs](https://chatg.pt/DWjSBZn)
 
-Created for SEITech OEE Demo project.
-
-## 🤝 Contributing
-
-For issues or improvements, please contact the development team.
-
----
-
-**Last Updated**: December 2025  
-**Compatible with**: EdgeBox-ESP-100, Pymodbus 3.11.4
+Let's create wonders together with the power and simplicity of crewAI.
