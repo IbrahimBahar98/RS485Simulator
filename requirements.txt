@@ -1,2 +1,4 @@
-pymodbus==3.11.4
+# RS485Simulator Python dependencies
+# Generated on 2026-03-14
+pymodbus==3.12.1
 pyserial==3.5
