@@ -1,0 +1,29 @@
+{
+  "name": "modbus-device-simulator",
+  "version": "1.0.0",
+  "description": "A modern Modbus Device Simulator web application UI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": [
+    "modbus",
+    "simulator",
+    "electron",
+    "socket.io"
+  ],
+  "author": "Ibrahim Bashar",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^28.0.0",
+    "serialport": "^11.0.0",
+    "socket.io-client": "^4.7.2"
+  },
+  "devDependencies": {
+    "electron-devtools-installer": "^3.2.0",
+    "eslint": "^10.0.3",
+    "htmlhint": "^1.9.2",
+    "stylelint": "^17.4.0"
+  }
+}
