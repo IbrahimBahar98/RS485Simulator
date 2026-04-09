@@ -1,57 +1,65 @@
 {
   "name": "js-simulator",
   "version": "1.0.0",
-  "main": "app.js",
+  "description": "JavaScript simulator for Modbus devices",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "electron app.js",
-    "build": "electron-packager . Modbus-Inverter-Simulator --platform=win32 --arch=x64 --overwrite --out=dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon server.js",
+    "dev:client": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:app": "jest tests/app.test.js",
+    "test:server": "jest tests/server.test.js"
   },
-  "keywords": [],
-  "author": "Ibrahim Bashar",
-  "license": "ISC",
-  "description": "Modbus Inverter Simulator",
+  "keywords": [
+    "modbus",
+    "simulator",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "crc": "^4.3.2",
-    "express": "^5.2.1",
-    "modbus-serial": "^8.0.23",
-    "serialport": "^13.0.0",
-    "socket.io": "^4.8.3"
+    "@testing-library/user-event": "^14.6.1",
+    "chart.js": "^4.5.1",
+    "clsx": "^2.1.1",
+    "express": "^4.18.2",
+    "jest-canvas-mock": "^2.5.2",
+    "jest-environment-jsdom-sixteen": "^1.0.3",
+    "react-chartjs-2": "^5.3.1",
+    "serialport": "^10.3.0",
+    "socket.io": "^4.7.2"
   },
   "devDependencies": {
-    "@electron/rebuild": "^3.7.2",
-    "electron": "^39.2.7",
-    "electron-builder": "^25.1.8",
-    "electron-packager": "^17.1.2"
-  },
-  "build": {
-    "appId": "com.simulator.modbus-inverter",
-    "productName": "Modbus Inverter Simulator",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "app.js",
-      "server.js",
-      "public/**/*",
-      "node_modules/**/*"
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": null
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    }
+    "@babel/core": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
+    "@eslint/js": "^9.39.4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^14.3.1",
+    "@types/jest": "^29.5.14",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "babel-jest": "^30.3.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.15.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "jest-puppeteer": "^11.0.0",
+    "jsdom": "^22.1.0",
+    "nodemon": "^3.0.1",
+    "puppeteer": "^24.39.0",
+    "supertest": "^6.3.4",
+    "vite": "^4.5.14"
   }
 }
