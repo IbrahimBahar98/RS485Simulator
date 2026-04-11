@@ -143,7 +143,7 @@ class UserConfig:
     http_config = {
         "url": "https://interactivemap-1-fhc0.onrender.com/api/location",
         "car_id": "EC200U-04",
-        "sw_http_post": 0
+        "sw_http_post": 1
     }
 
     sensor_config = {
