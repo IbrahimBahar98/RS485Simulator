@@ -131,7 +131,7 @@ class UserConfig:
         "upgrade_status": _ota_upgrade_status.none,
     }
 
-    sw_mqtt_post = 0
+    sw_mqtt_post = 1
 
     buttons = {
         "refill": {"pin": 9, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "refill_request", "values": ["False", "True"]},
