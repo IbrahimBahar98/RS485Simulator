@@ -131,7 +131,7 @@ class UserConfig:
         "upgrade_status": _ota_upgrade_status.none,
     }
 
-    sw_mqtt_post = 0
+    sw_mqtt_post = 1
 
     buttons = {
         "refill": {"pin": 9, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "refill_request", "values": ["False", "True"]},
@@ -142,7 +142,7 @@ class UserConfig:
 
     http_config = {
         "url": "https://interactivemap-1-fhc0.onrender.com/api/location",
-        "car_id": "EC200U-100",
+        "car_id": "EC200U-222",
         "sw_http_post": 1
     }
 
