@@ -123,15 +123,15 @@ class UserConfig:
     user_ota_action = -1
 
     ota_status = {
-        "sys_current_version": "1",
-        "sys_target_version": "2.0",
-        "app_current_version": "1.0",
-        "app_target_version": "2.0",
+        "sys_current_version": "2",
+        "sys_target_version": "3.0",
+        "app_current_version": "2.0",
+        "app_target_version": "3.0",
         "upgrade_module": _ota_upgrade_module.none,
         "upgrade_status": _ota_upgrade_status.none,
     }
 
-    sw_mqtt_post = 0
+    sw_mqtt_post = 1
 
     buttons = {
         "refill": {"pin": 7, "led_pin": 4, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "refill_request", "values": ["False", "True"]},
@@ -144,7 +144,7 @@ class UserConfig:
     http_config = {
         "url": "https://interactivemap-1-fhc0.onrender.com/api/location",
         "car_id": "EC200U-01",
-        "sw_http_post": 1
+        "sw_http_post": 0
     }
 
     sensor_config = {
