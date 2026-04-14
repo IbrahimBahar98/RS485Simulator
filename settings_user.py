@@ -123,15 +123,15 @@ class UserConfig:
     user_ota_action = -1
 
     ota_status = {
-        "sys_current_version": "1",
-        "sys_target_version": "2",
-        "app_current_version": "3",
-        "app_target_version": "4",
+        "sys_current_version": "4",
+        "sys_target_version": "3",
+        "app_current_version": "2",
+        "app_target_version": "1",
         "upgrade_module": _ota_upgrade_module.none,
         "upgrade_status": _ota_upgrade_status.none,
     }
 
-    sw_mqtt_post = 0
+    sw_mqtt_post = 1
 
     buttons = {
         "refill": {"pin": 7, "led_pin": 4, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "refill_request", "values": ["False", "True"]},
