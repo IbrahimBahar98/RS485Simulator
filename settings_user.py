@@ -123,10 +123,10 @@ class UserConfig:
     user_ota_action = -1
 
     ota_status = {
-        "sys_current_version": "2.6.0",
-        "sys_target_version": "2.7.0",
-        "app_current_version": "2.6.0",
-        "app_target_version": "2.7.0",
+        "sys_current_version": "1",
+        "sys_target_version": "2.0",
+        "app_current_version": "1.0",
+        "app_target_version": "2.0",
         "upgrade_module": _ota_upgrade_module.none,
         "upgrade_status": _ota_upgrade_status.none,
     }
@@ -134,15 +134,16 @@ class UserConfig:
     sw_mqtt_post = 0
 
     buttons = {
-        "refill": {"pin": 9, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "refill_request", "values": ["False", "True"]},
-        "door": {"pin": 7, "type": _button_type.level, "pull": _pull_mode.pu, "key": "door_state", "values": ["Closed", "Open"]},
-        "maintenance": {"pin": 19, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "maintenance_state", "values": ["True", "False"]},
+        "refill": {"pin": 7, "led_pin": 4, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "refill_request", "values": ["False", "True"]},
+        "door": {"pin": 20, "type": _button_type.level, "pull": _pull_mode.pu, "key": "door_state", "values": ["Closed", "Open"]},
+        "maintenance": {"pin": 9, "led_pin": 3, "type": _button_type.toggle, "pull": _pull_mode.pu, "key": "maintenance_state", "values": ["True", "False"]},
+        "power": {"pin": 2, "led_pin": 1, "type": _button_type.level, "pull": _pull_mode.pu, "key": "power_state", "values": ["True", "False"]},
         "poll_interval_ms": 100
     }
 
     http_config = {
         "url": "https://interactivemap-1-fhc0.onrender.com/api/location",
-        "car_id": "EC200U-04",
+        "car_id": "EC200U-01",
         "sw_http_post": 1
     }
 
