@@ -123,10 +123,10 @@ class UserConfig:
     user_ota_action = -1
 
     ota_status = {
-        "sys_current_version": "",
-        "sys_target_version": "--",
-        "app_current_version": "",
-        "app_target_version": "--",
+        "sys_current_version": "2.6.0",
+        "sys_target_version": "2.7.0",
+        "app_current_version": "2.6.0",
+        "app_target_version": "2.7.0",
         "upgrade_module": _ota_upgrade_module.none,
         "upgrade_status": _ota_upgrade_status.none,
     }
