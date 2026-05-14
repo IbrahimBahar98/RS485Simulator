@@ -1,57 +1,25 @@
 {
-  "name": "js-simulator",
+  "name": "js_simulator",
   "version": "1.0.0",
+  "description": "JS-based RS485 Modbus simulator",
   "main": "app.js",
   "scripts": {
-    "start": "electron app.js",
-    "build": "electron-packager . Modbus-Inverter-Simulator --platform=win32 --arch=x64 --overwrite --out=dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "start": "node app.js"
   },
-  "keywords": [],
-  "author": "Ibrahim Bashar",
-  "license": "ISC",
-  "description": "Modbus Inverter Simulator",
-  "dependencies": {
-    "crc": "^4.3.2",
-    "express": "^5.2.1",
-    "modbus-serial": "^8.0.23",
-    "serialport": "^13.0.0",
-    "socket.io": "^4.8.3"
-  },
+  "keywords": ["modbus", "rs485", "simulator"],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
-    "@electron/rebuild": "^3.7.2",
-    "electron": "^39.2.7",
-    "electron-builder": "^25.1.8",
-    "electron-packager": "^17.1.2"
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0"
   },
-  "build": {
-    "appId": "com.simulator.modbus-inverter",
-    "productName": "Modbus Inverter Simulator",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "app.js",
-      "server.js",
-      "public/**/*",
-      "node_modules/**/*"
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": null
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    }
+  "dependencies": {
+    "electron": "^33.0.0",
+    "express": "^4.21.1",
+    "modbus-serial": "^9.0.8",
+    "serialport": "^12.0.0"
   }
 }
