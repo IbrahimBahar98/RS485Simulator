@@ -1,0 +1,6 @@
+# reqs.txt — Production dependencies for this project
+# Generated on 2026-03-14 for Python 3.13.12
+# Install with: pip install -r reqs.txt
+#
+pymodbus==3.11.4     # Industrial protocol library (Modbus RTU/TCP)
+pyserial==3.5        # Serial port access library
