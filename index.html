@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modbus Device Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="app-container">
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <span class="app-title">Modbus Device Simulator</span>
+        </div>
+        <div class="header-right">
+            <label for="theme-select">Theme:</label>
+            <select id="theme-select">
+                <option value="auto">Auto</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+            <button id="theme-toggle" aria-label="Toggle theme">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2.25C6.627 2.25 2.25 6.627 2.25 12C2.25 17.373 6.627 21.75 12 21.75C17.373 21.75 21.75 17.373 21.75 12C21.75 6.627 17.373 2.25 12 2.25ZM12 3.75C16.5538 3.75 20.25 7.4462 20.25 12C20.25 16.5538 16.5538 20.25 12 20.25C7.4462 20.25 3.75 16.5538 3.75 12C3.75 7.4462 7.4462 3.75 12 3.75Z" fill="currentColor"/>
+                    <path d="M12 7.5C10.6193 7.5 9.5 8.61929 9.5 10C9.5 11.3807 10.6193 12.5 12 12.5C13.3807 12.5 14.5 11.3807 14.5 10C14.5 8.61929 13.3807 7.5 12 7.5Z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- TOP CONTROL BAR -->
+    <div class="control-bar">
+        <div class="control-group">
+            <label for="port-select">Port:</label>
+            <select id="port-select"></select>
+            <button id="refresh-ports" aria-label="Refresh ports">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.657 16.243L13.414 20.485C12.635 21.264 11.365 21.264 10.586 20.485L6.343 16.243C5.564 15.464 5.564 14.195 6.343 13.416L10.586 9.173C11.365 8.394 12.635 8.394 13.414 9.173L17.657 13.416C18.436 14.195 18.436 15.464 17.657 16.243Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        <div class="control-group">
+            <label for="baud-rate-select">Baud Rate:</label>
+            <select id="baud-rate-select">
+                <option value="9600">9600</option>
+                <option value="19200">19200</option>
+                <option value="38400">38400</option>
+                <option value="57600">57600</option>
+                <option value="115200">115200</option>
+            </select>
+        </div>
+        <div class="control-group server-controls">
+            <button id="start-server" class="btn-primary">Start Server</button>
+            <button id="stop-server" class="btn-danger" disabled>Stop Server</button>
+            <span id="server-status" class="status-badge stopped" aria-live="polite">Stopped</span>
+        </div>
+    </div>
+
+    <!-- DEVICE MANAGEMENT SECTION -->
+    <section class="device-management">
+        <div class="section-header">
+            <h2>Device Management</h2>
+            <button id="add-device-btn" class="btn-accent">+ Add Device</button>
+        </div>
+        
+        <div id="add-device-form" class="add-device-form" style="display: none;">
+            <h3>Add New Device</h3>
+            <div class="form-grid">
+                <div>
+                    <label for="slave-id">Slave ID:</label>
+                    <input type="number" id="slave-id" min="1" max="247" value="1">
+                </div>
+                <div>
+                    <label for="device-type">Device Type:</label>
+                    <select id="device-type">
+                        <option value="inverter">Inverter (FR500A)</option>
+                        <option value="flow-meter">Flow Meter (CR009)</option>
+                        <option value="energy-meter">Energy Meter (ADL400)</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button id="add-device-submit" class="btn-primary">Add Device</button>
+                    <button id="add-device-cancel" class="btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="device-tabs" role="tablist" id="device-tabs">
+            <button role="tab" aria-selected="true" class="tab active">INV #1</button>
+            <button role="tab" aria-selected="false" class="tab">+ Add Device</button>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT GRID -->
+    <div class="main-content-grid">
+        <!-- LEFT PANEL - Device Configuration -->
+        <div class="panel device-panel">
+            <div class="panel-header">
+                <h3>Device Configuration</h3>
+                <div class="panel-controls">
+                    <span id="slave-id-display">Slave ID: 1</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="device-enabled">
+                        <span class="slider round"></span>
+                        <span class="toggle-label">Enabled</span>
+                    </label>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="device-type-selector">
+                    <label for="device-type-config">Device Type:</label>
+                    <select id="device-type-config">
+                        <option value="inverter">Inverter (FR500A)</option>
+                        <option value="flow-meter">Flow Meter (CR009)</option>
+                        <option value="energy-meter">Energy Meter (ADL400)</option>
+                    </select>
+                </div>
+                
+                <!-- Inverter Status Bar -->
+                <div class="inverter-status-bar" id="inverter-status-bar" style="display: block;">
+                    <div class="status-item">
+                        <span class="status-badge running">Pump: Forward</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-badge unlocked">Lock: Unlocked</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-badge mode-comm">Mode: Comm</span>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Section -->
+                <div class="dashboard-section">
+                    <h3>Dashboard</h3>
+                    <div class="dashboard-grid" id="dashboard-grid">
+                        <!-- Cards will be generated dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Key Registers Section -->
+                <div class="key-registers-section">
+                    <h3>Key Registers</h3>
+                    <div class="registers-table-container">
+                        <table class="registers-table">
+                            <thead>
+                                <tr>
+                                    <th>Addr</th>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                    <th>Hex</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registers-table-body">
+                                <!-- Rows will be generated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="add-register-form">
+                        <input type="text" id="register-addr" placeholder="0x3000" maxlength="6">
+                        <input type="text" id="register-name" placeholder="Frequency">
+                        <button id="add-register-btn" class="btn-secondary">+ Add Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL - Bus Traffic Log -->
+        <div class="panel log-panel">
+            <div class="panel-header">
+                <h3>Bus Traffic</h3>
+                <button id="clear-log" class="btn-secondary">Clear Log</button>
+            </div>
+            <div class="panel-content">
+                <div class="log-container" id="log-container" aria-live="polite">
+                    <!-- Log entries will be added here -->
+                </div>
+                <div class="log-count">0 entries</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>Modbus Device Simulator Copyright 2026 Built with Electron and Socket.IO</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script src="renderer.js"></script>
+</body>
+</html>
