@@ -148,7 +148,7 @@ const inverterDefaults = {
     0x3004: 11,                 // POWER_OUTPUT (x10 kW = 1.1 kW)
     0x3005: 1450,               // SPEED_MOTOR_ESTIMATED (rpm)
     0x3006: 3100,               // VOLTAGE_BUS (x10 V = 310.0 V DC Bus)
-    0x3017: 350,                // TEMPERATURE_INVERTER (x10 °C = 35.0 °C)
+    0x3017: 350,                // TEMPERATURE_INVERTER (x10 Â°C = 35.0 Â°C)
     0x3023: 999,                // POWER_CONSUMPTION / TOTAL_ENERGY (kWh)
     0x3100: 0,                  // FAULT_CODE_LATEST (0 = No Fault)
 
@@ -160,7 +160,7 @@ const inverterDefaults = {
     0x840A: 1,                  // DEVICE_ID (Modbus Slave Address)
 
     // Other FR500A Registers
-    0x0B15: 45,                 // TEMPERATURE_SETPOINT (°C)
+    0x0B15: 45,                 // TEMPERATURE_SETPOINT (Â°C)
 
     // Mirrored Registers (0x03xx = U00 Group for FC04 Input Regs)
     0x0300: 5000,               // U00.00 Output Frequency
@@ -475,7 +475,7 @@ process.on('unhandledRejection', (reason, promise) => {
     io.emit('log', { type: 'ERR', msg: `Promise Rejection: ${reason}` });
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('/api/ports', async (req, res) => {
     try {
@@ -1156,7 +1156,6 @@ io.on('connection', (socket) => {
             const oldType = device.type;
             setDeviceType(id, type);
             saveDevicesConfig(); // Save to file
-            saveDevicesConfig(); // Save to file
             io.emit('log', { type: 'INFO', msg: `Device ${id} changed from ${oldType} to ${type}` });
             // Preserve simulationMode or reset? Let's keep it if set, or default
             device.simulationMode = device.simulationMode || 'random';
@@ -1252,3 +1251,75 @@ function getDevicesList() {
 server.listen(APP_PORT, () => {
     console.log(`Web Interface running at http://localhost:${APP_PORT}`);
 });
+
+// WebSocket server for React frontend
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 3002 });
+
+wss.on('connection', (ws, req) => {
+    console.log('New WebSocket connection');
+    
+    // Send initial devices list
+    ws.send(JSON.stringify({ type: 'devices-list', devices: getDevicesList() }));
+    
+    // Send server status
+    ws.send(JSON.stringify({ type: 'server-status', status: !!serialPort && serialPort.isOpen }));
+    
+    // Forward socket.io events to WebSocket clients
+    const forwardEvent = (event, data) => {
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: event, ...data }));
+        }
+    };
+    
+    // Listen for socket.io events
+    io.on('connection', (socket) => {
+        socket.on('log', (data) => forwardEvent('log', data));
+        socket.on('server-status', (data) => forwardEvent('server-status', { status: data }));
+        socket.on('devices-list', (data) => forwardEvent('devices-list', { devices: data }));
+        socket.on('device-updated', (data) => forwardEvent('device-updated', data));
+        socket.on('device-added', (data) => forwardEvent('device-added', data));
+        socket.on('device-removed', (data) => forwardEvent('device-removed', data));
+        socket.on('reg-update', (data) => forwardEvent('reg-update', data));
+        socket.on('regs-update-batch', (data) => forwardEvent('regs-update-batch', data));
+    });
+    
+    // Handle WebSocket messages
+    ws.on('message', (data) => {
+        try {
+            const message = JSON.parse(data);
+            
+            if (message.type === 'start-server') {
+                // Forward to socket.io
+                io.emit('start-server', message);
+            } else if (message.type === 'stop-server') {
+                // Forward to socket.io
+                io.emit('stop-server');
+            } else if (message.type === 'toggle-inverter') {
+                // Forward to socket.io
+                io.emit('toggle-inverter', message);
+            } else if (message.type === 'set-register') {
+                // Forward to socket.io
+                io.emit('set-register', message);
+            } else if (message.type === 'add-device') {
+                // Forward to socket.io
+                io.emit('add-device', message);
+            } else if (message.type === 'remove-device') {
+                // Forward to socket.io
+                io.emit('remove-device', message);
+            }
+        } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+        }
+    });
+    
+    ws.on('close', () => {
+        console.log('WebSocket connection closed');
+    });
+    
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+    });
+});
+
+console.log('WebSocket server running on ws://localhost:3002');
